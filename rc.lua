@@ -535,6 +535,9 @@ wicked.register(cpubox,
 
 volumeicon = widget({ type = "imagebox", align = "right" })
 volumeicon.image = image(beautiful["volume"])
+volumeicon:buttons({
+    button({ }, 1, function() volume("mute", volumebar, "Master") end)
+})
 volumebar =  widget({ type = "progressbar", name = "volumebar", align = "right" })
 volumebar.width = 4
 volumebar.height = 1.0
