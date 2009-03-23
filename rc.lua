@@ -206,7 +206,7 @@ end
 -- <b>label:</b> content (| next_section)?
 function widget_section(label, content, next_section)
     local section
-    if content and content ~= nil then
+    if content and content then
         if label and label ~= "" then
             section = bold(label .. ": ") .. content
         else
@@ -225,7 +225,7 @@ end
 -- content (/ next_value)?
 function widget_value(content, next_value)
     local value
-    if content and content ~= nil then
+    if content and content then
         value = content
         if next_value and next_value ~= "" then
             value = value .. fg(beautiful.hilight, " / ") .. next_value
@@ -240,7 +240,7 @@ end
 calendar = nil
 cal_offset = 0
 function remove_notify(notify)
-    if notify ~= nil then
+    if notify then
         naughty.destroy(notify)
         notify = nil
         cal_offset = 0
@@ -371,9 +371,7 @@ mpdbox = widget { type = "textbox", align = "right" }
 wicked.register(mpdbox, function() return widget_mpd() end, "$1", 1)
 mpdboxpopup = nil
 mpdbox.mouse_enter = function()
-    if mpdboxpopup ~= nil then
-        naughty.destroy(mpdboxpopup)
-    end
+    remove_notify(mpdboxpopup)
     local stat = mpd.send("status")
     local string = ""
     if not mpd.is_stop() then
@@ -498,7 +496,7 @@ batteryboxpopup = nil
 batterybox.mouse_enter = function()
     local function battery_remaining()
         local f = io.popen("acpi -t")
-        local ret = ""
+        local ret = nil
         for line in f:lines() do
             local _, _, rem = string.find(line, "(..:..:..) remaining")
             if rem then
@@ -508,16 +506,16 @@ batterybox.mouse_enter = function()
         f:close()
         return ret
     end
-    if batteryboxpopup ~= nil then
-        naughty.destroy(batteryboxpopup)
-    end
+    remove_notify(batteryboxpopup)
     local timerem = battery_remaining()
-    batteryboxpopup = naughty.notify({
-            title = "battery",
-            text = timerem .. " remaining",
-            timeout = 0,
-            hover_timeout = 0.5,
-           })
+    if timerem then
+        batteryboxpopup = naughty.notify({
+                title = "battery",
+                text = timerem .. " remaining",
+                timeout = 0,
+                hover_timeout = 0.5,
+               })
+    end
 end
 batterybox.mouse_leave = function() remove_notify(batteryboxpopup) end
 
@@ -893,7 +891,7 @@ clientkeys =
         end),
 
     key({ modkey, ctrl }, "t", function (c)
-        if topapps[c.class] ~= nil then
+        if topapps[c.class] then
             topapps[c.class] = not topapps[c.class]
             c.ontop = topapps[c.class]
         else
@@ -1068,6 +1066,8 @@ awful.hooks.manage.register(function (c, startup)
     if awful.tag.getproperty(c:tags()[1], "setslave") then
         awful.client.setslave(c)
     end
+
+    awful.placement.no_offscreen(c)
 
     -- Honor size hints: if you want to drop the gaps between windows, set this to false.
     -- c.size_hints_honor = false
