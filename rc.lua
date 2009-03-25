@@ -1067,7 +1067,10 @@ awful.hooks.manage.register(function (c, startup)
         awful.client.setslave(c)
     end
 
-    awful.placement.no_offscreen(c)
+    -- no offscreen or over the statusbar placement - except flash in fullscreen
+    if not cls == "Firefox" and not inst == "Firefox" then
+        awful.placement.no_offscreen(c)
+    end
 
     -- Honor size hints: if you want to drop the gaps between windows, set this to false.
     -- c.size_hints_honor = false
