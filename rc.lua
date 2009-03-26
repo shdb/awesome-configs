@@ -835,6 +835,8 @@ globalkeys =
 
     key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end),
     key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end),
+    key({ modkey, ctrl      }, "j",     function () awful.client.incwfact(0.05)   end),
+    key({ modkey, ctrl      }, "k",     function () awful.client.incwfact(-0.05)  end),
     key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1)      end),
     key({ modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1)      end),
     key({ modkey, ctrl      }, "h",     function () awful.tag.incncol( 1)         end),
