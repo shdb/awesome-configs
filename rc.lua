@@ -1100,17 +1100,15 @@ awful.hooks.arrange.register(function (screen)
     end
 
     -- tasklist and topapps
-    local tlist = awful.tag.selectedlist(screen)
     local ccount = 0
     local selc = 0
-    for t = 1, #tlist do
-        local clients = tlist[t]:clients()
-        for i = 1, #clients do
-            if topapps[clients[i].class] and not clients[i].fullscreen then
-                clients[i].ontop = true
+    for unused, ttag in pairs(awful.tag.selectedlist(screen)) do
+        for unused, tclient in pairs(ttag:clients()) do
+            if topapps[tclient.class] and not tclient.fullscreen then
+                tclient.ontop = true
             end
             ccount = ccount + 1
-            if clients[i] == client.focus then
+            if tclient == client.focus then
                 selc = ccount
             end
         end
