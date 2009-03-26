@@ -1117,13 +1117,15 @@ awful.hooks.arrange.register(function (screen)
     end
     mytasklist[screen].text = widget_base(widget_section("", widget_value(selc, ccount)))
 
-    -- dwm border mod
+    -- borders
     local tiledclients = awful.client.tiled(screen)
     if (#tiledclients == 0) then return end
-    if (#tiledclients == 1) then
-        tiledclients[1].border_width = 0
-    else
-        for unused, current in pairs(tiledclients) do
+    for unused, current in pairs(tiledclients) do
+        if awful.client.floating.get(current) or layout == "floating" then
+            current.border_width = beautiful.border_width
+        elseif (#tiledclients == 1) or layout == "max" then
+            current.border_width = 0
+        else
             current.border_width = beautiful.border_width
         end
     end
