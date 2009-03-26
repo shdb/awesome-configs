@@ -874,6 +874,16 @@ globalkeys =
     key({ alt, ctrl         }, "x",     function () mpd_crossfade();         hook_mpd() end),
     key({ modkey, alt, ctrl }, "x",     function () awful.util.spawn("xrandr --auto") end),
     key({ modkey            }, "F2",    function () revelation.revelation() end),
+    key({ modkey            }, "s",
+        function()
+            for unused, ttag in pairs(awful.tag.selectedlist(mouse.screen)) do
+                for unused, tclient in pairs(ttag:clients()) do
+                    if tclient.minimized then
+                        tclient.minimized = false
+                    end
+                end
+            end
+        end),
 }
 
 -- Client awful tagging: this is useful to tag some clients and then do stuff like move to tag on them
@@ -885,40 +895,43 @@ clientkeys =
     key({ modkey, ctrl      }, "Return", function (c) c:swap(awful.client.getmaster()) end),
     key({ modkey,           }, "o",      awful.client.movetoscreen                        ),
     key({ modkey, "Shift"   }, "r",      function (c) c:redraw()                       end),
-    key({ modkey            }, "t",      awful.client.togglemarked),
+    key({ modkey            }, "t",      awful.client.togglemarked                        ),
+    key({ modkey            }, "i",      function(c) c.minimized = true                end),
     key({ modkey,           }, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal
             c.maximized_vertical   = not c.maximized_vertical
         end),
 
-    key({ modkey, ctrl }, "t", function (c)
-        if topapps[c.class] then
-            topapps[c.class] = not topapps[c.class]
-            c.ontop = topapps[c.class]
-        else
-            c.ontop = not c.ontop
-        end
+    key({ modkey, ctrl }, "t",
+        function (c)
+            if topapps[c.class] then
+                topapps[c.class] = not topapps[c.class]
+                c.ontop = topapps[c.class]
+            else
+                c.ontop = not c.ontop
+            end
         end),
 
-    key({ modkey, "Ctrl" }, "i", function ()
-        local s = mouse.screen
-        local string = ""
-        if client.focus then
-            if client.focus.class then
-                string = string .. bold("Class: ") .. client.focus.class .. "\n"
+    key({ modkey, "Ctrl" }, "i",
+        function ()
+            local s = mouse.screen
+            local string = ""
+            if client.focus then
+                if client.focus.class then
+                    string = string .. bold("Class: ") .. client.focus.class .. "\n"
+                end
+                if client.focus.instance then
+                    string = string .. bold("Instance: ") .. client.focus.instance .. "\n"
+                end
+                if client.focus.role then
+                    string = string .. bold("Role: ") .. client.focus.role
+                end
+                naughty.notify {
+                    title = "Client Info",
+                    text  = string,
+                }
             end
-            if client.focus.instance then
-                string = string .. bold("Instance: ") .. client.focus.instance .. "\n"
-            end
-            if client.focus.role then
-                string = string .. bold("Role: ") .. client.focus.role
-            end
-        end
-        naughty.notify {
-            title = "Client Info",
-            text  = string,
-        }
         end),
 }
 
@@ -1104,6 +1117,7 @@ awful.hooks.arrange.register(function (screen)
     -- tasklist and topapps
     local ccount = 0
     local selc = 0
+    local mcount = 0
     for unused, ttag in pairs(awful.tag.selectedlist(screen)) do
         for unused, tclient in pairs(ttag:clients()) do
             if topapps[tclient.class] and not tclient.fullscreen then
@@ -1113,9 +1127,19 @@ awful.hooks.arrange.register(function (screen)
             if tclient == client.focus then
                 selc = ccount
             end
+            if tclient.minimized then
+                mcount = mcount + 1
+                ccount = ccount - 1
+            end
         end
     end
-    mytasklist[screen].text = widget_base(widget_section("", widget_value(selc, ccount)))
+    if mcount > 0 then
+        mytasklist[screen].text = widget_base(
+            widget_section("", widget_value(selc, ccount),
+            widget_section("", mcount)))
+    else
+        mytasklist[screen].text = widget_base(widget_section("", widget_value(selc, ccount)))
+    end
 
     -- borders
     local tiledclients = awful.client.tiled(screen)
