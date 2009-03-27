@@ -128,7 +128,7 @@ end
 cardid  = 0
 lastvol = 0
 mute = false
-function volume (mode, widget, channel)
+function volume(mode, widget, channel)
     local function get_vol(channel)
         local fd = io.popen("amixer -c " .. cardid .. " -- sget " .. channel)
         local status = fd:read("*all")
@@ -148,6 +148,12 @@ function volume (mode, widget, channel)
         volume("update", widget, channel)
     elseif mode == "down" then
         awful.util.spawn("amixer -q -c " .. cardid .. " sset " .. channel .. " 2%-")
+        volume("update", widget, channel)
+    elseif mode == "init" then
+        if get_vol("PCM") ~= 100 then
+            mute = true
+            awful.util.spawn("amixer -q -c " .. cardid .. " sset " .. channel .. " 0%")
+        end
         volume("update", widget, channel)
     else
         local vol_chan = get_vol(channel)
@@ -552,7 +558,7 @@ volumebar:bar_properties_set("vol",
     border_color = beautiful.bg_normal,
     reverse      = false
 })
-volume("update", volumebar, "Master")
+volume("init", volumebar, "Master")
 volumebar:buttons({
     button({ }, 1, function() volume("mute", volumebar, "Master") end)
 })
