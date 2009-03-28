@@ -150,7 +150,7 @@ function volume(mode, widget, channel)
         awful.util.spawn("amixer -q -c " .. cardid .. " sset " .. channel .. " 2%-")
         volume("update", widget, channel)
     elseif mode == "init" then
-        if get_vol("PCM") ~= 100 then
+        if tonumber(get_vol("PCM")) ~= 100 then
             mute = true
             awful.util.spawn("amixer -q -c " .. cardid .. " sset " .. channel .. " 0%")
         end
