@@ -474,11 +474,7 @@ function currentsong()
 end
 
 function is_connected()
-    if connected then
-        return true
-    else
-        return false
-    end
+    return connected
 end
 
 -- Send command to MPD host
@@ -487,14 +483,12 @@ end
 -- @return Answer from MPD
 function send(command)
     local buffer = ""
-    if not connected then
-        if not last_try or (os.time() - last_try) > 60 then
-            mpd_socket:settimeout(settings.timeout, 't')
-            last_try = os.time()
-            connected = mpd_socket:connect(settings.hostname, settings.port)
-            if connected and settings.password then
-                send(string.format("password %s", settings.password))
-            end
+    if not connected and (not last_try or (os.time() - last_try) > 60) then
+        mpd_socket:settimeout(settings.timeout, 't')
+        last_try = os.time()
+        connected = mpd_socket:connect(settings.hostname, settings.port)
+        if connected and settings.password then
+            send(string.format("password %s", settings.password))
         end
     end
 
