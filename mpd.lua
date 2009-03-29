@@ -488,9 +488,11 @@ function send(command)
         mpd_socket:settimeout(settings.timeout, 't')
         last_try = os.time()
         connected = mpd_socket:connect(settings.hostname, settings.port)
-        if connected and settings.password then
+        if connected then
+            if settings.password then
+                send(string.format("password %s", settings.password))
+            end
             delay = 0;
-            send(string.format("password %s", settings.password))
         else
             if delay < 28 then
                 delay = delay + 1
