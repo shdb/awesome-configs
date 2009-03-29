@@ -18,6 +18,7 @@ module("mpd")
 local current_song = {}
 local state = {}
 local connected = nil
+local delay = 0
 
 local settings = {
     hostname = "localhost",
@@ -483,12 +484,17 @@ end
 -- @return Answer from MPD
 function send(command)
     local buffer = ""
-    if not connected and (not last_try or (os.time() - last_try) > 60) then
+    if not connected and (not last_try or (os.time() - last_try) > delay) then
         mpd_socket:settimeout(settings.timeout, 't')
         last_try = os.time()
         connected = mpd_socket:connect(settings.hostname, settings.port)
         if connected and settings.password then
+            delay = 0;
             send(string.format("password %s", settings.password))
+        else
+            if delay < 28 then
+                delay = delay + 1
+            end
         end
     end
 
