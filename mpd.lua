@@ -1,12 +1,13 @@
 ----------------------------------------------------------------------------
--- @author Christian Kuka &lt;ckuka@madkooky.de&gt;
--- @copyright 2008 Christian Kuka
+-- @author Christian Kuka &lt;ckuka@madkooky.de&gt, ShdB;
+-- @copyright 2008 Christian Kuka, 2009 ShdB
 ----------------------------------------------------------------------------
 
 -- Protocol: http://mpd.wikia.com/wiki/Protocol_Reference
 -- Based on: http://awesome.naquadah.org/wiki/index.php?title=KAworu_MPD_Widget
 
 local socket = require("socket")
+local mpd_socket = socket.tcp()
 local io = io
 local os = os
 local string = string
@@ -16,12 +17,13 @@ local tonumber = tonumber
 module("mpd")
 local current_song = {}
 local state = {}
-local connection = nil
+local connected = nil
 
 local settings = {
     hostname = "localhost",
     port = 6600,
-    password = nil
+    password = nil,
+    timeout = 1
 }
 
 --- Scans the music directory as defined in the MPD configuration file's 
@@ -472,7 +474,7 @@ function currentsong()
 end
 
 function is_connected()
-    if connection then
+    if connected then
         return true
     else
         return false
@@ -485,23 +487,27 @@ end
 -- @return Answer from MPD
 function send(command)
     local buffer = ""
-    if not connection then
-        connection = socket.connect(settings.hostname, settings.port)
-        if connection and settings.password then
-            send(string.format("password %s", settings.password))
+    if not connected then
+        if not last_try or (os.time() - last_try) > 60 then
+            mpd_socket:settimeout(settings.timeout, 't')
+            last_try = os.time()
+            connected = mpd_socket:connect(settings.hostname, settings.port)
+            if connected and settings.password then
+                send(string.format("password %s", settings.password))
+            end
         end
     end
 
-    if connection then
-        connection:send(string.format("%s\n", command))
-        local line = connection:receive("*l")
+    if connected then
+        mpd_socket:send(string.format("%s\n", command))
+        local line = mpd_socket:receive("*l")
         if not line then -- closed (mpd killed?): reset socket and retry
-            connection = nil
+            connected = false
             return send(command)
         end
         while line and not (line:match("^OK$") or line:match("^ACK ")) do
             buffer = buffer..line.."\n"
-            line = connection:receive("*l")
+            line = mpd_socket:receive("*l")
         end
     end
     return buffer
@@ -509,11 +515,11 @@ end
 
 -- Close the connection with the MPD host
 function disconnect()
-    if connection then
+    if connected then
         send("close")
-        connection:close()
+        mpd_socket:close()
     end
-    connection = nil
+    connected = false
 end
 
 -- vim: filetype=lua:expandtab:shiftwidth=4:tabstop=4:softtabstop=4
