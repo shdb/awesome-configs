@@ -821,8 +821,8 @@ globalkeys =
         end),
 
     -- Layout manipulation
-    key({ modkey, "Shift"   }, "j",     function () awful.client.swap.byidx(  1) end),
-    key({ modkey, "Shift"   }, "k",     function () awful.client.swap.byidx( -1) end),
+    key({ modkey, shift     }, "j",     function () awful.client.swap.byidx(  1) end),
+    key({ modkey, shift     }, "k",     function () awful.client.swap.byidx( -1) end),
     key({ modkey, ctrl      }, "j",     function () awful.screen.focus( 1)       end),
     key({ modkey, ctrl      }, "k",     function () awful.screen.focus(-1)       end),
     key({ modkey,           }, "u",     awful.client.urgent.jumpto),
@@ -837,18 +837,18 @@ globalkeys =
     -- Standard program
     key({ modkey,           }, "Return",function () awful.util.spawn(terminal) end),
     key({ modkey, ctrl      }, "r",     awesome.restart),
-    key({ modkey, "Shift"   }, "q",     awesome.quit),
+    key({ modkey, shift     }, "q",     awesome.quit),
 
     key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.01)    end),
     key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.01)    end),
     key({ modkey, ctrl      }, "j",     function () awful.client.incwfact(0.01)   end),
     key({ modkey, ctrl      }, "k",     function () awful.client.incwfact(-0.01)  end),
-    key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1)      end),
-    key({ modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1)      end),
+    key({ modkey, shift     }, "h",     function () awful.tag.incnmaster( 1)      end),
+    key({ modkey, shift     }, "l",     function () awful.tag.incnmaster(-1)      end),
     key({ modkey, ctrl      }, "h",     function () awful.tag.incncol( 1)         end),
     key({ modkey, ctrl      }, "l",     function () awful.tag.incncol(-1)         end),
     key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
-    key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
+    key({ modkey, shift     }, "space", function () awful.layout.inc(layouts, -1) end),
 
     -- Prompt
     key({ modkey }, "F1",
@@ -900,7 +900,7 @@ clientkeys =
     key({ modkey, ctrl      }, "space",  awful.client.floating.toggle                     ),
     key({ modkey, ctrl      }, "Return", function (c) c:swap(awful.client.getmaster()) end),
     key({ modkey,           }, "o",      awful.client.movetoscreen                        ),
-    key({ modkey, "Shift"   }, "r",      function (c) c:redraw()                       end),
+    key({ modkey, shift     }, "r",      function (c) c:redraw()                       end),
     key({ modkey            }, "t",      awful.client.togglemarked                        ),
     key({ modkey            }, "i",      function(c) c.minimized = true                end),
     key({ modkey,           }, "m",
@@ -939,6 +939,78 @@ clientkeys =
                 }
             end
         end),
+    key({ modkey, alt       }, "j",
+        function(c)
+            if awful.client.floating.get(c) then
+                awful.client.moveresize(0, 0, 0, 2)
+            end
+        end),
+    key({ modkey, alt       }, "k",
+        function(c)
+            if awful.client.floating.get(c) then
+                awful.client.moveresize(0, -2, 0, 2)
+            end
+        end),
+    key({ modkey, alt       }, "l",
+        function(c)
+            if awful.client.floating.get(c) then
+                awful.client.moveresize(0, 0, 2, 0)
+            end
+        end),
+    key({ modkey, alt       }, "h",
+        function(c)
+            if awful.client.floating.get(c) then
+                awful.client.moveresize(-2, 0, 2, 0)
+            end
+        end),
+    key({ modkey, alt, shift}, "j",
+        function(c)
+            if awful.client.floating.get(c) then
+                awful.client.moveresize(0, 0, 0, -2)
+            end
+        end),
+    key({ modkey, alt, shift}, "k",
+        function(c)
+            if awful.client.floating.get(c) then
+                awful.client.moveresize(0, 2, 0, -2)
+            end
+        end),
+    key({ modkey, alt, shift}, "l",
+        function(c)
+            if awful.client.floating.get(c) then
+                awful.client.moveresize(0, 0, -2, 0)
+            end
+        end),
+    key({ modkey, alt, shift}, "h",
+        function(c)
+            if awful.client.floating.get(c) then
+                awful.client.moveresize(2, 0, -2, 0)
+            end
+        end),
+    key({ modkey, alt, ctrl }, "j",
+        function(c)
+            if awful.client.floating.get(c) then
+                awful.client.moveresize(0, 2, 0, 0)
+            end
+        end),
+    key({ modkey, alt, ctrl }, "k",
+        function(c)
+            if awful.client.floating.get(c) then
+                awful.client.moveresize(0, -2, 0, 0)
+            end
+        end),
+    key({ modkey, alt, ctrl }, "l",
+        function(c)
+            if awful.client.floating.get(c) then
+                awful.client.moveresize(2, 0, 0, 0)
+            end
+        end),
+    key({ modkey, alt, ctrl }, "h",
+        function(c)
+            if awful.client.floating.get(c) then
+                awful.client.moveresize(-2, 0, 0, 0)
+            end
+        end),
 }
 
 -- Compute the maximum number of digit we need, limited to 9
@@ -965,14 +1037,14 @@ for i = 1, keynumber do
                 end
             end))
     table.insert(globalkeys,
-        key({ modkey, "Shift" }, i,
+        key({ modkey, shift   }, i,
             function ()
                 if client.focus and tags[client.focus.screen][i] then
                     awful.client.movetotag(tags[client.focus.screen][i])
                 end
             end))
     table.insert(globalkeys,
-        key({ modkey, ctrl, "Shift" }, i,
+        key({ modkey, ctrl, shift   }, i,
             function ()
                 if client.focus and tags[client.focus.screen][i] then
                     awful.client.toggletag(tags[client.focus.screen][i])
@@ -982,7 +1054,7 @@ end
 
 
 for i = 1, keynumber do
-    table.insert(globalkeys, key({ modkey, "Shift" }, "F" .. i,
+    table.insert(globalkeys, key({ modkey, shift   }, "F" .. i,
         function ()
             local screen = mouse.screen
             if tags[screen][i] then
