@@ -7,7 +7,7 @@
 -- Based on: http://awesome.naquadah.org/wiki/index.php?title=KAworu_MPD_Widget
 
 local socket = require("socket")
-local mpd_socket = socket.tcp()
+local mpd_socket
 local io = io
 local os = os
 local string = string
@@ -485,6 +485,7 @@ end
 function send(command)
     local buffer = ""
     if not connected and (not last_try or (os.time() - last_try) > delay) then
+        mpd_socket = socket.tcp()
         mpd_socket:settimeout(settings.timeout, 't')
         last_try = os.time()
         connected = mpd_socket:connect(settings.hostname, settings.port)
@@ -505,6 +506,7 @@ function send(command)
         local line = mpd_socket:receive("*l")
         if not line then -- closed (mpd killed?): reset socket and retry
             connected = false
+            mpd_socket:close()
             return send(command)
         end
         while line and not (line:match("^OK$") or line:match("^ACK ")) do
