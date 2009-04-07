@@ -763,30 +763,17 @@ for s = 1, screen.count() do
         gapboxl,
         mypromptbox[s],
         mpdbox,
-        openboxbat,
-        batteryicon,
-        batterybox,
-        closeboxbat,
+        openboxbat, batteryicon, batterybox, closeboxbat,
         gapboxr,
-        netgraph_down,
-        netwidget,
-        netgraph_up,
+        netgraph_down, netwidget, netgraph_up,
         gapboxr,
-        openbox,
-        cpuicon,
-        cpubox,
-        sepbox,
-        cputempicon,
-        cputempbox,
-        closebox,
+        openbox, cpuicon, cpubox, sepbox, cputempicon, cputempbox, closebox,
         gapboxr,
         cpugraph,
         gapboxr,
-        memicon,
-        membar,
+        memicon, membar,
         gapboxr,
-        volumeicon,
-        volumebar,
+        volumeicon, volumebar,
         clockbox,
         s == 1 and mysystray or nil
     }
@@ -1167,7 +1154,7 @@ awful.hooks.manage.register(function (c, startup)
 
     -- Honor size hints: if you want to drop the gaps between windows, set this to false.
     -- c.size_hints_honor = false
-    if c.class == "MPlayer" then
+    if cls == "MPlayer" then
         c.size_hints_honor = true
     else
         c.size_hints_honor = false
