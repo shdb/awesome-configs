@@ -192,7 +192,7 @@ end
 -- [content]
 function widget_base(content)
     if content and content ~= "" then
-        return fg(beautiful.hilight, " [ ") .. content .. fg(beautiful.hilight, " ]")
+        return fg(beautiful.hilight, "[ ") .. content .. fg(beautiful.hilight, " ]")
     end
 end
 
@@ -346,6 +346,56 @@ function mpd_crossfade()
         text  = "crossfade " .. onoff(stat),
         timeout = 2
     }
+end
+
+function net_get_up()
+    local lfd, wfd, lan, wlan
+    lfd = io.open("/sys/class/net/eth0/operstate")
+    lan = lfd:read()
+    if file_exists("/sys/class/net/wlan0/operstate") then
+        wfd = io.open("/sys/class/net/wlan0/operstate")
+        wlan = wfd:read()
+    end
+    if lan and lan == "up" then
+        return "lan", "eth0"
+    elseif wlan and wlan == "up" then
+        return "wlan", "wlan0"
+    else
+        return nil, nil
+    end
+end
+
+function net_get_essid(iface)
+    local f = io.popen("/sbin/iwgetid " .. iface)
+    local ret = ""
+    for line in f:lines() do
+        local _, _, essid = string.find(line, "ESSID:\"(.*)\"")
+        if essid then
+            ret = ret .. essid
+        end
+    end
+    f:close()
+    return ret
+end
+
+net_if = nil
+net_name = nil
+function net_update(w1, w2, w3)
+    local nname, nif = net_get_up()
+    if not nname and not nif then
+        wicked.unregister(w1, true)
+        wicked.unregister(w2, true)
+        w3.text = ""
+        return
+    elseif net_if ~= nif then
+        wicked.unregister(w1, true)
+        wicked.unregister(w2, true)
+        wicked.register(w1, wicked.widgets.net,"${" .. nif .. " down_kb}",2,"down")
+        wicked.register(w2, wicked.widgets.net,"${" .. nif .. " up_kb}",2,"up")
+        net_if = nif
+        net_name = nname
+        w3.text = widget_base(bold(net_get_essid(nif))) .. " "
+    end
 end
 
 -- {{{ Wibox
@@ -626,7 +676,8 @@ wicked.register(cputempbox,
     end,
 "$1", 5)
 
--- wireless
+-- net
+netbox = widget({type = "textbox", name = "netbox", align = "right" })
 netgraph_down = widget({
    type  = 'graph',
    name  = 'netgraph_down',
@@ -657,6 +708,7 @@ netgraph_up:plot_properties_set('up', {
     fg                = beautiful.fg_normal,
     vertical_gradient = false
 })
+net_update(netgraph_down, netgraph_up, netbox)
 
 --[[
 netwidget = widget({
@@ -665,10 +717,6 @@ netwidget = widget({
                       align = 'right'
 
                    })
---]]
-wicked.register(netgraph_down, wicked.widgets.net,"${wlan0 down_kb}",3,"down")
-wicked.register(netgraph_up, wicked.widgets.net,"${wlan0 up_kb}",3,"up")
---[[
 wicked.register(netwidget, wicked.widgets.net,
                 'wlan0:  ${wlan0 down_kb} / ${wlan0 up_kb}',
                 nil, nil, 8)
@@ -765,7 +813,7 @@ for s = 1, screen.count() do
         mpdbox,
         openboxbat, batteryicon, batterybox, closeboxbat,
         gapboxr,
-        netgraph_down, netwidget, netgraph_up,
+        netbox, netgraph_down, netwidget, netgraph_up,
         gapboxr,
         openbox, cpuicon, cpubox, sepbox, cputempicon, cputempbox, closebox,
         gapboxr,
@@ -774,6 +822,7 @@ for s = 1, screen.count() do
         memicon, membar,
         gapboxr,
         volumeicon, volumebar,
+        gapboxr,
         clockbox,
         s == 1 and mysystray or nil
     }
@@ -1223,6 +1272,7 @@ end)
 
 awful.hooks.timer.register(5, function ()
     volume("update", volumebar, "Master")
+    net_update(netgraph_down, netgraph_up, netbox)
 end)
 -- }}}
 
