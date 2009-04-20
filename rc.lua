@@ -352,9 +352,11 @@ function net_get_up()
     local lfd, wfd, lan, wlan
     lfd = io.open("/sys/class/net/eth0/operstate")
     lan = lfd:read()
+    lfd:close()
     if file_exists("/sys/class/net/wlan0/operstate") then
         wfd = io.open("/sys/class/net/wlan0/operstate")
         wlan = wfd:read()
+        wfd:close()
     end
     if lan and lan == "up" then
         return "lan", "eth0"
@@ -380,21 +382,39 @@ end
 
 net_if = nil
 net_name = nil
+net_last_update = 0
 function net_update(w1, w2, w3)
     local nname, nif = net_get_up()
     if not nname and not nif then
-        wicked.unregister(w1, true)
-        wicked.unregister(w2, true)
+        wicked.unregister(w1, false)
+        wicked.unregister(w2, false)
+        openboxnet.text = ""
         w3.text = ""
-        return
+        neticon.image = nil
     elseif net_if ~= nif then
         wicked.unregister(w1, true)
         wicked.unregister(w2, true)
         wicked.register(w1, wicked.widgets.net,"${" .. nif .. " down_kb}",2,"down")
         wicked.register(w2, wicked.widgets.net,"${" .. nif .. " up_kb}",2,"up")
+        if nif == "wlan0" then
+            neticon.image = image(beautiful.wireless)
+            w3.text = bold(net_get_essid(nif)) .. fg(beautiful.hilight, " ] ")
+            openboxnet.text = fg(beautiful.hilight, "[ ")
+        elseif nif == "eth0" then
+            neticon.image = image(beautiful.network)
+            w3.text = ""
+            openboxnet.text = ""
+        end
         net_if = nif
         net_name = nname
-        w3.text = widget_base(bold(net_get_essid(nif))) .. " "
+    elseif nif == "wlan0" then
+        net_last_update = net_last_update + 1
+        if net_last_update == 3 then
+            openboxnet.text = fg(beautiful.hilight, "[ ")
+            w3.text = bold(net_get_essid(nif)) .. fg(beautiful.hilight, " ] ")
+            --neticon.image = image(beautiful.wireless)
+            net_last_update = 0
+        end
     end
 end
 
@@ -678,6 +698,8 @@ wicked.register(cputempbox,
 
 -- net
 netbox = widget({type = "textbox", name = "netbox", align = "right" })
+openboxnet = widget { type = "textbox", align = "right" }
+neticon = widget({ type = "imagebox", align = "right" })
 netgraph_down = widget({
    type  = 'graph',
    name  = 'netgraph_down',
@@ -813,7 +835,7 @@ for s = 1, screen.count() do
         mpdbox,
         openboxbat, batteryicon, batterybox, closeboxbat,
         gapboxr,
-        netbox, netgraph_down, netwidget, netgraph_up,
+        openboxnet, neticon, netbox, netgraph_down, netwidget, netgraph_up,
         gapboxr,
         openbox, cpuicon, cpubox, sepbox, cputempicon, cputempbox, closebox,
         gapboxr,
