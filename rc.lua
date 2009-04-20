@@ -5,6 +5,7 @@ require("beautiful")
 require("naughty")
 require("revelation")
 require("mpd")
+require("shiny.battery")
 
 -- {{{ Variable definitions
 theme_path = "/usr/share/awesome/themes/shdb/theme"
@@ -513,88 +514,6 @@ mpdbox:buttons({
         end)
 })
 
-batteryicon = widget({ type = "imagebox", align = "right" })
-batterybox = widget({type = "textbox", name = "batterybox", align = "right" })
-openboxbat = widget({ type = "textbox", align = "right" })
-closeboxbat = widget({ type = "textbox", align = "right" })
-wicked.register(batterybox,
-    function()
-        local adapter = "BAT0"
-        if file_exists("/sys/class/power_supply/"..adapter) then
-            spacer = " "
-            local fcur = io.open("/sys/class/power_supply/"..adapter.."/energy_now")    
-            local fcap = io.open("/sys/class/power_supply/"..adapter.."/energy_full")
-            local fsta = io.open("/sys/class/power_supply/"..adapter.."/status")
-            local cur = fcur:read()
-            local cap = fcap:read()
-            local sta = fsta:read()
-            local battery = math.floor(cur * 100 / cap)
-            if sta:match("Charging") then
-                battery = battery .. "% A/C"
-            elseif sta:match("Discharging") then
-                if tonumber(battery) <= 3 then
-                    naughty.notify({
-                        title      = "Battery Warning",
-                        text       = "Battery low!"..spacer..battery.."%"..spacer.."left!",
-                        timeout    = 5,
-                        position   = "top_right",
-                        fg         = beautiful.fg_focus,
-                        bg         = beautiful.bg_focus,
-                    })
-                end
-                if tonumber(battery) < 10 then
-                    battery = fg("#ff0000", battery .. "%")
-                elseif tonumber(battery) < 20 then
-                    battery = fg("#ffff00", battery .. "%")
-                else
-                    battery = battery .. "%"
-                end
-            else
-                battery = "A/C"
-            end
-            fcur:close()
-            fcap:close()
-            fsta:close()
-            openboxbat.text = fg(beautiful.hilight, " [ ")
-            closeboxbat.text = fg(beautiful.hilight, " ]")
-            batteryicon.image = image(beautiful["battery"])
-            return battery
-        else
-            openboxbat.text = ""
-            closeboxbat.text = ""
-            batteryicon.image = nil
-            return ""
-        end
-    end,
-"$1", 5)
-
-batteryboxpopup = nil
-batterybox.mouse_enter = function()
-    local function battery_remaining()
-        local f = io.popen("acpi -t")
-        local ret = nil
-        for line in f:lines() do
-            local _, _, rem = string.find(line, "(..:..:..) remaining")
-            if rem then
-                ret = rem
-            end
-        end
-        f:close()
-        return ret
-    end
-    remove_notify(batteryboxpopup)
-    local timerem = battery_remaining()
-    if timerem then
-        batteryboxpopup = naughty.notify({
-                title = "battery",
-                text = timerem .. " remaining",
-                timeout = 0,
-                hover_timeout = 0.5,
-               })
-    end
-end
-batterybox.mouse_leave = function() remove_notify(batteryboxpopup) end
-
 cpuicon = widget({ type = "imagebox", align = "right" })
 cpuicon.image = image(beautiful["cpu"])
 cpubox = widget({type = "textbox", name = "cpubox", align = "right" })
@@ -833,7 +752,7 @@ for s = 1, screen.count() do
         gapboxl,
         mypromptbox[s],
         mpdbox,
-        openboxbat, batteryicon, batterybox, closeboxbat,
+        shiny.battery(),
         gapboxr,
         openboxnet, neticon, netbox, netgraph_down, netwidget, netgraph_up,
         gapboxr,
