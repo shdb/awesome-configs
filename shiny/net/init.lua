@@ -8,9 +8,6 @@ local io = {
 	popen = io.popen,
 	close = io.close
 }
-local math = {
-	floor = math.floor
-}
 local string = {
 	find = string.find
 }
