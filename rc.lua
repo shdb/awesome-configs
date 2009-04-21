@@ -8,6 +8,7 @@ require("naughty")
 require("revelation")
 require("mpd")
 require("shiny.battery")
+require("shiny.net")
 
 -- {{{ Variable definitions
 
@@ -348,76 +349,6 @@ function mpd_crossfade()
     }
 end
 
-function net_get_up()
-    local lfd, wfd, lan, wlan
-    lfd = io.open("/sys/class/net/eth0/operstate")
-    lan = lfd:read()
-    lfd:close()
-    if file_exists("/sys/class/net/wlan0/operstate") then
-        wfd = io.open("/sys/class/net/wlan0/operstate")
-        wlan = wfd:read()
-        wfd:close()
-    end
-    if lan and lan == "up" then
-        return "lan", "eth0"
-    elseif wlan and wlan == "up" then
-        return "wlan", "wlan0"
-    else
-        return nil, nil
-    end
-end
-
-function net_get_essid(iface)
-    local f = io.popen("/sbin/iwgetid " .. iface)
-    local ret = ""
-    for line in f:lines() do
-        local _, _, essid = string.find(line, "ESSID:\"(.*)\"")
-        if essid then
-            ret = ret .. essid
-        end
-    end
-    f:close()
-    return ret
-end
-
-net_if = nil
-net_name = nil
-net_last_update = 0
-function net_update(w1, w2, w3)
-    local nname, nif = net_get_up()
-    if not nname and not nif then
-        wicked.unregister(w1, false)
-        wicked.unregister(w2, false)
-        openboxnet.text = ""
-        w3.text = ""
-        neticon.image = nil
-    elseif net_if ~= nif then
-        wicked.unregister(w1, true)
-        wicked.unregister(w2, true)
-        wicked.register(w1, wicked.widgets.net,"${" .. nif .. " down_kb}",2,"down")
-        wicked.register(w2, wicked.widgets.net,"${" .. nif .. " up_kb}",2,"up")
-        if nif == "wlan0" then
-            neticon.image = image(beautiful.wireless)
-            w3.text = bold(net_get_essid(nif)) .. fg(beautiful.hilight, " ] ")
-            openboxnet.text = fg(beautiful.hilight, "[ ")
-        elseif nif == "eth0" then
-            neticon.image = image(beautiful.network)
-            w3.text = ""
-            openboxnet.text = ""
-        end
-        net_if = nif
-        net_name = nname
-    elseif nif == "wlan0" then
-        net_last_update = net_last_update + 1
-        if net_last_update == 3 then
-            openboxnet.text = fg(beautiful.hilight, "[ ")
-            w3.text = bold(net_get_essid(nif)) .. fg(beautiful.hilight, " ] ")
-            --neticon.image = image(beautiful.wireless)
-            net_last_update = 0
-        end
-    end
-end
-
 -- {{{ Wibox
 gapboxr = widget { type = "textbox", align = "right" }
 gapboxr.text = " "
@@ -614,54 +545,6 @@ wicked.register(cputempbox,
     end,
 "$1", 5)
 
--- net
-netbox = widget({type = "textbox", name = "netbox", align = "right" })
-openboxnet = widget { type = "textbox", align = "right" }
-neticon = widget({ type = "imagebox", align = "right" })
-netgraph_down = widget({
-   type  = 'graph',
-   name  = 'netgraph_down',
-   align = 'right'
-})
-netgraph_up = widget({
-    type  = 'graph',
-    name  = 'netgraph_up',
-    align = 'right'
-})
-netgraph_down.height = 0.85
-netgraph_down.width = 35
-netgraph_down.bg = beautiful.graph_bg
-netgraph_down.border_color = beautiful.bg_normal
-netgraph_down.grow = 'right'
-
-netgraph_up.height = 0.85
-netgraph_up.width = 35
-netgraph_up.bg = beautiful.graph_bg
-netgraph_up.border_color = beautiful.bg_normal
-netgraph_up.grow = 'right'
-
-netgraph_down:plot_properties_set('down', {
-    fg                = beautiful.fg_normal,
-    vertical_gradient = false
-})
-netgraph_up:plot_properties_set('up', {
-    fg                = beautiful.fg_normal,
-    vertical_gradient = false
-})
-net_update(netgraph_down, netgraph_up, netbox)
-
---[[
-netwidget = widget({
-                      type = 'textbox',
-                      name = 'netwidget',
-                      align = 'right'
-
-                   })
-wicked.register(netwidget, wicked.widgets.net,
-                'wlan0:  ${wlan0 down_kb} / ${wlan0 up_kb}',
-                nil, nil, 8)
---]]
-
 -- Create a laucher widget and a main menu
 myawesomemenu = {
    { "manual", terminal .. " -e man awesome" },
@@ -753,7 +636,7 @@ for s = 1, screen.count() do
         mpdbox,
         shiny.battery(),
         gapboxr,
-        openboxnet, neticon, netbox, netgraph_down, netwidget, netgraph_up,
+        shiny.net(),
         gapboxr,
         openbox, cpuicon, cpubox, sepbox, cputempicon, cputempbox, closebox,
         gapboxr,
@@ -1212,7 +1095,6 @@ end)
 
 awful.hooks.timer.register(5, function ()
     volume("update", volumebar, "Master")
-    net_update(netgraph_down, netgraph_up, netbox)
 end)
 -- }}}
 
