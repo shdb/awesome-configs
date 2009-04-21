@@ -20,10 +20,10 @@ local widget, button, mouse, image = widget, button, mouse, image
 
 
 module("shiny.battery")
-batteryicon = widget({ type = "imagebox", align = "right" })
-batterybox = widget({type = "textbox", name = "batterybox", align = "right" })
-openboxbat = widget({ type = "textbox", align = "right" })
-closeboxbat = widget({ type = "textbox", align = "right" })
+local icon = widget({ type = "imagebox", align = "right" })
+local infobox = widget({type = "textbox", name = "batterybox", align = "right" })
+local openbox = widget({ type = "textbox", align = "right" })
+local closebox = widget({ type = "textbox", align = "right" })
 
 local function fg(color, text)
 	if not color then
@@ -62,10 +62,10 @@ local function battery_info()
         f:close() 
         return ret 
     end 
-    remove_notify(batteryboxpopup) 
+    remove_notify(popup) 
     local timerem = battery_remaining() 
     if timerem then 
-        batteryboxpopup = naughty.notify({ 
+        popup = naughty.notify({ 
                 title = "battery", 
                 text = timerem .. " remaining", 
                 timeout = 0, 
@@ -111,29 +111,27 @@ local function update()
 		fcur:close()
 		fcap:close()
 		fsta:close()
-		openboxbat.text = fg(beautiful.hilight, " [ ")
-		closeboxbat.text = fg(beautiful.hilight, " ]")
-		if beautiful.battery then
-			batteryicon.image = image(beautiful.battery)
-		end
+		openbox.text = fg(beautiful.hilight, " [ ")
+		closebox.text = fg(beautiful.hilight, " ]")
+		icon.image = image(beautiful.battery)
 		return battery
 	else
-		openboxbat.text = ""
-		closeboxbat.text = ""
-		batteryicon.image = nil
+		openbox.text = ""
+		closebox.text = ""
+		icon.image = nil
 		return ""
 	end
 end
 
-batterybox.mouse_enter = battery_info
-batterybox.mouse_leave = function() remove_notify(batteryboxpopup) end
-batteryicon.mouse_enter = battery_info
-batteryicon.mouse_leave = function() remove_notify(batteryboxpopup) end
-closeboxbat.mouse_enter = battery_info
-closeboxbat.mouse_leave = function() remove_notify(batteryboxpopup) end
-openboxbat.mouse_enter = battery_info
-openboxbat.mouse_leave = function() remove_notify(batteryboxpopup) end
+infobox.mouse_enter = battery_info
+infobox.mouse_leave = function() remove_notify(popup) end
+icon.mouse_enter = battery_info
+icon.mouse_leave = function() remove_notify(popup) end
+closebox.mouse_enter = battery_info
+closebox.mouse_leave = function() remove_notify(popup) end
+openbox.mouse_enter = battery_info
+openbox.mouse_leave = function() remove_notify(popup) end
 
-wicked.register(batterybox, update, "$1", 5)
+wicked.register(infobox, update, "$1", 5)
 
-setmetatable(_M, { __call = function () return {openboxbat, batteryicon, batterybox, closeboxbat} end })
+setmetatable(_M, { __call = function () return {openbox, icon, infobox, closebox} end })
