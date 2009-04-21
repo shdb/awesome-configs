@@ -2,15 +2,14 @@
 require("awful")
 require("wicked")
 require("beautiful")
+theme_path = "/usr/share/awesome/themes/shdb/theme"
+beautiful.init(theme_path)
 require("naughty")
 require("revelation")
 require("mpd")
 require("shiny.battery")
 
 -- {{{ Variable definitions
-theme_path = "/usr/share/awesome/themes/shdb/theme"
-
-beautiful.init(theme_path)
 
 -- This is used later as the default terminal and editor to run.
 terminal = "urxvtc"
