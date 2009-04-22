@@ -86,6 +86,10 @@ end
 
 -- Toggle pause / resume playing
 function pause()
+    if state.state == "stop" then
+        send("play")
+        return
+    end
     send("pause")
 end
 
