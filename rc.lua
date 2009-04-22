@@ -7,6 +7,7 @@ beautiful.init(theme_path)
 require("naughty")
 require("revelation")
 require("mpd")
+require("shiny.cpu")
 require("shiny.battery")
 require("shiny.mpd")
 require("shiny.net")
@@ -267,8 +268,6 @@ openbox = widget { type = "textbox", align = "right" }
 openbox.text = fg(beautiful.hilight, "[ ")
 closebox = widget { type = "textbox", align = "right" }
 closebox.text = fg(beautiful.hilight, " ]")
-sepbox = widget { type = "textbox", align = "right" }
-sepbox.text = fg(beautiful.hilight, " | ")
 
 clockbox = widget({ type  = 'textbox',
                     name  = 'clock_wid',
@@ -282,18 +281,6 @@ clockbox:buttons {
     button({ }, 1, function() add_calendar(-1) end),
     button({ }, 3, function() add_calendar(1)  end),
 }
-
-cpuicon = widget({ type = "imagebox", align = "right" })
-cpuicon.image = image(beautiful["cpu"])
-cpubox = widget({type = "textbox", name = "cpubox", align = "right" })
-wicked.register(cpubox,
-    function()
-        local fhz = io.open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
-        local hz = fhz:read();
-        fhz:close()
-        return round_num(hz/10^6, 1) .. " GHz"
-    end,
-"$1")
 
 volumeicon = widget({ type = "imagebox", align = "right" })
 volumeicon.image = image(beautiful["volume"])
@@ -321,25 +308,6 @@ volumebar:buttons({
     button({ }, 1, function() volume("mute", volumebar, "Master") end)
 })
 
-cpugraph = widget({
-    type  = 'graph',
-    name  = 'cpugraph',
-    align = 'right'
-})
-
-cpugraph.height = 0.85
-cpugraph.width = 35
-cpugraph.bg = beautiful.graph_bg
-cpugraph.border_color = beautiful.bg_normal
-cpugraph.grow = 'right'
-
-cpugraph:plot_properties_set('cpu', {
-    fg = beautiful.fg_normal,
-    vertical_gradient = false
-})
-
-wicked.register(cpugraph, wicked.widgets.cpu, '$1', 1, 'cpu')
-
 memicon = widget({ type = "imagebox", align = "right" })
 memicon.image = image(beautiful["mem"])
 membar =  widget({ type = "progressbar", align = "right" })
@@ -362,27 +330,6 @@ membar:bar_properties_set("mem",
 })
 
 wicked.register(membar, wicked.widgets.mem, '$1', 1, 'mem')
-
--- CPU Temp Widget
-cputempicon = widget({ type = "imagebox", align = "right" })
-cputempicon.image = image(beautiful["temp"])
-cputempbox = widget({type = "textbox", align="right"})
-
-wicked.register(cputempbox,
-    function ()
-        local f = io.popen("acpi -t")
-        local ret = ""
-        for line in f:lines() do
-            local _, _, temp = string.find(line, "(..)\.. degrees")
-            if temp then
-                ret = ret .. temp .. "C, "
-            end
-        end
-        f:close()
-        ret = ret:sub(0, ret:len() - 2)
-        return ret
-    end,
-"$1", 5)
 
 -- Create a laucher widget and a main menu
 myawesomemenu = {
@@ -477,9 +424,7 @@ for s = 1, screen.count() do
         gapboxr,
         shiny.net(),
         gapboxr,
-        openbox, cpuicon, cpubox, sepbox, cputempicon, cputempbox, closebox,
-        gapboxr,
-        cpugraph,
+        shiny.cpu(),
         gapboxr,
         memicon, membar,
         gapboxr,
