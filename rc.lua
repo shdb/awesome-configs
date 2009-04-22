@@ -103,16 +103,6 @@ for s = 1, screen.count() do
 end
 -- }}}
 
-function file_exists(filename)
-    local file = io.open(filename)
-    if file then
-        io.close(file)
-        return true
-    else
-        return false
-    end
-end
-
 function round_num(num, idp)
     local mult = 10^(idp or 0)
     return math.floor(num * mult + 0.5) / mult
