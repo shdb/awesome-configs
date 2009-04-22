@@ -8,6 +8,7 @@ require("naughty")
 require("revelation")
 require("mpd")
 require("shiny.battery")
+require("shiny.mpd")
 require("shiny.net")
 
 -- {{{ Variable definitions
@@ -106,14 +107,6 @@ end
 function round_num(num, idp)
     local mult = 10^(idp or 0)
     return math.floor(num * mult + 0.5) / mult
-end
-
-function onoff(value)
-    if value then
-        return "on"
-    else
-        return "off"
-    end
 end
 
 cardid  = 0
@@ -265,80 +258,6 @@ function add_calendar(inc_offset)
     }
 end
 
-function hook_mpd()
-    mpdbox.text = widget_mpd()
-end
-
--- Get and format MPD status
--- (need the mpd lib for lua)
-last_songid = nil
-mpd.scroll  = 0
-function widget_mpd()
-    local state = ""
-    local function timeformat(t)
-        if tonumber(t) >= 60 * 60 then -- more than one hour !
-            return os.date("%X", t)
-        else
-            return os.date("%M:%S", t)
-        end
-    end
-    mpd.currentsong()
-    mpd.status()
-
-    local function unknowize(x)
-        return awful.util.escape(x or "(unknow)")
-    end
-
-    if not mpd.is_connected() then
-        return ""
-    end
-
-    if mpd.is_stop() then
-        last_songid = false
-        return widget_base(widget_section("MPD", "stopped."))
-    end
-
-    if not mpd.is_playing() then
-        state = " (" .. mpd.get_state() .. ")"
-    end
-
-    if use_naughty then
-        if not last_songid or last_songid ~= mpd.songid() then
-            last_songid = mpd.songid()
-            naughty.notify {
-                text = string.format("%s: %s\n%s:  %s\n%s: %s",
-                bold("artist"), unknowize(mpd.artist),
-                bold("album"),  unknowize(mpd.album),
-                bold("title"),  unknowize(mpd.title)),
-                width = 280,
-                timeout = 2
-            }
-        end
-    end
-
-    return widget_base(
-        widget_section("", awful.util.escape(mpd.artist()) .. " - " .. awful.util.escape(mpd.title()) .. state,
-        widget_section("", widget_value(timeformat(mpd.elapsed_time()), timeformat(mpd.time())))))
-end
-
-function mpd_rand()
-    local stat = mpd.toggle_random()
-    naughty.notify {
-        title = "mpd",
-        text  = "random " .. onoff(stat),
-        timeout = 2
-    }
-end
-
-function mpd_crossfade()
-    local stat = mpd.toggle_crossfade()
-    naughty.notify {
-        title = "mpd",
-        text  = "crossfade " .. onoff(stat),
-        timeout = 2
-    }
-end
-
 -- {{{ Wibox
 gapboxr = widget { type = "textbox", align = "right" }
 gapboxr.text = " "
@@ -363,76 +282,6 @@ clockbox:buttons {
     button({ }, 1, function() add_calendar(-1) end),
     button({ }, 3, function() add_calendar(1)  end),
 }
-
-mpdbox = widget { type = "textbox", align = "right" }
-wicked.register(mpdbox, function() return widget_mpd() end, "$1", 1)
-mpdboxpopup = nil
-mpdbox.mouse_enter = function()
-    remove_notify(mpdboxpopup)
-    local stat = mpd.send("status")
-    local string = ""
-    if not mpd.is_stop() then
-        string = string .. bold("Artist:\t") .. awful.util.escape(mpd.artist()) .. "\n"
-        string = string .. bold("Title:\t\t") .. awful.util.escape(mpd.title()) .. "\n"
-        string = string .. bold("Album:\t") .. awful.util.escape(mpd.album()) .. "\n"
-        string = string .. bold("Year:\t") .. mpd.year() .. "\t"
-            .. bold("Genre: ") .. awful.util.escape(mpd.genre()) .. "\n"
-    end
-    string = string .. bold("random: ") .. onoff(mpd.is_random())
-    string = string .. bold("\tcrossfade: ") .. onoff(mpd.is_xfade())
-    mpdboxpopup = naughty.notify({
-            title = "mpd",
-            text = string,
-            timeout = 0,
-            hover_timeout = 0.5,
-           })
-end
-mpdbox.mouse_leave = function() remove_notify(mpdboxpopup) end
-
-function build_mpd_menu()
-    local menu_items = {}
-    local menu_genres = mpd.list("genre")
-    table.sort(menu_genres, function (a,b)
-            return (a < b)
-        end)
-    for i = 1,#menu_genres do
-        table.insert(menu_items, { awful.util.escape(menu_genres[i]),
-            function() mpd.play_by_genre(menu_genres[i]) end})
-    end
-
-    menu_playlists = mpd.playlists()
-    table.sort(menu_playlists, function (a,b)
-            return (a < b)
-        end)
-    for i = 1,#menu_playlists do
-        table.insert(menu_items, { awful.util.escape(menu_playlists[i]),
-            function() mpd.play_playlist(menu_playlists[i]) end})
-    end
-    return menu_items
-end
-
-mpd.menu = awful.menu.new({
-    id    = "mpd",
-    items = build_mpd_menu()
-})
- 
-mpdbox:buttons({
-    button({ }, 1,
-        function()
-            mpd.pause()
-            hook_mpd()
-        end),
-    button({ }, 3,
-        function ()
-            if #mpd.menu.items == 0 then
-                mpd.menu = awful.menu.new({
-                    id    = "mpd",
-                    items = build_mpd_menu() 
-                })
-            end
-            mpd.menu:toggle()
-        end)
-})
 
 cpuicon = widget({ type = "imagebox", align = "right" })
 cpuicon.image = image(beautiful["cpu"])
@@ -623,7 +472,7 @@ for s = 1, screen.count() do
         mytasklist[s],
         gapboxl,
         mypromptbox[s],
-        mpdbox,
+        shiny.mpd(),
         shiny.battery(),
         gapboxr,
         shiny.net(),
@@ -721,12 +570,12 @@ globalkeys =
     key({ alt, ctrl         }, "j",     function () volume("down", volumebar, "Master") end),
     key({ alt, ctrl         }, "k",     function () volume("up", volumebar, "Master") end),
     key({ alt, ctrl         }, "m",     function () volume("mute", volumebar, "Master") end),
-    key({ alt, ctrl         }, "space", function () mpd.pause();  hook_mpd() end),
-    key({ alt, ctrl         }, "s",     function () mpd.stop();         hook_mpd() end),
-    key({ alt, ctrl         }, "h",     function () mpd.previous();     hook_mpd() end),
-    key({ alt, ctrl         }, "l",     function () mpd.next();         hook_mpd() end),
-    key({ alt, ctrl         }, "z",     function () mpd_rand();         hook_mpd() end),
-    key({ alt, ctrl         }, "x",     function () mpd_crossfade();         hook_mpd() end),
+    key({ alt, ctrl         }, "space", function () mpd.pause();        shiny.mpd.hook() end),
+    key({ alt, ctrl         }, "s",     function () mpd.stop();         shiny.mpd.hook() end),
+    key({ alt, ctrl         }, "h",     function () mpd.previous();     shiny.mpd.hook() end),
+    key({ alt, ctrl         }, "l",     function () mpd.next();         shiny.mpd.hook() end),
+    key({ alt, ctrl         }, "z",     function () shiny.mpd.info_rand();      shiny.mpd.hook() end),
+    key({ alt, ctrl         }, "x",     function () shiny.mpd.info_crossfade(); shiny.mpd.hook() end),
     key({ modkey, alt, ctrl }, "x",     function () awful.util.spawn("xrandr --auto") end),
     key({ modkey            }, "F2",    function () revelation.revelation() end),
     key({ modkey            }, "s",
