@@ -2,7 +2,7 @@
 require("awful")
 require("wicked")
 require("beautiful")
-theme_path = "/usr/share/awesome/themes/shdb/theme"
+theme_path = "/usr/share/awesome/themes/shdb/theme.lua"
 beautiful.init(theme_path)
 require("naughty")
 require("revelation")
@@ -104,11 +104,6 @@ for s = 1, screen.count() do
     tags[s][1].selected = true
 end
 -- }}}
-
-function round_num(num, idp)
-    local mult = 10^(idp or 0)
-    return math.floor(num * mult + 0.5) / mult
-end
 
 cardid  = 0
 lastvol = 0
@@ -387,7 +382,7 @@ mytasklist.buttons = { awful.button({ }, 1, function (c)
 
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
-    mypromptbox[s] = widget({ type = "textbox", align = "left" })
+    mypromptbox[s] = awful.widget.prompt({ align = "left" })
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     mylayoutbox[s] = widget({ type = "imagebox", align = "left" })
@@ -492,21 +487,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, shift     }, "space", function () awful.layout.inc(layouts, -1) end),
 
     -- Prompt
-    awful.key({ modkey }, "F1",
-        function ()
-            awful.prompt.run({ prompt = fg(beautiful.hilight, "Run: ") },
-            mypromptbox[mouse.screen],
-            awful.util.spawn, awful.completion.shell,
-            awful.util.getdir("cache") .. "/history")
-        end),
-
-    awful.key({ modkey }, "F4",
-        function ()
-            awful.prompt.run({ prompt = "Run Lua code: " },
-            mypromptbox[mouse.screen],
-            awful.util.eval, awful.prompt.bash,
-            awful.util.getdir("cache") .. "/history_eval")
-        end),
+    awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
 
     awful.key({                   }, volup,   function () volume("up", volumebar, "Master") end),
     awful.key({                   }, voldn,   function () volume("down", volumebar, "Master") end),
