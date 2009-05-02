@@ -27,7 +27,7 @@ local infobox_cpu = widget({type = "textbox", name = "batterybox", align = "righ
 local infobox_temp = widget({type = "textbox", name = "batterybox", align = "right" })
 local openbox = widget({ type = "textbox", align = "right" })
 
-graph = widget({
+local graph = widget({
     type  = 'graph',
     name  = 'cpugraph',
     align = 'right'
@@ -39,6 +39,11 @@ graph.bg = beautiful.graph_bg
 graph.border_color = beautiful.bg_normal
 graph.grow = 'right'
 
+graph:plot_properties_set('cpu', {
+    fg = beautiful.fg_normal,
+    vertical_gradient = false
+})
+
 local function fg(color, text)
 	if not color then
 		color = "#555555"
@@ -46,12 +51,7 @@ local function fg(color, text)
     return '<span color="' .. color .. '">' .. text .. '</span>'
 end
 
-graph:plot_properties_set('cpu', {
-    fg = beautiful.fg_normal,
-    vertical_gradient = false
-})
-
-function round_num(num, idp)
+local function round_num(num, idp)
     local mult = 10^(idp or 0)
     return math.floor(num * mult + 0.5) / mult
 end

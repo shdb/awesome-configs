@@ -75,7 +75,7 @@ local function file_exists(filename)
     end
 end
 
-function get_up()
+local function get_up()
     local lfd, wfd, lan, wlan
     lfd = io.open("/sys/class/net/eth0/operstate")
     lan = lfd:read()
@@ -94,7 +94,7 @@ function get_up()
     end
 end
 
-function get_essid(iface)
+local function get_essid(iface)
     local f = io.popen("/sbin/iwgetid " .. iface)
     local ret = ""
     for line in f:lines() do
@@ -107,7 +107,7 @@ function get_essid(iface)
     return ret
 end
 
-function update()
+local function update()
     local nname, nif = get_up()
     if not nname and not nif then
         wicked.unregister(graph_down, false)
@@ -118,8 +118,8 @@ function update()
     elseif net_if ~= nif then
         wicked.unregister(graph_down, true)
         wicked.unregister(graph_up, true)
-        wicked.register(graph_down, wicked.widgets.net,"${" .. nif .. " down_kb}",2,"down")
-        wicked.register(graph_up, wicked.widgets.net,"${" .. nif .. " up_kb}",2,"up")
+        wicked.register(graph_down, wicked.widgets.net,"${" .. nif .. " down_kb}",1,"down")
+        wicked.register(graph_up, wicked.widgets.net,"${" .. nif .. " up_kb}",1,"up")
         if nif == "wlan0" then
             icon.image = image(beautiful.wireless)
             openbox.text = fg(beautiful.hilight, "[ ")

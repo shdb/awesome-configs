@@ -42,7 +42,7 @@ local function file_exists(filename)
     end
 end
 
-function remove_notify(notify)
+local function remove_notify(notify)
     if notify then
         naughty.destroy(notify)
         notify = nil

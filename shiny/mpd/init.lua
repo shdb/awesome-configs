@@ -32,7 +32,7 @@ local function fg(color, text)
     return '<span color="' .. color .. '">' .. text .. '</span>'
 end
 
-function bold(text)
+local function bold(text)
     return '<b>' .. text .. '</b>'
 end
 
