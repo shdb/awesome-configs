@@ -382,7 +382,7 @@ mytasklist.buttons = { awful.button({ }, 1, function (c)
 
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
-    mypromptbox[s] = awful.widget.prompt({ align = "left" })
+    mypromptbox[s] = awful.widget.prompt({ align = "left", prompt = fg(beautiful.hilight, "Run: ") })
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     mylayoutbox[s] = widget({ type = "imagebox", align = "left" })
