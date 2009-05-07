@@ -502,14 +502,12 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
     awful.key({ modkey, shift     }, "space", function () awful.layout.inc(layouts, -1) end),
 
-    -- Prompt
-    awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
-
-    awful.key({                   }, volup,   function () volume("up", volumebar, "Master") end),
-    awful.key({                   }, voldn,   function () volume("down", volumebar, "Master") end),
-    awful.key({ alt, ctrl         }, "j",     function () volume("down", volumebar, "Master") end),
-    awful.key({ alt, ctrl         }, "k",     function () volume("up", volumebar, "Master") end),
-    awful.key({ alt, ctrl         }, "m",     function () volume("mute", volumebar, "Master") end),
+    awful.key({ modkey            }, "r",     function () mypromptbox[mouse.screen]:run()      end),
+    awful.key({                   }, volup,   function () volume("up", volumebar, "Master")    end),
+    awful.key({                   }, voldn,   function () volume("down", volumebar, "Master")  end),
+    awful.key({ alt, ctrl         }, "j",     function () volume("down", volumebar, "Master")  end),
+    awful.key({ alt, ctrl         }, "k",     function () volume("up", volumebar, "Master")    end),
+    awful.key({ alt, ctrl         }, "m",     function () volume("mute", volumebar, "Master")  end),
     awful.key({ modkey, alt, ctrl }, "l",     function () toggle_keyboard_layout()             end),
     awful.key({ alt, ctrl         }, "space", function () mpd.pause();        shiny.mpd.hook() end),
     awful.key({ alt, ctrl         }, "s",     function () mpd.stop();         shiny.mpd.hook() end),
@@ -517,8 +515,8 @@ globalkeys = awful.util.table.join(
     awful.key({ alt, ctrl         }, "l",     function () mpd.next();         shiny.mpd.hook() end),
     awful.key({ alt, ctrl         }, "z",     function () shiny.mpd.info_rand();      shiny.mpd.hook() end),
     awful.key({ alt, ctrl         }, "x",     function () shiny.mpd.info_crossfade(); shiny.mpd.hook() end),
-    awful.key({ modkey, alt, ctrl }, "x",     function () awful.util.spawn("xrandr --auto") end),
-    awful.key({ modkey            }, "F2",    function () revelation.revelation() end),
+    awful.key({ modkey, alt, ctrl }, "x",     function () awful.util.spawn("xrandr --auto")    end),
+    awful.key({ modkey            }, "F2",    function () revelation.revelation()              end),
     awful.key({ modkey            }, "s",
         function()
             for unused, ttag in pairs(awful.tag.selectedlist(mouse.screen)) do
