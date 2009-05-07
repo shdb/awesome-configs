@@ -254,6 +254,22 @@ function add_calendar(inc_offset)
     }
 end
 
+function toggle_keyboard_layout()
+    if keyboard_layout and keyboard_layout == "us" then
+        awful.util.spawn("setxkbmap -layout ch")
+        keyboard_layout = "ch"
+    else
+        awful.util.spawn("setxkbmap -layout us")
+        keyboard_layout = "us"
+    end
+    awful.util.spawn("xmodmap /home/shdb/.Xmodmap")
+    naughty.notify {
+        title = "keyboard layout",
+        text  = "current layout: " .. keyboard_layout,
+        timeout = 2
+    }
+end
+
 -- {{{ Wibox
 gapboxr = widget { type = "textbox", align = "right" }
 gapboxr.text = " "
@@ -494,6 +510,7 @@ globalkeys = awful.util.table.join(
     awful.key({ alt, ctrl         }, "j",     function () volume("down", volumebar, "Master") end),
     awful.key({ alt, ctrl         }, "k",     function () volume("up", volumebar, "Master") end),
     awful.key({ alt, ctrl         }, "m",     function () volume("mute", volumebar, "Master") end),
+    awful.key({ modkey, alt, ctrl }, "l",     function () toggle_keyboard_layout()             end),
     awful.key({ alt, ctrl         }, "space", function () mpd.pause();        shiny.mpd.hook() end),
     awful.key({ alt, ctrl         }, "s",     function () mpd.stop();         shiny.mpd.hook() end),
     awful.key({ alt, ctrl         }, "h",     function () mpd.previous();     shiny.mpd.hook() end),
