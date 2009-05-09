@@ -270,6 +270,82 @@ function toggle_keyboard_layout()
     }
 end
 
+function dropdown(prog, sscreen, height)
+
+    local function removefromtags(c)
+        local tags = c:tags()
+        for i, v in ipairs(tags) do
+            tags[i] = nil
+        end    
+        c:tags(tags)
+    end
+
+    if not sscreen then sscreen = mouse.screen end
+    if not height then height = 0.2 end
+
+    if not dropdownl then
+        dropdownl = {}
+    end
+
+    if not dropdownl[prog] then
+        dropdownl[prog] = {}
+
+        -- Add unmanage hook
+        awful.hooks.unmanage.register(function (c)
+            for scr, cl in pairs(dropdownl[prog]) do
+                if cl == c then
+                    dropdownl[prog][scr] = nil
+                end
+            end
+        end)
+    end
+
+    if not dropdownl[prog][sscreen] then
+        local function spawnw(c)
+            -- Store client
+            dropdownl[prog][sscreen] = c
+
+            awful.client.floating.set(c, true)
+            screengeom = screen[sscreen].workarea
+
+            if height < 1 then
+                height = screengeom.height*height
+            end
+
+            c:geometry({
+                x = screengeom.x,
+                y = screengeom.y,
+                width = screengeom.width,
+                height = height
+            })
+
+            c.above = true
+            c.ontop = true
+            c.sticky = true
+            c:raise()
+            removefromtags(c)
+            client.focus = c
+
+            awful.hooks.manage.unregister(spawnw)
+            awful.hooks.manage()
+        end
+
+        awful.hooks.manage.register(spawnw)
+        awful.util.spawn(prog)
+    else
+        c = dropdownl[prog][sscreen]
+
+        if c.hide then
+            c.hide = false
+            c:raise()
+            client.focus = c
+        else
+            c.hide = true
+        end
+        removefromtags(c)
+    end
+end
+
 -- {{{ Wibox
 gapboxr = widget { type = "textbox", align = "right" }
 gapboxr.text = " "
@@ -488,6 +564,7 @@ globalkeys = awful.util.table.join(
 
     -- Standard program
     awful.key({ modkey,           }, "Return",function () awful.util.spawn(terminal) end),
+    awful.key({ modkey,           }, "space", function () dropdown("urxvtc")         end),
     awful.key({ modkey, ctrl      }, "r",     awesome.restart),
     awful.key({ modkey, shift     }, "q",     awesome.quit),
 
@@ -499,8 +576,8 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, shift     }, "l",     function () awful.tag.incnmaster(-1)      end),
     awful.key({ modkey, ctrl      }, "h",     function () awful.tag.incncol( 1)         end),
     awful.key({ modkey, ctrl      }, "l",     function () awful.tag.incncol(-1)         end),
-    awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
-    awful.key({ modkey, shift     }, "space", function () awful.layout.inc(layouts, -1) end),
+    awful.key({ modkey,           }, ".", function () awful.layout.inc(layouts,  1)     end),
+    awful.key({ modkey,           }, ",", function () awful.layout.inc(layouts, -1)     end),
 
     awful.key({ modkey            }, "r",     function () mypromptbox[mouse.screen]:run()      end),
     awful.key({                   }, volup,   function () volume("up", volumebar, "Master")    end),
