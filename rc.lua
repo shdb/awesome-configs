@@ -2,7 +2,7 @@
 require("awful")
 require("wicked")
 require("beautiful")
-theme_path = "/usr/share/awesome/themes/shdb/theme.lua"
+theme_path = awful.util.getdir("config") .. "/themes/shdb/theme.lua"
 beautiful.init(theme_path)
 require("naughty")
 require("revelation")
