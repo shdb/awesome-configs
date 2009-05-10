@@ -20,10 +20,6 @@ editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 
 -- Default modkey.
--- Usually, Mod4 is the key with a logo between Control and Alt.
--- If you do not like this or do not have such a key,
--- I suggest you to remap Mod4 to another key using xmodmap or other tools.
--- However, you can use another modifier like Mod1, but it may interact with others.
 modkey  = "Mod4"
 alt     = "Mod1"
 ctrl    = "Control"
@@ -433,9 +429,6 @@ mymainmenu = awful.menu.new({
     }
 })
 
---mylauncher = awful.widget.launcher({ image = image(beautiful.awesome_icon),
---                                     menu = mymainmenu })
-
 -- Create a systray
 mysystray = widget({ type = "systray", align = "right" })
 
@@ -453,24 +446,6 @@ mytaglist.buttons = awful.util.table.join(
     awful.button({ }, 5, awful.tag.viewprev)
 )
 mytasklist = {}
---[[
-mytasklist.buttons = { awful.button({ }, 1, function (c)
-                                          if not c:isvisible() then
-                                              awful.tag.viewonly(c:tags()[1])
-                                          end
-                                          client.focus = c
-                                          c:raise()
-                                      end),
-                       awful.button({ }, 3, function () if instance then instance:hide() end instance = awful.menu.clients({ width=250 }) end),
-                       awful.button({ }, 4, function ()
-                                          awful.client.focus.byidx(1)
-                                          if client.focus then client.focus:raise() end
-                                      end),
-                       awful.button({ }, 5, function ()
-                                          awful.client.focus.byidx(-1)
-                                          if client.focus then client.focus:raise() end
-                                      end) }
-]]--
 
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
@@ -487,19 +462,12 @@ for s = 1, screen.count() do
     -- Create a taglist widget
     mytaglist[s] = awful.widget.taglist.new(s, awful.widget.taglist.label.all, mytaglist.buttons)
 
-    -- Create a tasklist widget
-    --[[
-    mytasklist[s] = awful.widget.tasklist.new(function(c)
-                                                  return awful.widget.tasklist.label.currenttags(c, s)
-                                              end, mytasklist.buttons)
-    ]]--
     mytasklist[s] = widget({ type = "textbox", align = "left" })
 
     -- Create the wibox
     mywibox[s] = wibox({ position = "top", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
     -- Add widgets to the wibox - order matters
     mywibox[s].widgets = {
-        --mylauncher,
         mylayoutbox[s],
         gapboxl,
         mytaglist[s],
@@ -818,10 +786,6 @@ awful.hooks.manage.register(function (c, startup)
         c.screen = mouse.screen
     end
 
-    if use_titlebar then
-        -- Add a titlebar
-        awful.titlebar.add(c, { modkey = modkey })
-    end
     -- Add mouse bindings
     c:buttons(awful.util.table.join(
         awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
@@ -854,9 +818,6 @@ awful.hooks.manage.register(function (c, startup)
         awful.client.movetotag(tags[target.screen][target.tag], c)
     end
 
-    -- Do this after tag mapping, so you don't see it on the wrong tag for a split second.
-    client.focus = c
-
     -- Set key bindings
     c:keys(clientkeys)
 
@@ -878,6 +839,9 @@ awful.hooks.manage.register(function (c, startup)
     else
         c.size_hints_honor = false
     end
+
+    -- Do this after tag mapping, so you don't see it on the wrong tag for a split second.
+    client.focus = c
 
 end)
 
