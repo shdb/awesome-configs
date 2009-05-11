@@ -120,6 +120,8 @@ local function update()
         wicked.unregister(graph_up, true)
         wicked.register(graph_down, wicked.widgets.net,"${" .. nif .. " down_kb}",1,"down")
         wicked.register(graph_up, wicked.widgets.net,"${" .. nif .. " up_kb}",1,"up")
+        net_if = nif
+        net_name = nname
         if nif == "wlan0" then
             icon.image = image(beautiful.wireless)
             openbox.text = fg(beautiful.hilight, "[ ")
@@ -129,8 +131,6 @@ local function update()
             openbox.text = ""
 			return ""
         end
-        net_if = nif
-        net_name = nname
     elseif nif == "wlan0" then
         last_update = last_update + 1
         if last_update == 3 then
