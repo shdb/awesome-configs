@@ -4,24 +4,23 @@ local wicked = require("wicked")
 local tonumber = tonumber
 local setmetatable = setmetatable
 local io = {
-	open = io.open,
-	popen = io.popen,
-	close = io.close
+    open = io.open,
+    popen = io.popen,
+    close = io.close
 }
 local string = {
-	find = string.find
+    find = string.find
 }
 local widget, button, mouse, image = widget, button, mouse, image
 
 local net_if = nil
-local net_name = nil
+local essid = nil
 local last_update = 0
 
 module("shiny.net")
 local icon = widget({ type = "imagebox", align = "right" })
-local infobox = widget({type = "textbox", name = "batterybox", align = "right" })
+local infobox = widget({type = "textbox", name = "netbox", align = "right" })
 local openbox = widget({ type = "textbox", align = "right" })
-local closebox = widget({ type = "textbox", align = "right" })
 
 local graph_down = widget({
    type  = 'graph',
@@ -55,9 +54,9 @@ graph_up:plot_properties_set('up', {
 })
 
 local function fg(color, text)
-	if not color then
-		color = "#555555"
-	end
+    if not color then
+        color = "#555555"
+    end
     return '<span color="' .. color .. '">' .. text .. '</span>'
 end
 
@@ -86,11 +85,11 @@ local function get_up()
         wfd:close()
     end
     if lan and lan == "up" then
-        return "lan", "eth0"
+        return "eth0"
     elseif wlan and wlan == "up" then
-        return "wlan", "wlan0"
+        return "wlan0"
     else
-        return nil, nil
+        return nil
     end
 end
 
@@ -108,41 +107,39 @@ local function get_essid(iface)
 end
 
 local function update()
-    local nname, nif = get_up()
-    if not nname and not nif then
+    local nif = get_up()
+    if not nif then
         wicked.unregister(graph_down, false)
         wicked.unregister(graph_up, false)
         openbox.text = ""
         icon.image = nil
-		return ""
+        return ""
     elseif net_if ~= nif then
         wicked.unregister(graph_down, true)
         wicked.unregister(graph_up, true)
         wicked.register(graph_down, wicked.widgets.net,"${" .. nif .. " down_kb}",1,"down")
         wicked.register(graph_up, wicked.widgets.net,"${" .. nif .. " up_kb}",1,"up")
         net_if = nif
-        net_name = nname
         if nif == "wlan0" then
             icon.image = image(beautiful.wireless)
             openbox.text = fg(beautiful.hilight, "[ ")
-			return bold(get_essid(nif)) .. fg(beautiful.hilight, " ] ")
+            essid = get_essid(nif)
+            return bold(essid) .. fg(beautiful.hilight, " ] ")
         elseif nif == "eth0" then
             icon.image = image(beautiful.network)
             openbox.text = ""
-			return ""
+            return ""
         end
     elseif nif == "wlan0" then
         last_update = last_update + 1
         if last_update == 3 then
-            openbox.text = fg(beautiful.hilight, "[ ")
             last_update = 0
-			return bold(get_essid(nif)) .. fg(beautiful.hilight, " ] ")
+            essid = get_essid(nif)
         end
-	else
-		return infobox.text
+        return bold(essid) .. fg(beautiful.hilight, " ] ")
     end
 end
 
 wicked.register(infobox, update, "$1", 5)
 
-setmetatable(_M, { __call = function () return {openbox, icon, infobox, closebox, graph_down, graph_up} end })
+setmetatable(_M, { __call = function () return {openbox, icon, infobox, graph_down, graph_up} end })
