@@ -6,10 +6,7 @@ theme_path = awful.util.getdir("config") .. "/themes/shdb/theme.lua"
 beautiful.init(theme_path)
 require("naughty")
 require("revelation")
-require("mpd")
 require("shiny.cpu")
-require("shiny.battery")
-require("shiny.mpd")
 require("shiny.net")
 
 -- {{{ Variable definitions
@@ -24,8 +21,6 @@ modkey  = "Mod4"
 alt     = "Mod1"
 ctrl    = "Control"
 shift   = "Shift"
-volup   = "XF86AudioRaiseVolume"
-voldn   = "XF86AudioLowerVolume"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 layouts =
@@ -66,7 +61,7 @@ topapps =
 -- Use the screen and tags indices.
 apptags =
 {
-    ["Firefox"] = { screen = 1, tag = 3 },
+    ["Firefox"] = { screen = 2, tag = 3 },
     ["Thunderbird"] = { screen = 1, tag = 3 },
     -- ["mocp"] = { screen = 2, tag = 4 },
 }
@@ -77,10 +72,10 @@ use_titlebar = false
 
 -- {{{ Tags
 gold_number   = 0.618
-tags_name     = { "sys",       "ssh",       "www",       "dev",       "etc" }
-tags_layout   = {     1,           3,           2,           1,           2 }
-tags_mwfact   = {  0.65, gold_number,        0.85, gold_number, gold_number }
-tags_setslave = { false,       false,        true,       false,       false }
+tags_name     = { "sys",       "ssh",       "www",       "dev",       "win",       "etc" }
+tags_layout   = {     1,           3,           2,           1,           2,           1 }
+tags_mwfact   = {  0.70, gold_number,        0.85, gold_number, gold_number, gold_number }
+tags_setslave = { false,       false,        true,       false,       false,       false }
 
 -- Define tags table.
 tags = {}
@@ -474,8 +469,6 @@ for s = 1, screen.count() do
         mytasklist[s],
         gapboxl,
         mypromptbox[s],
-        shiny.mpd(),
-        shiny.battery(),
         gapboxr,
         shiny.net(),
         shiny.cpu(),
@@ -548,18 +541,10 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, ",", function () awful.layout.inc(layouts, -1)     end),
 
     awful.key({ modkey            }, "r",     function () mypromptbox[mouse.screen]:run()      end),
-    awful.key({                   }, volup,   function () volume("up", volumebar, "Master")    end),
-    awful.key({                   }, voldn,   function () volume("down", volumebar, "Master")  end),
     awful.key({ alt, ctrl         }, "j",     function () volume("down", volumebar, "Master")  end),
     awful.key({ alt, ctrl         }, "k",     function () volume("up", volumebar, "Master")    end),
     awful.key({ alt, ctrl         }, "m",     function () volume("mute", volumebar, "Master")  end),
     awful.key({ modkey, alt, ctrl }, "l",     function () toggle_keyboard_layout()             end),
-    awful.key({ alt, ctrl         }, "space", function () mpd.pause();        shiny.mpd.hook() end),
-    awful.key({ alt, ctrl         }, "s",     function () mpd.stop();         shiny.mpd.hook() end),
-    awful.key({ alt, ctrl         }, "h",     function () mpd.previous();     shiny.mpd.hook() end),
-    awful.key({ alt, ctrl         }, "l",     function () mpd.next();         shiny.mpd.hook() end),
-    awful.key({ alt, ctrl         }, "z",     function () shiny.mpd.info_rand();      shiny.mpd.hook() end),
-    awful.key({ alt, ctrl         }, "x",     function () shiny.mpd.info_crossfade(); shiny.mpd.hook() end),
     awful.key({ modkey, alt, ctrl }, "x",     function () awful.util.spawn("xrandr --auto")    end),
     awful.key({ modkey            }, "F2",    function () revelation.revelation()              end),
     awful.key({ modkey            }, "s",

@@ -76,7 +76,7 @@ end
 
 local function get_up()
     local lfd, wfd, lan, wlan
-    lfd = io.open("/sys/class/net/eth0/operstate")
+    lfd = io.open("/sys/class/net/br0/operstate")
     lan = lfd:read()
     lfd:close()
     if file_exists("/sys/class/net/wlan0/operstate") then
@@ -85,7 +85,7 @@ local function get_up()
         wfd:close()
     end
     if lan and lan == "up" then
-        return "eth0"
+        return "br0"
     elseif wlan and wlan == "up" then
         return "wlan0"
     else
@@ -125,7 +125,7 @@ local function update()
             openbox.text = fg(beautiful.hilight, "[ ")
             essid = get_essid(nif)
             return bold(essid) .. fg(beautiful.hilight, " ] ")
-        elseif nif == "eth0" then
+        elseif nif == "br0" then
             icon.image = image(beautiful.network)
             openbox.text = ""
             return ""

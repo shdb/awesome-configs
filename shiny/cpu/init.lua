@@ -21,8 +21,8 @@ local widget, button, mouse, image = widget, button, mouse, image
 module("shiny.cpu")
 local cpuicon = widget({ type = "imagebox", align = "right" })
 cpuicon.image = image(beautiful.cpu)
-local tempicon = widget({ type = "imagebox", align = "right" })
-tempicon.image = image(beautiful.temp)
+--local tempicon = widget({ type = "imagebox", align = "right" })
+--tempicon.image = image(beautiful.temp)
 local infobox_cpu = widget({type = "textbox", name = "batterybox", align = "right" })
 local infobox_temp = widget({type = "textbox", name = "batterybox", align = "right" })
 local openbox = widget({ type = "textbox", align = "right" })
@@ -95,7 +95,7 @@ local function get_temp()
 end
 
 local function update()
-	infobox_temp.text = get_temp()
+	--infobox_temp.text = get_temp()
 	return get_cpu()
 end
 
@@ -103,4 +103,4 @@ openbox.text = fg(beautiful.hilight, " [ ")
 wicked.register(infobox_cpu, update, "$1", 5)
 wicked.register(graph, wicked.widgets.cpu, '$1', 1, 'cpu')
 
-setmetatable(_M, { __call = function () return {openbox, cpuicon, infobox_cpu, tempicon, infobox_temp, graph} end })
+setmetatable(_M, { __call = function () return {openbox, cpuicon, infobox_cpu, infobox_temp, graph} end })
