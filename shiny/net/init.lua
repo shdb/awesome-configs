@@ -113,6 +113,7 @@ local function update()
         wicked.unregister(graph_up, false)
         openbox.text = ""
         icon.image = nil
+        net_if = nil
         return ""
     elseif net_if ~= nif then
         wicked.unregister(graph_down, true)
