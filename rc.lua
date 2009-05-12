@@ -819,7 +819,7 @@ awful.hooks.manage.register(function (c, startup)
 
     -- Honor size hints: if you want to drop the gaps between windows, set this to false.
     -- c.size_hints_honor = false
-    if cls == "MPlayer" then
+    if cls == "MPlayer" or cls == "kvm" then
         c.size_hints_honor = true
     else
         c.size_hints_honor = false
