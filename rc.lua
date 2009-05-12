@@ -258,7 +258,7 @@ function toggle_keyboard_layout()
         awful.util.spawn("setxkbmap -layout us")
         keyboard_layout = "us"
     end
-    awful.util.spawn("xmodmap /home/shdb/.Xmodmap")
+    awful.util.spawn("xmodmap " .. awful.util.getdir("config") .. "/../../.Xmodmap")
     naughty.notify {
         title = "keyboard layout",
         text  = "current layout: " .. keyboard_layout,
