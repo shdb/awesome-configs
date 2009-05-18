@@ -277,7 +277,7 @@ function dropdown(prog, sscreen, height)
     end
 
     if not sscreen then sscreen = mouse.screen end
-    if not height then height = 0.2 end
+    if not height then height = 0.21 end
 
     if not dropdownl then
         dropdownl = {}
