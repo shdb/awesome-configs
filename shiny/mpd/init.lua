@@ -90,8 +90,9 @@ local function update()
 		.. fg(beautiful.hilight, " ]")
 end
 
-local function info()
+function info(tout)
 	remove_notify(popup)
+    if not tout then tout = 0 end
     local stat = mpd.send("status")
     local string = ""
     if not mpd.is_stop() then
@@ -106,7 +107,7 @@ local function info()
     popup = naughty.notify({
             title = "mpd",
             text = string,
-            timeout = 0,
+            timeout = tout,
             hover_timeout = 0.5,
            })
 end
