@@ -560,6 +560,7 @@ globalkeys = awful.util.table.join(
     awful.key({ alt, ctrl         }, "l",     function () mpd.next();         shiny.mpd.hook() end),
     awful.key({ alt, ctrl         }, "z",     function () shiny.mpd.info_rand();      shiny.mpd.hook() end),
     awful.key({ alt, ctrl         }, "x",     function () shiny.mpd.info_crossfade(); shiny.mpd.hook() end),
+    awful.key({ alt, ctrl         }, "i",     function () shiny.mpd.info(3)                    end),
     awful.key({ modkey, alt, ctrl }, "x",     function () awful.util.spawn("xrandr --auto")    end),
     awful.key({ modkey            }, "F2",    function () revelation.revelation()              end),
     awful.key({ modkey            }, "s",
