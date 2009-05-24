@@ -71,7 +71,7 @@ local function update()
     if mpd.is_stop() then
 		icon.image = image(beautiful.mpd_stop)
         openbox.text =  fg(beautiful.hilight, "[ ") .. bold("MPD")
-		return ""
+		return fg(beautiful.hilight, " ]")
     end
 
 	if mpd.is_playing() then
