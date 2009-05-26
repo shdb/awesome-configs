@@ -76,7 +76,7 @@ end
 
 local function get_up()
     local lfd, wfd, lan, wlan
-    lfd = io.open("/sys/class/net/br0/operstate")
+    lfd = io.open("/sys/class/net/eth0/operstate")
     lan = lfd:read()
     lfd:close()
     if file_exists("/sys/class/net/wlan0/operstate") then
