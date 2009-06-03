@@ -111,6 +111,7 @@ function volume(mode, widget, channel)
             fd:close()
     
         local volume = string.match(status, "(%d?%d?%d)%%")
+        if not volume then return 0 end
         return string.format("% 3d", volume)
     end
     if mode == "update" then
