@@ -106,6 +106,7 @@ function volume(mode, widget, channel)
             fd:close()
     
         local volume = string.match(status, "(%d?%d?%d)%%")
+        if not volume then return 0 end
         return string.format("% 3d", volume)
     end
     if mode == "update" then
@@ -247,13 +248,14 @@ end
 
 function toggle_keyboard_layout()
     if keyboard_layout and keyboard_layout == "us" then
-        awful.util.spawn("setxkbmap -layout ch")
+        awful.util.spawn_with_shell("setxkbmap -layout ch; "
+                .. "xmodmap " .. awful.util.getdir("config") .. "/../../.Xmodmap")
         keyboard_layout = "ch"
     else
-        awful.util.spawn("setxkbmap -layout us")
+        awful.util.spawn_with_shell("setxkbmap -layout us; "
+                .. "xmodmap " .. awful.util.getdir("config") .. "/../../.Xmodmap")
         keyboard_layout = "us"
     end
-    awful.util.spawn("xmodmap " .. awful.util.getdir("config") .. "/../../.Xmodmap")
     naughty.notify {
         title = "keyboard layout",
         text  = "current layout: " .. keyboard_layout,

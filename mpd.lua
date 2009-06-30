@@ -385,7 +385,7 @@ end
 function search(tag, term)
     local songs = {}
     local id = 0
-    local buffer = send(string.format("search %s %s", tag, term))
+    local buffer = send(string.format("search %s %q", tag, term))
     for line in buffer:gmatch("[^\r\n]+") do
         local _, _, key, value = string.find(line, "([^:]+):%s(.+)")
         if key then

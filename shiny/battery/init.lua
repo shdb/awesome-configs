@@ -51,7 +51,7 @@ end
 
 local function battery_info()
 	local function battery_remaining() 
-        local f = io.popen("acpi -t") 
+        local f = io.popen("acpi -b") 
         local ret = nil 
         for line in f:lines() do 
             local _, _, rem = string.find(line, "(..:..:..) remaining") 
