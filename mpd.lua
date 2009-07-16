@@ -273,7 +273,7 @@ function toggle_crossfade()
     if isxfade then
         send("crossfade 0")
     else
-        send("crossfade 1")
+        send("crossfade 5")
     end
     return not isxfade
 end
@@ -281,7 +281,7 @@ end
 -- Crossfading 
 -- @return boolean
 function is_xfade()
-    if tonumber(state["xfade"]) == 1 then
+    if tonumber(state["xfade"]) ~= 0 then
         return true
     else
         return false
