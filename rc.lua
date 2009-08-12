@@ -6,7 +6,9 @@ theme_path = awful.util.getdir("config") .. "/themes/shdb/theme.lua"
 beautiful.init(theme_path)
 require("naughty")
 require("revelation")
+require("mpd")
 require("shiny.cpu")
+require("shiny.mpd")
 require("shiny.net")
 
 -- {{{ Variable definitions
@@ -471,6 +473,7 @@ for s = 1, screen.count() do
         mytasklist[s],
         gapboxl,
         mypromptbox[s],
+        shiny.mpd(),
         gapboxr,
         shiny.net(),
         shiny.cpu(),
@@ -547,6 +550,13 @@ globalkeys = awful.util.table.join(
     awful.key({ alt, ctrl         }, "k",     function () volume("up", volumebar, "Master")    end),
     awful.key({ alt, ctrl         }, "m",     function () volume("mute", volumebar, "Master")  end),
     awful.key({ modkey, alt, ctrl }, "l",     function () toggle_keyboard_layout()             end),
+    awful.key({ alt, ctrl         }, "space", function () mpd.pause();        shiny.mpd.hook() end),
+    awful.key({ alt, ctrl         }, "s",     function () mpd.stop();         shiny.mpd.hook() end),
+    awful.key({ alt, ctrl         }, "h",     function () mpd.previous();     shiny.mpd.hook() end),
+    awful.key({ alt, ctrl         }, "l",     function () mpd.next();         shiny.mpd.hook() end),
+    awful.key({ alt, ctrl         }, "z",     function () shiny.mpd.info_rand();      shiny.mpd.hook() end),
+    awful.key({ alt, ctrl         }, "x",     function () shiny.mpd.info_crossfade(); shiny.mpd.hook() end),
+    awful.key({ alt, ctrl         }, "i",     function () shiny.mpd.info(3)                    end),
     awful.key({ modkey, alt, ctrl }, "x",     function () awful.util.spawn("xrandr --auto")    end),
     awful.key({ modkey            }, "F2",    function () revelation.revelation()              end),
     awful.key({ modkey            }, "s",
