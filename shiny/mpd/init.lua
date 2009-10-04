@@ -188,4 +188,4 @@ infobox.mouse_leave = function() remove_notify(popup) end
 
 wicked.register(infobox, update, "$1", 1)
 
-setmetatable(_M, { __call = function () return {openbox, icon, infobox} end })
+setmetatable(_M, { __call = function () return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })

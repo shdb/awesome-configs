@@ -103,4 +103,4 @@ openbox.text = fg(beautiful.hilight, " [ ")
 wicked.register(infobox_cpu, update, "$1", 5)
 wicked.register(graph, wicked.widgets.cpu, '$1', 1, 'cpu')
 
-setmetatable(_M, { __call = function () return {openbox, cpuicon, infobox_cpu, tempicon, infobox_temp, graph} end })
+setmetatable(_M, { __call = function () return {graph, infobox_temp, tempicon, infobox_cpu, cpuicon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })

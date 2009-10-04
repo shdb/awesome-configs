@@ -1,3 +1,4 @@
+local awful = require("awful")
 local beautiful = require("beautiful")
 local wicked = require("wicked")
 
@@ -143,4 +144,4 @@ end
 
 wicked.register(infobox, update, "$1", 5)
 
-setmetatable(_M, { __call = function () return {openbox, icon, infobox, graph_down, graph_up} end })
+setmetatable(_M, { __call = function () return {graph_up, graph_down, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
