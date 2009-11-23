@@ -211,10 +211,8 @@ function playlists()
     local buffer = send("lsinfo")
     for line in buffer:gmatch("[^\r\n]+") do
         local _, _, key, value = string.find(line, "([^:]+):%s(.+)")
-        if key then
-            if key == "playlist" then
-                table.insert(playlists, value)
-            end
+        if key and key == "playlist" then
+            table.insert(playlists, value)
         end
     end
     return playlists
