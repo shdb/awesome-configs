@@ -572,6 +572,7 @@ globalkeys = awful.util.table.join(
                 for unused, tclient in pairs(ttag:clients()) do
                     if tclient.minimized then
                         tclient.minimized = false
+                        client.focus = tclient
                     end
                 end
             end
