@@ -211,10 +211,8 @@ function playlists()
     local buffer = send("lsinfo")
     for line in buffer:gmatch("[^\r\n]+") do
         local _, _, key, value = string.find(line, "([^:]+):%s(.+)")
-        if key then
-            if key == "playlist" then
-                table.insert(playlists, value)
-            end
+        if key and key == "playlist" then
+            table.insert(playlists, value)
         end
     end
     return playlists
@@ -273,7 +271,7 @@ function toggle_crossfade()
     if isxfade then
         send("crossfade 0")
     else
-        send("crossfade 1")
+        send("crossfade 5")
     end
     return not isxfade
 end
@@ -281,7 +279,7 @@ end
 -- Crossfading 
 -- @return boolean
 function is_xfade()
-    if tonumber(state["xfade"]) == 1 then
+    if tonumber(state["xfade"]) ~= 0 then
         return true
     else
         return false

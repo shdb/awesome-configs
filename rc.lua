@@ -454,6 +454,7 @@ for s = 1, screen.count() do
     mylayoutbox[s] = widget({ type = "imagebox", align = "left" })
     mylayoutbox[s]:buttons(awful.util.table.join(
         awful.button({ }, 1, function () awful.layout.inc(layouts, 1) end),
+        awful.button({ }, 2, function () mymainmenu:toggle() end),
         awful.button({ }, 3, function () awful.layout.inc(layouts, -1) end),
         awful.button({ }, 4, function () awful.layout.inc(layouts, 1) end),
         awful.button({ }, 5, function () awful.layout.inc(layouts, -1) end)
@@ -565,6 +566,7 @@ globalkeys = awful.util.table.join(
                 for unused, tclient in pairs(ttag:clients()) do
                     if tclient.minimized then
                         tclient.minimized = false
+                        client.focus = tclient
                     end
                 end
             end
