@@ -40,7 +40,7 @@ layouts =
     awful.layout.suit.fair.horizontal,        -- 4
 --    awful.layout.suit.magnifier,
     awful.layout.suit.max,            -- 5
---    wful.layout.suit.max.fullscreen,
+--    awful.layout.suit.max.fullscreen,
 --    awful.layout.suit.floating        -- 6
 }
 
@@ -350,15 +350,18 @@ function dropdown(prog, sscreen, height)
     end
 end
 
-function update_tasklist(c, u)
+function update_tasklist(c)
     -- tasklist and topapps
     local ccount = 0
     local selc = 0
     local mcount = 0
-    for unused, ttag in pairs(awful.tag.selectedlist(c.screen)) do
-        for unused, tclient in pairs(ttag:clients()) do
+    local screen
+    screen = c and c.screen or mouse.screen 
+    for _, ttag in pairs(awful.tag.selectedlist(screen)) do
+        for _, tclient in pairs(ttag:clients()) do
             if topapps[tclient.class] and not tclient.fullscreen then
                 tclient.ontop = true
+                tclient:raise()
             end
             ccount = ccount + 1
             if tclient == client.focus then
@@ -370,19 +373,18 @@ function update_tasklist(c, u)
             end
         end
     end
-    if u then ccount = ccount - 1 end
     if mcount > 0 then
-        mytasklist[c.screen].text = widget_base(
+        mytasklist[screen].text = widget_base(
             widget_section("", widget_value(selc, ccount),
             widget_section("", mcount)))
     else
-        mytasklist[c.screen].text = widget_base(widget_section("", widget_value(selc, ccount)))
+        mytasklist[screen].text = widget_base(widget_section("", widget_value(selc, ccount)))
     end
 
     -- borders
-    local tiledclients = awful.client.tiled(c.screen)
+    local tiledclients = awful.client.tiled(screen)
     if (#tiledclients == 0) then return end
-    for unused, current in pairs(tiledclients) do
+    for _, current in pairs(tiledclients) do
         if awful.client.floating.get(current) or layout == "floating" then
             current.border_width = beautiful.border_width
         elseif (#tiledclients == 1) or layout == "max" then
@@ -620,8 +622,8 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey            }, "F2",    function () revelation.revelation()              end),
     awful.key({ modkey            }, "s",
         function()
-            for unused, ttag in pairs(awful.tag.selectedlist(mouse.screen)) do
-                for unused, tclient in pairs(ttag:clients()) do
+            for _, ttag in pairs(awful.tag.selectedlist(mouse.screen)) do
+                for _, tclient in pairs(ttag:clients()) do
                     if tclient.minimized then
                         tclient.minimized = false
                         client.focus = tclient
@@ -822,8 +824,8 @@ awful.rules.rules = {
     { rule = { class = "gimp" },
       properties = { floating = true } },
     -- Set Firefox to always map on tags number 2 of screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { tag = tags[1][2] } },
+    { rule = { class = "Firefox" },
+      properties = { tag = tags[1][3] } },
 }
 -- }}}
 
@@ -845,6 +847,9 @@ client.add_signal("manage", function (c, startup)
         -- Set the windows at the slave,
         -- i.e. put it at the end of others instead of setting it master.
         -- awful.client.setslave(c)
+        if awful.tag.getproperty(c:tags()[1], "setslave") then
+            awful.client.setslave(c)
+        end
 
         -- Put windows in a smart way, only if they does not set an initial position.
         if not c.size_hints.user_position and not c.size_hints.program_position then
@@ -852,7 +857,7 @@ client.add_signal("manage", function (c, startup)
             awful.placement.no_offscreen(c)
         end
     end
-    c.size_hints_honor = false
+    c.size_hints_honor = c.class == "MPlayer" or false
 end)
 
 client.add_signal("focus", function(c)
@@ -861,8 +866,12 @@ client.add_signal("focus", function(c)
     end)
 client.add_signal("unfocus", function(c)
         c.border_color = beautiful.border_normal
-        update_tasklist(c, 1)
+        update_tasklist(c)
     end)
+client.add_signal("unmanage", update_tasklist(c))
+for s = 1, screen.count() do
+    awful.tag.attached_add_signal(s, "property::selected", update_tasklist)
+end
 -- }}}
 
 -- vim: filetype=lua:expandtab:shiftwidth=4:tabstop=4:softtabstop=4
