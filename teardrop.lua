@@ -4,6 +4,7 @@
 -- Blame: Adrian C. <anrxc@sysphere.org>
 -- Licensed under the WTFPL version 2
 --   * http://sam.zoy.org/wtfpl/COPYING
+-- modified by shdb
 ----------------------------------------------------------------
 -- To use this module add:
 --   require("teardrop")
@@ -18,13 +19,14 @@
 --            when <= 1 (1 (100% of the screen) by default)
 --   height - Height in absolute pixels, or height percentage
 --            when <= 1 (0.25 (25% of the screen) by default)
---   sticky - Visible on all tags, false by default
+--   sticky - Visible on all tags, true by default
 --   screen - Screen (optional), mouse.screen by default
 ----------------------------------------------------------------
 
 -- Grab environment
 local pairs = pairs
 local awful = require("awful")
+local beautiful = require("beautiful")
 local setmetatable = setmetatable
 local capi = {
     mouse = mouse,
@@ -43,9 +45,17 @@ function toggle(prog, vert, horiz, width, height, sticky, screen)
     local vert   = vert   or "top"
     local horiz  = horiz  or "center"
     local width  = width  or 1
-    local height = height or 0.25
-    local sticky = sticky or false
+    local height = height or 0.21
+    local sticky = sticky or true
     local screen = screen or capi.mouse.screen
+
+    local function removefromtags(c)
+        local ctags = c:tags()
+        for i, t in pairs(ctags) do
+            ctags[i] = nil
+        end
+        c:tags(ctags)
+    end
 
     if not dropdown[prog] then
         dropdown[prog] = {}
@@ -62,10 +72,13 @@ function toggle(prog, vert, horiz, width, height, sticky, screen)
 
     if not dropdown[prog][screen] then
         spawnw = function (c)
+            capi.client.remove_signal("manage", spawnw)
+            removefromtags(c)
             dropdown[prog][screen] = c
 
             -- Teardrop clients are floaters
             awful.client.floating.set(c, true)
+            c.border_width = beautiful.border_width
 
             -- Client geometry and placement
             local screengeom = capi.screen[screen].workarea
@@ -79,7 +92,7 @@ function toggle(prog, vert, horiz, width, height, sticky, screen)
 
             if     vert == "bottom" then y = screengeom.height + screengeom.y - height
             elseif vert == "center" then y = screengeom.y+(screengeom.height-height)/2
-            else   y =  screengeom.y - screengeom.y end
+            else   y =  screengeom.y - screengeom.y + 15 end
 
             -- Client properties
             c:geometry({ x = x, y = y, width = width, height = height })
@@ -91,7 +104,6 @@ function toggle(prog, vert, horiz, width, height, sticky, screen)
 
             c:raise()
             capi.client.focus = c
-            capi.client.remove_signal("manage", spawnw)
         end
 
         -- Add manage signal and spawn the program
@@ -116,12 +128,8 @@ function toggle(prog, vert, horiz, width, height, sticky, screen)
             capi.client.focus = c
         else -- Hide and detach tags if not
             c.hidden = true
-            local ctags = c:tags()
-            for i, t in pairs(ctags) do
-                ctags[i] = nil
-            end
-            c:tags(ctags)
         end
+        removefromtags(c)
     end
 end
 

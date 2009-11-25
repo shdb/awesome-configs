@@ -9,6 +9,7 @@ beautiful.init(theme_path)
 require("naughty")
 require("revelation")
 require("mpd")
+require("teardrop")
 require("shiny.battery")
 require("shiny.cpu")
 require("shiny.mpd")
@@ -270,86 +271,6 @@ function toggle_keyboard_layout()
     }
 end
 
-function dropdown(prog, sscreen, height)
-
-    local function removefromtags(c)
-        local tags = c:tags()
-        for i, v in ipairs(tags) do
-            tags[i] = nil
-        end    
-        c:tags(tags)
-    end
-
-    if not sscreen then sscreen = mouse.screen end
-    if not height then height = 0.21 end
-
-    if not dropdownl then
-        print("dl")
-        dropdownl = {}
-    end
-
-    if not dropdownl[prog] then
-        print("pr")
-        dropdownl[prog] = {}
-
-    end
-
-    if not dropdownl[prog][sscreen] then
-        local function spawnw(c)
-
-            client.remove_signal("manage", spawnw)
-            -- Store client
-            dropdownl[prog][sscreen] = c
-            print(c)
-
-            awful.client.floating.set(c, true)
-            screengeom = screen[sscreen].workarea
-
-            if height < 1 then
-                height = screengeom.height*height
-            end
-
-            c:geometry({
-                x = screengeom.x,
-                y = screengeom.y,
-                width = screengeom.width,
-                height = height
-            })
-
-            c.above = true
-            c.ontop = true
-            c.sticky = true
-            c:raise()
-            client.focus = c
-
-            -- Add unmanage signal
-            c:add_signal("unmanage", function(c)
-                for scr, cl in pairs(dropdownl[prog]) do
-                    if cl == c then
-                        dropdownl[prog][scr] = nil
-                    end
-                end
-            end)
-        end
-
-        client.add_signal("manage", spawnw)
-        print("here")
-        awful.util.spawn(prog)
-    else
-        print(dropdownl[prog][sscreen] .. " lala")
-        c = dropdownl[prog][sscreen]
-        print("got client: " .. c)
-
-        if c.hide then
-            c.hide = false
-            c:raise()
-            client.focus = c
-        else
-            c.hide = true
-        end
-    end
-end
-
 function update_tasklist(c)
     -- tasklist and topapps
     local ccount = 0
@@ -589,7 +510,7 @@ globalkeys = awful.util.table.join(
 
     -- Standard program
     awful.key({ modkey,           }, "Return",function () awful.util.spawn(terminal) end),
-    awful.key({ modkey,           }, "space", function () dropdown("urxvtc")         end),
+    awful.key({ modkey,           }, "space", function () teardrop("urxvtc"); update_tasklist() end),
     awful.key({ modkey, ctrl      }, "r",     awesome.restart),
     awful.key({ modkey, shift     }, "q",     awesome.quit),
 
