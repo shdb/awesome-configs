@@ -706,7 +706,9 @@ for i = 1, keynumber do
     awful.key({ modkey, "Control", "Shift" }, i,
                   function ()
                       if client.focus and tags[client.focus.screen][i] then
+                          local c = client.focus
                           awful.client.toggletag(tags[client.focus.screen][i])
+                          client.focus = c
                       end
                   end),
     awful.key({ modkey, "Shift" }, "F" .. i,
