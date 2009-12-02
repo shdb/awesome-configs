@@ -178,12 +178,12 @@ openbox:buttons(button_table)
 icon:buttons(button_table)
 infobox:buttons(button_table)
 
-openbox.mouse_enter = info
-openbox.mouse_leave = function() remove_notify(popup) end
-icon.mouse_enter = info
-icon.mouse_leave = function() remove_notify(popup) end
-infobox.mouse_enter = info
-infobox.mouse_leave = function() remove_notify(popup) end
+openbox:add_signal("mouse::enter", function() info() end)
+openbox:add_signal("mouse::leave", function() remove_notify(popup) end)
+icon:add_signal("mouse::enter", function() info() end)
+icon:add_signal("mouse::leave", function() remove_notify(popup) end)
+infobox:add_signal("mouse::enter", function() info() end)
+infobox:add_signal("mouse::leave", function() remove_notify(popup) end)
 
 
 shiny.register(update, 1)

@@ -123,14 +123,14 @@ local function update()
 	end
 end
 
-infobox.mouse_enter = battery_info
-infobox.mouse_leave = function() remove_notify(popup) end
-icon.mouse_enter = battery_info
-icon.mouse_leave = function() remove_notify(popup) end
-closebox.mouse_enter = battery_info
-closebox.mouse_leave = function() remove_notify(popup) end
-openbox.mouse_enter = battery_info
-openbox.mouse_leave = function() remove_notify(popup) end
+infobox:add_signal("mouse::enter", function () battery_info() end)
+infobox:add_signal("mouse::leave", function() remove_notify(popup) end)
+icon:add_signal("mouse:enter", function () battery_info() end)
+icon:add_signal("mouse::leave", function() remove_notify(popup) end)
+closebox:add_signal("mouse::enter", function () battery_info() end)
+closebox:add_signal("mouse::leave", function() remove_notify(popup) end)
+openbox:add_signal("mouse::enter", function () battery_info() end)
+openbox:add_signal("mouse::leave", function() remove_notify(popup) end)
 
 shiny.register(update, 5)
 
