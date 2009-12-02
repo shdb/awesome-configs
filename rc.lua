@@ -11,6 +11,7 @@ require("revelation")
 require("mpd")
 require("teardrop")
 require("shiny.battery")
+require("shiny.clock")
 require("shiny.cpu")
 require("shiny.mpd")
 require("shiny.net")
@@ -222,38 +223,6 @@ function widget_value(content, next_value)
     return value
 end
 
--- naughty calendar
-calendar = nil
-cal_offset = 0
-function remove_notify(notify)
-    if notify then
-        naughty.destroy(notify)
-        notify = nil
-        cal_offset = 0
-    end
-end
-
-function add_calendar(inc_offset)
-    local save_offset = cal_offset
-    remove_notify(calendar)
-    cal_offset = save_offset + inc_offset
-    local datespec = os.date("*t")
-    datespec = datespec.year * 12 + datespec.month - 1 + cal_offset
-    datespec = (datespec % 12 + 1) .. " " .. math.floor(datespec / 12)
-    local cal = awful.util.pread("cal -m " .. datespec)
-    if cal_offset == 0 then -- this month, hilight day and month
-        cal = string.gsub(cal, "%s" .. tonumber(os.date("%d")) .. "%s", bold(fg(beautiful.hilight, "%1")))
-        cal = string.gsub(cal, "^(%s*%w+%s+%d+)", bold(fg(beautiful.hilight, "%1")))
-    end
-    calendar = naughty.notify {
-        text = string.format('<span font_desc="%s">%s</span>', "monospace", cal),
-        timeout = 0,
-        hover_timeout = 0.5,
-        width  = 245,
-        height = 400,
-    }
-end
-
 function toggle_keyboard_layout()
     if keyboard_layout and keyboard_layout == "us" then
         awful.util.spawn_with_shell("setxkbmap -layout ch; "
@@ -323,18 +292,6 @@ openbox = widget { type = "textbox" }
 openbox.text = fg(beautiful.hilight, "[ ")
 closebox = widget { type = "textbox" }
 closebox.text = fg(beautiful.hilight, " ]")
-
-clockbox = widget({ type  = 'textbox',
-                    name  = 'clock_wid',
-})
-wicked.register(clockbox, wicked.widgets.date, widget_base("%d/%m/%Y " .. bold("%H:%M:%S")))
-clockbox.mouse_enter = function() add_calendar(0) end
-clockbox.mouse_leave = function() remove_notify(calendar) end
-
-clockbox:buttons(awful.util.table.join(
-    awful.button({ }, 1, function() add_calendar(-1) end),
-    awful.button({ }, 3, function() add_calendar(1)  end)
-))
 
 volumeicon = widget({ type = "imagebox" })
 volumeicon.image = image(beautiful["volume"])
@@ -450,7 +407,7 @@ for s = 1, screen.count() do
             mypromptbox[s],
             layout = awful.widget.layout.horizontal.leftright
         },
-        clockbox,
+        shiny.clock(),
         gapbox,
         volumeicon, volumebar,
         gapbox,
