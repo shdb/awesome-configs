@@ -9,3 +9,11 @@ function register(func, tout)
     -- initial update
     func()
 end
+
+function fg(color, text)
+    return '<span color="' .. color .. '">' .. text .. '</span>'
+end
+
+function bold(text)
+    return '<b>' .. text .. '</b>'
+end
