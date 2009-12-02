@@ -156,13 +156,13 @@ function info_crossfade()
     }
 end
 
-local button_table = {
-    button({ }, 1,
+local button_table = awful.util.table.join(
+    awful.button({ }, 1,
         function()
             mpd.pause()
             hook()
         end),
-    button({ }, 3,
+    awful.button({ }, 3,
         function ()
             if not mpd.menu or #mpd.menu.items == 0 then
                 mpd.menu = awful.menu.new({
@@ -172,7 +172,7 @@ local button_table = {
             end
             mpd.menu:toggle()
         end)
-}
+)
 
 openbox:buttons(button_table)
 icon:buttons(button_table)
