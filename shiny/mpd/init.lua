@@ -28,14 +28,6 @@ local icon = widget({ type = "imagebox", align = "right" })
 local infobox = widget({type = "textbox", name = "batterybox", align = "right" })
 local openbox = widget({ type = "textbox", align = "right" })
 
-local function fg(color, text)
-    return '<span color="' .. color .. '">' .. text .. '</span>'
-end
-
-local function bold(text)
-    return '<b>' .. text .. '</b>'
-end
-
 local function remove_notify(notify)
     if notify then
         naughty.destroy(notify)
@@ -70,8 +62,8 @@ local function update()
 
     if mpd.is_stop() then
 		icon.image = image(beautiful.mpd_stop)
-        openbox.text =  fg(beautiful.hilight, "[ ") .. bold("MPD")
-		infobox.text = fg(beautiful.hilight, " ]")
+        openbox.text =  shiny.fg(beautiful.hilight, "[ ") .. shiny.bold("MPD")
+		infobox.text = shiny.fg(beautiful.hilight, " ]")
     end
 
 	if mpd.is_playing() then
@@ -79,15 +71,15 @@ local function update()
 	elseif mpd.is_pause() then
 		icon.image = image(beautiful.mpd_pause)
 	end
-	openbox.text =  fg(beautiful.hilight, "[ ")
+	openbox.text =  shiny.fg(beautiful.hilight, "[ ")
 		.. awful.util.escape(mpd.artist())
 		.. " - "
 		.. awful.util.escape(mpd.title())
-	infobox.text = fg(beautiful.hilight, " | ")
+	infobox.text = shiny.fg(beautiful.hilight, " | ")
 		.. timeformat(mpd.elapsed_time())
-		.. fg(beautiful.hilight, " / ")
+		.. shiny.fg(beautiful.hilight, " / ")
 		.. timeformat(mpd.time())
-		.. fg(beautiful.hilight, " ]")
+		.. shiny.fg(beautiful.hilight, " ]")
 end
 
 function info(tout)
@@ -96,14 +88,14 @@ function info(tout)
     local stat = mpd.send("status")
     local string = ""
     if not mpd.is_stop() then
-        string = string .. bold("Artist:\t") .. awful.util.escape(mpd.artist()) .. "\n"
-        string = string .. bold("Title:\t\t") .. awful.util.escape(mpd.title()) .. "\n"
-        string = string .. bold("Album:\t") .. awful.util.escape(mpd.album()) .. "\n"
-        string = string .. bold("Year:\t") .. mpd.year() .. "\t"
-            .. bold("Genre: ") .. awful.util.escape(mpd.genre()) .. "\n"
+        string = string .. shiny.bold("Artist:\t") .. awful.util.escape(mpd.artist()) .. "\n"
+        string = string .. shiny.bold("Title:\t\t") .. awful.util.escape(mpd.title()) .. "\n"
+        string = string .. shiny.bold("Album:\t") .. awful.util.escape(mpd.album()) .. "\n"
+        string = string .. shiny.bold("Year:\t") .. mpd.year() .. "\t"
+            .. shiny.bold("Genre: ") .. awful.util.escape(mpd.genre()) .. "\n"
     end
-    string = string .. bold("random: ") .. onoff(mpd.is_random())
-    string = string .. bold("\tcrossfade: ") .. onoff(mpd.is_xfade())
+    string = string .. shiny.bold("random: ") .. onoff(mpd.is_random())
+    string = string .. shiny.bold("\tcrossfade: ") .. onoff(mpd.is_xfade())
     popup = naughty.notify({
             title = "mpd",
             text = string,
@@ -134,10 +126,6 @@ local function build_mpd_menu()
     return menu_items
 end
 
-function hook()
-	infobox.text = update()
-end
-
 function info_rand()
     local stat = mpd.toggle_random()
     naughty.notify {
@@ -160,7 +148,7 @@ local button_table = awful.util.table.join(
     awful.button({ }, 1,
         function()
             mpd.pause()
-            hook()
+            update()
         end),
     awful.button({ }, 3,
         function ()
