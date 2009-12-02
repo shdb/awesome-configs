@@ -16,6 +16,7 @@ require("shiny.clock")
 require("shiny.cpu")
 require("shiny.mpd")
 require("shiny.net")
+require("shiny.tasklist")
 require("shiny.topapps")
 
 -- {{{ Variable definitions
@@ -236,35 +237,6 @@ function toggle_keyboard_layout()
     }
 end
 
-function update_tasklist(c)
-    -- tasklist and topapps
-    local ccount = 0
-    local selc = 0
-    local mcount = 0
-    local screen
-    screen = c and c.screen or mouse.screen 
-    for _, ttag in pairs(awful.tag.selectedlist(screen)) do
-        for _, tclient in pairs(ttag:clients()) do
-            ccount = ccount + 1
-            if tclient == client.focus then
-                selc = ccount
-            end
-            if tclient.minimized then
-                mcount = mcount + 1
-                ccount = ccount - 1
-            end
-        end
-    end
-    if mcount > 0 then
-        mytasklist[screen].text = widget_base(
-            widget_section("", widget_value(selc, ccount),
-            widget_section("", mcount)))
-    else
-        mytasklist[screen].text = widget_base(widget_section("", widget_value(selc, ccount)))
-    end
-
-end
-
 -- {{{ Wibox
 gapbox = widget { type = "textbox" }
 gapbox.text = " "
@@ -353,7 +325,6 @@ mytaglist.buttons = awful.util.table.join(
     awful.button({ }, 4, awful.tag.viewnext),
     awful.button({ }, 5, awful.tag.viewprev)
 )
-mytasklist = {}
 
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
@@ -371,9 +342,6 @@ for s = 1, screen.count() do
     -- Create a taglist widget
     mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.label.all, mytaglist.buttons)
 
-    mytasklist[s] = widget({ type = "textbox" })
-    mytasklist[s].text = widget_base(widget_section("", widget_value(0, 0)))
-
     -- Create the wibox
     mywibox[s] = awful.wibox({ position = "top", screen = s })
     -- Add widgets to the wibox - order matters
@@ -382,7 +350,7 @@ for s = 1, screen.count() do
             mylayoutbox[s],
             gapbox,
             mytaglist[s],
-            mytasklist[s],
+            shiny.tasklist(),
             gapbox,
             mypromptbox[s],
             layout = awful.widget.layout.horizontal.leftright
@@ -447,7 +415,7 @@ globalkeys = awful.util.table.join(
 
     -- Standard program
     awful.key({ modkey,           }, "Return",function () awful.util.spawn(terminal) end),
-    awful.key({ modkey,           }, "space", function () teardrop("urxvtc"); update_tasklist() end),
+    awful.key({ modkey,           }, "space", function () teardrop("urxvtc"); shiny.tasklist.update() end),
     awful.key({ modkey, ctrl      }, "r",     awesome.restart),
     awful.key({ modkey, shift     }, "q",     awesome.quit),
 
@@ -719,19 +687,6 @@ client.add_signal("manage", function (c, startup)
     end
     c.size_hints_honor = c.class == "MPlayer" or false
 end)
-
-client.add_signal("focus", function(c)
-        c.border_color = beautiful.border_focus
-        update_tasklist(c)
-    end)
-client.add_signal("unfocus", function(c)
-        c.border_color = beautiful.border_normal
-        update_tasklist(c)
-    end)
-client.add_signal("unmanage", update_tasklist)
-for s = 1, screen.count() do
-    awful.tag.attached_add_signal(s, "property::selected", update_tasklist)
-end
 -- }}}
 
 -- vim: filetype=lua:expandtab:shiftwidth=4:tabstop=4:softtabstop=4
