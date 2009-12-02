@@ -49,33 +49,6 @@ layouts =
 --    awful.layout.suit.floating        -- 6
 }
 
--- Table of clients that should be set floating. The index may be either
--- the application class or instance. The instance is useful when running
--- a console app in a terminal like (Music on Console)
---    xterm -name mocp -e mocp
-floatapps =
-{
-    -- by class
-    ["MPlayer"] = true,
-    ["pinentry"] = true,
-    ["gimp"] = true,
-    -- by instance
-    ["mocp"] = true
-}
-
--- Applications to be moved to a pre-defined tag by class or instance.
--- Use the screen and tags indices.
-apptags =
-{
-    ["Firefox"] = { screen = 1, tag = 3 },
-    ["Thunderbird"] = { screen = 1, tag = 3 },
-    -- ["mocp"] = { screen = 2, tag = 4 },
-}
-
--- Define if we want to use titlebar on all applications.
-use_titlebar = false
--- }}}
-
 -- {{{ Tags
 gold_number   = 0.618
 tags_name     = { "sys",       "ssh",       "www",       "dev",       "etc" }
