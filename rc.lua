@@ -791,7 +791,7 @@ client.add_signal("unfocus", function(c)
         c.border_color = beautiful.border_normal
         update_tasklist(c)
     end)
-client.add_signal("unmanage", update_tasklist(c))
+client.add_signal("unmanage", update_tasklist)
 for s = 1, screen.count() do
     awful.tag.attached_add_signal(s, "property::selected", update_tasklist)
 end
