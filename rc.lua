@@ -16,6 +16,7 @@ require("shiny.clock")
 require("shiny.cpu")
 require("shiny.mpd")
 require("shiny.net")
+require("shiny.topapps")
 
 -- {{{ Variable definitions
 
@@ -59,12 +60,6 @@ floatapps =
     ["gimp"] = true,
     -- by instance
     ["mocp"] = true
-}
-
-topapps =
-{
-    ["MPlayer"] = true,
-    ["Gkrellm"] = true,
 }
 
 -- Applications to be moved to a pre-defined tag by class or instance.
@@ -250,10 +245,6 @@ function update_tasklist(c)
     screen = c and c.screen or mouse.screen 
     for _, ttag in pairs(awful.tag.selectedlist(screen)) do
         for _, tclient in pairs(ttag:clients()) do
-            if topapps[tclient.class] and not tclient.fullscreen then
-                tclient.ontop = true
-                tclient:raise()
-            end
             ccount = ccount + 1
             if tclient == client.focus then
                 selc = ccount
@@ -518,9 +509,9 @@ clientkeys = awful.util.table.join(
 
     awful.key({ modkey, ctrl }, "t",
         function (c)
-            if topapps[c.class] then
-                topapps[c.class] = not topapps[c.class]
-                c.ontop = topapps[c.class]
+            if shiny.topapps[c.class] then
+                shiny.topapps[c.class] = not topapps[c.class]
+                c.ontop = shiny.topapps[c.class]
             else
                 c.ontop = not c.ontop
             end
