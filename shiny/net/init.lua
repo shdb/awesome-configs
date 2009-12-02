@@ -1,6 +1,7 @@
 local awful = require("awful")
 local beautiful = require("beautiful")
 local wicked = require("wicked")
+local shiny = require("shiny")
 
 local tonumber = tonumber
 local setmetatable = setmetatable
@@ -115,7 +116,7 @@ local function update()
         openbox.text = ""
         icon.image = nil
         net_if = nil
-        return ""
+        infobox.text = ""
     elseif net_if ~= nif then
         wicked.unregister(graph_down, true)
         wicked.unregister(graph_up, true)
@@ -126,11 +127,11 @@ local function update()
             icon.image = image(beautiful.wireless)
             openbox.text = fg(beautiful.hilight, "[ ")
             essid = get_essid(nif)
-            return bold(essid) .. fg(beautiful.hilight, " ] ")
+            infobox.text = bold(essid) .. fg(beautiful.hilight, " ] ")
         elseif nif == "eth0" then
             icon.image = image(beautiful.network)
             openbox.text = ""
-            return ""
+            infobox.text = ""
         end
     elseif nif == "wlan0" then
         last_update = last_update + 1
@@ -138,10 +139,10 @@ local function update()
             last_update = 0
             essid = get_essid(nif)
         end
-        return bold(essid) .. fg(beautiful.hilight, " ] ")
+        infobox.text = bold(essid) .. fg(beautiful.hilight, " ] ")
     end
 end
 
-wicked.register(infobox, update, "$1", 5)
+shiny.register(update, 5)
 
 setmetatable(_M, { __call = function () return {graph_up, graph_down, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })

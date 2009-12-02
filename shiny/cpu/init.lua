@@ -2,6 +2,7 @@ local naughty = require("naughty")
 local awful = require("awful")
 local beautiful = require("beautiful")
 local wicked = require("wicked")
+local shiny = require("shiny")
 
 local setmetatable = setmetatable
 local io = {
@@ -96,11 +97,11 @@ end
 
 local function update()
 	infobox_temp.text = get_temp()
-	return get_cpu()
+    infobox_cpu.text = get_cpu()
 end
 
 openbox.text = fg(beautiful.hilight, " [ ")
-wicked.register(infobox_cpu, update, "$1", 5)
+shiny.register(update, 5)
 wicked.register(graph, wicked.widgets.cpu, '$1', 1, 'cpu')
 
 setmetatable(_M, { __call = function () return {graph, infobox_temp, tempicon, infobox_cpu, cpuicon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })

@@ -1,6 +1,6 @@
 local awful = require("awful")
 local beautiful = require("beautiful")
-local wicked = require("wicked")
+local shiny = require("shiny")
 local naughty = require("naughty")
 local mpd = require("mpd")
 
@@ -65,13 +65,13 @@ local function update()
     if not mpd.is_connected() then
 		openbox.text = ""
 		icon.image = nil
-        return ""
+        infobox.text = ""
     end
 
     if mpd.is_stop() then
 		icon.image = image(beautiful.mpd_stop)
         openbox.text =  fg(beautiful.hilight, "[ ") .. bold("MPD")
-		return fg(beautiful.hilight, " ]")
+		infobox.text = fg(beautiful.hilight, " ]")
     end
 
 	if mpd.is_playing() then
@@ -83,7 +83,7 @@ local function update()
 		.. awful.util.escape(mpd.artist())
 		.. " - "
 		.. awful.util.escape(mpd.title())
-	return fg(beautiful.hilight, " | ")
+	infobox.text = fg(beautiful.hilight, " | ")
 		.. timeformat(mpd.elapsed_time())
 		.. fg(beautiful.hilight, " / ")
 		.. timeformat(mpd.time())
@@ -186,6 +186,6 @@ infobox.mouse_enter = info
 infobox.mouse_leave = function() remove_notify(popup) end
 
 
-wicked.register(infobox, update, "$1", 1)
+shiny.register(update, 1)
 
 setmetatable(_M, { __call = function () return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })

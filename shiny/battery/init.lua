@@ -1,7 +1,7 @@
 local naughty = require("naughty")
 local awful = require("awful")
 local beautiful = require("beautiful")
-local wicked = require("wicked")
+local shiny = require("shiny")
 
 local tonumber = tonumber
 local setmetatable = setmetatable
@@ -114,12 +114,12 @@ local function update()
 		openbox.text = fg(beautiful.hilight, " [ ")
 		closebox.text = fg(beautiful.hilight, " ]")
 		icon.image = image(beautiful.battery)
-		return battery
+		infobox.text = battery
 	else
 		openbox.text = ""
 		closebox.text = ""
 		icon.image = nil
-		return ""
+		infobox.text = ""
 	end
 end
 
@@ -132,6 +132,6 @@ closebox.mouse_leave = function() remove_notify(popup) end
 openbox.mouse_enter = battery_info
 openbox.mouse_leave = function() remove_notify(popup) end
 
-wicked.register(infobox, update, "$1", 5)
+shiny.register(update, 5)
 
 setmetatable(_M, { __call = function () return {closebox, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
