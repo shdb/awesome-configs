@@ -71,7 +71,7 @@ local function get_cpu()
 	local fhz = io.open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
 	local hz = fhz:read();
 	fhz:close()
-	return round_num(hz/10^6, 1) .. " GHz" .. shiny.fg(beautiful.hilight, " | ")
+	return round_num(hz/10^6, 1) .. " GHz" .. shiny.fg(beautiful.hilight, " ] ")
 end
 
 local function get_temp() 
