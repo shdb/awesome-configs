@@ -45,13 +45,6 @@ graph:plot_properties_set('cpu', {
     vertical_gradient = false
 })
 
-local function fg(color, text)
-	if not color then
-		color = "#555555"
-	end
-    return '<span color="' .. color .. '">' .. text .. '</span>'
-end
-
 local function round_num(num, idp)
     local mult = 10^(idp or 0)
     return math.floor(num * mult + 0.5) / mult
@@ -78,7 +71,7 @@ local function get_cpu()
 	local fhz = io.open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
 	local hz = fhz:read();
 	fhz:close()
-	return round_num(hz/10^6, 1) .. " GHz" .. fg(beautiful.hilight, " | ")
+	return round_num(hz/10^6, 1) .. " GHz" .. shiny.fg(beautiful.hilight, " | ")
 end
 
 local function get_temp() 
@@ -92,7 +85,7 @@ local function get_temp()
 	end
 	f:close()
 	ret = ret:sub(0, ret:len() - 2)
-	return ret .. fg(beautiful.hilight, " ] ")
+	return ret .. shiny.fg(beautiful.hilight, " ] ")
 end
 
 local function update()
@@ -100,7 +93,7 @@ local function update()
     infobox_cpu.text = get_cpu()
 end
 
-openbox.text = fg(beautiful.hilight, " [ ")
+openbox.text = shiny.fg(beautiful.hilight, " [ ")
 shiny.register(update, 5)
 wicked.register(graph, wicked.widgets.cpu, '$1', 1, 'cpu')
 

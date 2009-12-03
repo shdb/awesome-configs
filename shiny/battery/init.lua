@@ -25,13 +25,6 @@ local infobox = widget({type = "textbox", name = "batterybox", align = "right" }
 local openbox = widget({ type = "textbox", align = "right" })
 local closebox = widget({ type = "textbox", align = "right" })
 
-local function fg(color, text)
-	if not color then
-		color = "#555555"
-	end
-    return '<span color="' .. color .. '">' .. text .. '</span>'
-end
-
 local function file_exists(filename)
     local file = io.open(filename)
     if file then
@@ -99,9 +92,9 @@ local function update()
 				})
 			end
 			if tonumber(battery) < 10 then
-				battery = fg("#ff0000", battery .. "%")
+				battery = shiny.fg("#ff0000", battery .. "%")
 			elseif tonumber(battery) < 20 then
-				battery = fg("#ffff00", battery .. "%")
+				battery = shiny.fg("#ffff00", battery .. "%")
 			else
 				battery = battery .. "%"
 			end
@@ -111,8 +104,8 @@ local function update()
 		fcur:close()
 		fcap:close()
 		fsta:close()
-		openbox.text = fg(beautiful.hilight, " [ ")
-		closebox.text = fg(beautiful.hilight, " ]")
+		openbox.text = shiny.fg(beautiful.hilight, " [ ")
+		closebox.text = shiny.fg(beautiful.hilight, " ]")
 		icon.image = image(beautiful.battery)
 		infobox.text = battery
 	else

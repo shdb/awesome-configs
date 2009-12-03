@@ -58,6 +58,7 @@ local function update()
 		openbox.text = ""
 		icon.image = nil
         infobox.text = ""
+		return
     end
 
     if mpd.is_stop() then
