@@ -55,17 +55,6 @@ graph_up:plot_properties_set('up', {
     vertical_gradient = false
 })
 
-local function fg(color, text)
-    if not color then
-        color = "#555555"
-    end
-    return '<span color="' .. color .. '">' .. text .. '</span>'
-end
-
-function bold(text)
-    return '<b>' .. text .. '</b>'
-end
-
 local function file_exists(filename)
     local file = io.open(filename)
     if file then
@@ -125,9 +114,9 @@ local function update()
         net_if = nif
         if nif == "wlan0" then
             icon.image = image(beautiful.wireless)
-            openbox.text = fg(beautiful.hilight, "[ ")
+            openbox.text = shiny.fg(beautiful.hilight, "[ ")
             essid = get_essid(nif)
-            infobox.text = bold(essid) .. fg(beautiful.hilight, " ] ")
+            infobox.text = shiny.bold(essid) .. shiny.fg(beautiful.hilight, " ] ")
         elseif nif == "eth0" then
             icon.image = image(beautiful.network)
             openbox.text = ""
@@ -139,7 +128,7 @@ local function update()
             last_update = 0
             essid = get_essid(nif)
         end
-        infobox.text = bold(essid) .. fg(beautiful.hilight, " ] ")
+        infobox.text = shiny.bold(essid) .. shiny.fg(beautiful.hilight, " ] ")
     end
 end
 
