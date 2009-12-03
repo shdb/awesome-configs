@@ -568,20 +568,20 @@ for i = 1, keynumber do
                             awful.tag.viewonly(tags[screen][i])
                         end
                   end),
-    awful.key({ modkey, "Control" }, i,
+    awful.key({ modkey, ctrl }, i,
                   function ()
                       local screen = mouse.screen
                       if tags[screen][i] then
                           awful.tag.viewtoggle(tags[screen][i])
                       end
                   end),
-    awful.key({ modkey, "Shift" }, i,
+    awful.key({ modkey, shift }, i,
                   function ()
                       if client.focus and tags[client.focus.screen][i] then
                           awful.client.movetotag(tags[client.focus.screen][i])
                       end
                   end),
-    awful.key({ modkey, "Control", "Shift" }, i,
+    awful.key({ modkey, shift, ctrl }, i,
                   function ()
                       if client.focus and tags[client.focus.screen][i] then
                           local c = client.focus
@@ -589,7 +589,7 @@ for i = 1, keynumber do
                           client.focus = c
                       end
                   end),
-    awful.key({ modkey, "Shift" }, "F" .. i,
+    awful.key({ modkey, shift }, "F" .. i,
                   function ()
                       local screen = mouse.screen
                       if tags[screen][i] then
