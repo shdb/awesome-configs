@@ -1,6 +1,6 @@
 local awful = require("awful")
 local beautiful = require("beautiful")
-local wicked = require("wicked")
+local shiny = require("shiny")
 local naughty = require("naughty")
 local mpd = require("mpd")
 
@@ -27,14 +27,6 @@ module("shiny.mpd")
 local icon = widget({ type = "imagebox", align = "right" })
 local infobox = widget({type = "textbox", name = "batterybox", align = "right" })
 local openbox = widget({ type = "textbox", align = "right" })
-
-local function fg(color, text)
-    return '<span color="' .. color .. '">' .. text .. '</span>'
-end
-
-local function bold(text)
-    return '<b>' .. text .. '</b>'
-end
 
 local function remove_notify(notify)
     if notify then
@@ -65,13 +57,13 @@ local function update()
     if not mpd.is_connected() then
 		openbox.text = ""
 		icon.image = nil
-        return ""
+        infobox.text = ""
     end
 
     if mpd.is_stop() then
 		icon.image = image(beautiful.mpd_stop)
-        openbox.text =  fg(beautiful.hilight, "[ ") .. bold("MPD")
-		return fg(beautiful.hilight, " ]")
+        openbox.text =  shiny.fg(beautiful.hilight, "[ ") .. shiny.bold("MPD")
+		infobox.text = shiny.fg(beautiful.hilight, " ]")
     end
 
 	if mpd.is_playing() then
@@ -79,15 +71,15 @@ local function update()
 	elseif mpd.is_pause() then
 		icon.image = image(beautiful.mpd_pause)
 	end
-	openbox.text =  fg(beautiful.hilight, "[ ")
+	openbox.text =  shiny.fg(beautiful.hilight, "[ ")
 		.. awful.util.escape(mpd.artist())
 		.. " - "
 		.. awful.util.escape(mpd.title())
-	return fg(beautiful.hilight, " | ")
+	infobox.text = shiny.fg(beautiful.hilight, " | ")
 		.. timeformat(mpd.elapsed_time())
-		.. fg(beautiful.hilight, " / ")
+		.. shiny.fg(beautiful.hilight, " / ")
 		.. timeformat(mpd.time())
-		.. fg(beautiful.hilight, " ]")
+		.. shiny.fg(beautiful.hilight, " ]")
 end
 
 function info(tout)
@@ -96,14 +88,14 @@ function info(tout)
     local stat = mpd.send("status")
     local string = ""
     if not mpd.is_stop() then
-        string = string .. bold("Artist:\t") .. awful.util.escape(mpd.artist()) .. "\n"
-        string = string .. bold("Title:\t\t") .. awful.util.escape(mpd.title()) .. "\n"
-        string = string .. bold("Album:\t") .. awful.util.escape(mpd.album()) .. "\n"
-        string = string .. bold("Year:\t") .. mpd.year() .. "\t"
-            .. bold("Genre: ") .. awful.util.escape(mpd.genre()) .. "\n"
+        string = string .. shiny.bold("Artist:\t") .. awful.util.escape(mpd.artist()) .. "\n"
+        string = string .. shiny.bold("Title:\t\t") .. awful.util.escape(mpd.title()) .. "\n"
+        string = string .. shiny.bold("Album:\t") .. awful.util.escape(mpd.album()) .. "\n"
+        string = string .. shiny.bold("Year:\t") .. mpd.year() .. "\t"
+            .. shiny.bold("Genre: ") .. awful.util.escape(mpd.genre()) .. "\n"
     end
-    string = string .. bold("random: ") .. onoff(mpd.is_random())
-    string = string .. bold("\tcrossfade: ") .. onoff(mpd.is_xfade())
+    string = string .. shiny.bold("random: ") .. onoff(mpd.is_random())
+    string = string .. shiny.bold("\tcrossfade: ") .. onoff(mpd.is_xfade())
     popup = naughty.notify({
             title = "mpd",
             text = string,
@@ -134,10 +126,6 @@ local function build_mpd_menu()
     return menu_items
 end
 
-function hook()
-	infobox.text = update()
-end
-
 function info_rand()
     local stat = mpd.toggle_random()
     naughty.notify {
@@ -156,13 +144,13 @@ function info_crossfade()
     }
 end
 
-local button_table = {
-    button({ }, 1,
+local button_table = awful.util.table.join(
+    awful.button({ }, 1,
         function()
             mpd.pause()
-            hook()
+            update()
         end),
-    button({ }, 3,
+    awful.button({ }, 3,
         function ()
             if not mpd.menu or #mpd.menu.items == 0 then
                 mpd.menu = awful.menu.new({
@@ -172,20 +160,20 @@ local button_table = {
             end
             mpd.menu:toggle()
         end)
-}
+)
 
 openbox:buttons(button_table)
 icon:buttons(button_table)
 infobox:buttons(button_table)
 
-openbox.mouse_enter = info
-openbox.mouse_leave = function() remove_notify(popup) end
-icon.mouse_enter = info
-icon.mouse_leave = function() remove_notify(popup) end
-infobox.mouse_enter = info
-infobox.mouse_leave = function() remove_notify(popup) end
+openbox:add_signal("mouse::enter", function() info() end)
+openbox:add_signal("mouse::leave", function() remove_notify(popup) end)
+icon:add_signal("mouse::enter", function() info() end)
+icon:add_signal("mouse::leave", function() remove_notify(popup) end)
+infobox:add_signal("mouse::enter", function() info() end)
+infobox:add_signal("mouse::leave", function() remove_notify(popup) end)
 
 
-wicked.register(infobox, update, "$1", 1)
+shiny.register(update, 1)
 
-setmetatable(_M, { __call = function () return {openbox, icon, infobox} end })
+setmetatable(_M, { __call = function () return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
