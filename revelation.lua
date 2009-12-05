@@ -57,19 +57,14 @@ function keyboardhandler (restore)
     return function (mod, key, event)
         if event ~= "press" then return true end
         -- translate vim-style home keys to directions
-        if key == "j" or key == "k" or key == "h" or key == "l" then
-            if key == "j" then
-                key = "Down"
-            elseif key == "k" then
-                key = "Up"
-            elseif key == "h" then
-                key = "Left"
-            elseif key == "l" then
-                key = "Right"
-            end
-        end
+        translate = {
+            j = "Down",
+            k = "Up",
+            h = "Left",
+            l = "Right"
+        }
+        key = translate[key] or key
 
-        --
         if key == "Escape" then
             restore()
             -- awful.tag.history.restore()
