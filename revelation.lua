@@ -13,7 +13,6 @@ local table = table
 local pairs = pairs
 local button = button
 local awful = awful
-local otable = otable
 local capi =
 {
     tag = tag,
@@ -93,7 +92,7 @@ end
 function revelation(class, fn, s)
     local screen = s or capi.mouse.screen
     local t = awful.tag.selected()
-	local data = otable()
+	local data = {}
 
 	local clients = clients(class, screen)
     local oset = {}
@@ -134,7 +133,7 @@ function revelation(class, fn, s)
 
 	for k, c in pairs(clients) do
 		data[c] = c:buttons()
-		c:buttons({ button({}, 1, selectfn(restore)) })
+		c:buttons(awful.util.table.join(awful.button({}, 1, selectfn(restore)) ))
 	end
     awful.tag.viewonly(t)
     capi.keygrabber.run(keyboardhandler(restore))
