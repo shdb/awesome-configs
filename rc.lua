@@ -323,11 +323,12 @@ for s = 1, screen.count() do
             mylayoutbox[s],
             gapbox,
             mytaglist[s],
-            shiny.tasklist(),
+            shiny.tasklist(s),
             gapbox,
             mypromptbox[s],
             layout = awful.widget.layout.horizontal.leftright
         },
+        s == 1 and mysystray or nil,
         shiny.clock(),
         gapbox,
         volumeicon, volumebar,
@@ -339,7 +340,6 @@ for s = 1, screen.count() do
         gapbox,
         shiny.battery(),
         shiny.mpd(),
-        s == 1 and mysystray or nil,
         layout = awful.widget.layout.horizontal.rightleft
     }
     mywibox[s].screen = s
