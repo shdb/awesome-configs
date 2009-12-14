@@ -11,7 +11,6 @@ local mytasklist = {}
 for s = 1, screen.count() do
     mytasklist[s] = widget({ type = "textbox" })
 end
-local curscreen = 0
 
 function update(c)
     -- tasklist and topapps
@@ -48,7 +47,4 @@ for s = 1, screen.count() do
     awful.tag.attached_add_signal(s, "property::selected", function() update() end)
 end
 
-setmetatable(_M, { __call = function() 
-        curscreen = curscreen + 1
-        return {mytasklist[curscreen]}
-    end })
+setmetatable(_M, { __call = function(_, scr) return {mytasklist[scr]} end })
