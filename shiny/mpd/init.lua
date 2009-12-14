@@ -43,7 +43,7 @@ local function onoff(value)
     end
 end
 
-local function update()
+function update()
     local function timeformat(t)
         if tonumber(t) >= 60 * 60 then -- more than one hour !
             return os.date("%X", t)
