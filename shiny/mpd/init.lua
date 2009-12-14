@@ -86,7 +86,6 @@ end
 function info(tout)
 	remove_notify(popup)
     if not tout then tout = 0 end
-    local stat = mpd.send("status")
     local string = ""
     if not mpd.is_stop() then
         string = string .. shiny.bold("Artist:\t") .. awful.util.escape(mpd.artist()) .. "\n"
@@ -131,7 +130,7 @@ function info_rand()
     local stat = mpd.toggle_random()
     naughty.notify {
         title = "mpd",
-        text  = "random " .. onoff(stat),
+        text  = "random: " .. onoff(stat),
         timeout = 2
     }
 end
@@ -140,7 +139,7 @@ function info_crossfade()
     local stat = mpd.toggle_crossfade()
     naughty.notify {
         title = "mpd",
-        text  = "crossfade " .. onoff(stat),
+        text  = "crossfade: " .. onoff(stat),
         timeout = 2
     }
 end
