@@ -2,7 +2,6 @@
 require("awful")
 require("awful.autofocus")
 require("awful.rules")
-require("wicked")
 require("beautiful")
 theme_path = awful.util.getdir("config") .. "/themes/shdb/theme.lua"
 beautiful.init(theme_path)
@@ -15,9 +14,11 @@ require("shiny.borders")
 require("shiny.clock")
 require("shiny.cpu")
 require("shiny.mpd")
+require("shiny.memory")
 require("shiny.net")
 require("shiny.tasklist")
 require("shiny.topapps")
+require("shiny.volume")
 
 -- {{{ Variable definitions
 
@@ -73,54 +74,6 @@ for s = 1, screen.count() do
 end
 -- }}}
 
-cardid  = 0
-lastvol = 0
-mute = false
-function volume(mode, widget, channel)
-    local function get_vol(channel)
-        local fd = io.popen("amixer -c " .. cardid .. " -- sget " .. channel)
-        local status = fd:read("*all")
-            fd:close()
-    
-        local volume = string.match(status, "(%d?%d?%d)%%")
-        if not volume then return 0 end
-        return string.format("% 3d", volume)
-    end
-    if mode == "update" then
-        widget:bar_data_add("vol", get_vol(channel))
-    elseif mode == "up" then
-        if mute then
-            mute = not mute
-            awful.util.spawn("amixer -q -c " .. cardid .. " sset PCM 100%")
-        end
-        awful.util.spawn("amixer -q -c " .. cardid .. " sset " .. channel .. " 2%+")
-        volume("update", widget, channel)
-    elseif mode == "down" then
-        awful.util.spawn("amixer -q -c " .. cardid .. " sset " .. channel .. " 2%-")
-        volume("update", widget, channel)
-    elseif mode == "init" then
-        if tonumber(get_vol("PCM")) ~= 100 then
-            mute = true
-            awful.util.spawn("amixer -q -c " .. cardid .. " sset " .. channel .. " 0%")
-        end
-        volume("update", widget, channel)
-    else
-        local vol_chan = get_vol(channel)
-        local vol_pcm
-        if mute then
-            vol_pcm = 100
-        else
-            vol_pcm = 0
-            lastvol = 0
-        end
-        mute = not mute
-        awful.util.spawn("amixer -q -c " .. cardid .. " sset " .. channel .. " " .. lastvol .. "%")
-        awful.util.spawn("amixer -q -c " .. cardid .. " sset PCM " .. vol_pcm .. "%")
-        volume("update", widget, channel)
-        lastvol = vol_chan
-    end
-end
-
 -- {{{ Widgets
 -- Set background color
 function bg(color, text)
@@ -135,60 +88,6 @@ end
 -- Boldify text
 function bold(text)
     return '<b>' .. text .. '</b>'
-end
-
--- Widget base
--- [content]
-function widget_base(content)
-    if content and content ~= "" then
-        return fg(beautiful.hilight, "[ ") .. content .. fg(beautiful.hilight, " ]")
-    end
-end
-
-function widget_basel(content)
-    if content and content ~= "" then
-        return fg(beautiful.hilight, " [ ") .. content .. fg(beautiful.hilight, " |")
-    end
-end
-
-function widget_baser(content)
-    if content and content ~= "" then
-        return " " .. content .. fg(beautiful.hilight, " ]")
-    end
-end
-
--- Widget section
--- <b>label:</b> content (| next_section)?
-function widget_section(label, content, next_section)
-    local section
-    if content and content then
-        if label and label ~= "" then
-            section = bold(label .. ": ") .. content
-        else
-            section = content
-        end
-        if next_section and next_section ~= "" then
-            section = section .. fg(beautiful.hilight, " | ") .. next_section
-        end
-    else
-        section = next_section
-    end
-    return section
-end
-
--- Widget value
--- content (/ next_value)?
-function widget_value(content, next_value)
-    local value
-    if content and content then
-        value = content
-        if next_value and next_value ~= "" then
-            value = value .. fg(beautiful.hilight, " / ") .. next_value
-        end
-    else
-        value = next_value
-    end
-    return value
 end
 
 function toggle_keyboard_layout()
@@ -211,59 +110,6 @@ end
 -- {{{ Wibox
 gapbox = widget { type = "textbox" }
 gapbox.text = " "
-openbox = widget { type = "textbox" }
-openbox.text = fg(beautiful.hilight, "[ ")
-closebox = widget { type = "textbox" }
-closebox.text = fg(beautiful.hilight, " ]")
-
-volumeicon = widget({ type = "imagebox" })
-volumeicon.image = image(beautiful["volume"])
-volumeicon:buttons(awful.util.table.join(
-    awful.button({ }, 1, function() volume("mute", volumebar, "Master") end)
-))
-volumebar =  widget({ type = "progressbar", name = "volumebar" })
-volumebar.width = 4
-volumebar.height = 1.0
-volumebar.border_padding = 0
-volumebar.border_width = 0
-volumebar.ticks_count = 5
-volumebar.vertical = true
-
-volumebar:bar_properties_set("vol", 
-{ 
-    bg           = beautiful.bg_normal,
-    fg           = beautiful.fg_normal,
-    fg_off       = beautiful.graph_bg,
-    border_color = beautiful.bg_normal,
-    reverse      = false
-})
-volume("init", volumebar, "Master")
-volumebar:buttons(awful.util.table.join(
-    awful.button({ }, 1, function() volume("mute", volumebar, "Master") end)
-))
-
-memicon = widget({ type = "imagebox" })
-memicon.image = image(beautiful["mem"])
-membar =  widget({ type = "progressbar" })
-membar.width = 4
-membar.height = 1.0
-membar.border_padding = 0
-membar.border_width = 0
-membar.ticks_count = 5
-membar.vertical = true
-
-membar:bar_properties_set("mem", 
-{ 
-    bg           = beautiful.bg_normal,
-    fg           = beautiful.fg_normal,
-    fg_center    = beautiful.graph_center,
-    fg_end       = beautiful.graph_end,
-    fg_off       = beautiful.graph_bg,
-    border_color = beautiful.bg_normal,
-    reverse      = false
-})
-
-wicked.register(membar, wicked.widgets.mem, '$1', 1, 'mem')
 
 -- Create a laucher widget and a main menu
 myawesomemenu = {
@@ -314,30 +160,30 @@ for s = 1, screen.count() do
     mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.label.all, mytaglist.buttons)
 
     -- Create the wibox
-    mywibox[s] = awful.wibox({ position = "top", screen = s })
+    mywibox[s] = awful.wibox({ position = "top", screen = s, height = 15 })
     -- Add widgets to the wibox - order matters
     mywibox[s].widgets = {
         {
             mylayoutbox[s],
             gapbox,
             mytaglist[s],
-            shiny.tasklist(),
+            shiny.tasklist(s),
             gapbox,
             mypromptbox[s],
             layout = awful.widget.layout.horizontal.leftright
         },
+        s == 1 and mysystray or nil,
         shiny.clock(),
         gapbox,
-        volumeicon, volumebar,
+        shiny.volume(),
         gapbox,
-        memicon, membar,
+        shiny.memory(),
         gapbox,
         shiny.cpu(),
         shiny.net(),
         gapbox,
         shiny.battery(),
         shiny.mpd(),
-        s == 1 and mysystray or nil,
         layout = awful.widget.layout.horizontal.rightleft
     }
     mywibox[s].screen = s
@@ -402,16 +248,16 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, ",", function () awful.layout.inc(layouts, -1)     end),
 
     awful.key({ modkey            }, "r",     function () mypromptbox[mouse.screen]:run()      end),
-    awful.key({ alt, ctrl         }, "j",     function () volume("down", volumebar, "Master")  end),
-    awful.key({ alt, ctrl         }, "k",     function () volume("up", volumebar, "Master")    end),
-    awful.key({ alt, ctrl         }, "m",     function () volume("mute", volumebar, "Master")  end),
+    awful.key({ alt, ctrl         }, "j",     function () shiny.volume.down()                  end),
+    awful.key({ alt, ctrl         }, "k",     function () shiny.volume.up()                    end),
+    awful.key({ alt, ctrl         }, "m",     function () shiny.volume.mute()                  end),
     awful.key({ modkey, alt, ctrl }, "l",     function () toggle_keyboard_layout()             end),
-    awful.key({ alt, ctrl         }, "space", function () mpd.pause();        shiny.mpd.hook() end),
-    awful.key({ alt, ctrl         }, "s",     function () mpd.stop();         shiny.mpd.hook() end),
-    awful.key({ alt, ctrl         }, "h",     function () mpd.previous();     shiny.mpd.hook() end),
-    awful.key({ alt, ctrl         }, "l",     function () mpd.next();         shiny.mpd.hook() end),
-    awful.key({ alt, ctrl         }, "z",     function () shiny.mpd.info_rand();      shiny.mpd.hook() end),
-    awful.key({ alt, ctrl         }, "x",     function () shiny.mpd.info_crossfade(); shiny.mpd.hook() end),
+    awful.key({ alt, ctrl         }, "space", function () mpd.pause();        shiny.mpd.update() end),
+    awful.key({ alt, ctrl         }, "s",     function () mpd.stop();         shiny.mpd.update() end),
+    awful.key({ alt, ctrl         }, "h",     function () mpd.previous();     shiny.mpd.update() end),
+    awful.key({ alt, ctrl         }, "l",     function () mpd.next();         shiny.mpd.update() end),
+    awful.key({ alt, ctrl         }, "z",     function () shiny.mpd.info_rand();      shiny.mpd.update() end),
+    awful.key({ alt, ctrl         }, "x",     function () shiny.mpd.info_crossfade(); shiny.mpd.update() end),
     awful.key({ alt, ctrl         }, "i",     function () shiny.mpd.info(3)                    end),
     awful.key({ modkey, alt, ctrl }, "x",     function () awful.util.spawn("xrandr --auto")    end),
     awful.key({ modkey            }, "F2",    function () revelation.revelation()              end),
@@ -564,20 +410,20 @@ for i = 1, keynumber do
                             awful.tag.viewonly(tags[screen][i])
                         end
                   end),
-    awful.key({ modkey, "Control" }, i,
+    awful.key({ modkey, ctrl }, i,
                   function ()
                       local screen = mouse.screen
                       if tags[screen][i] then
                           awful.tag.viewtoggle(tags[screen][i])
                       end
                   end),
-    awful.key({ modkey, "Shift" }, i,
+    awful.key({ modkey, shift }, i,
                   function ()
                       if client.focus and tags[client.focus.screen][i] then
                           awful.client.movetotag(tags[client.focus.screen][i])
                       end
                   end),
-    awful.key({ modkey, "Control", "Shift" }, i,
+    awful.key({ modkey, shift, ctrl }, i,
                   function ()
                       if client.focus and tags[client.focus.screen][i] then
                           local c = client.focus
@@ -585,7 +431,7 @@ for i = 1, keynumber do
                           client.focus = c
                       end
                   end),
-    awful.key({ modkey, "Shift" }, "F" .. i,
+    awful.key({ modkey, shift }, "F" .. i,
                   function ()
                       local screen = mouse.screen
                       if tags[screen][i] then

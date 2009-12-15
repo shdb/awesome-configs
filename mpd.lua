@@ -273,6 +273,7 @@ function toggle_crossfade()
     else
         send("crossfade 5")
     end
+    status()
     return not isxfade
 end
 
@@ -295,6 +296,7 @@ function toggle_random()
     else
         send("random 1")
     end
+    status()
     return not isrand
 end
 
@@ -310,11 +312,14 @@ end
 
 -- Toggle repeat on/off
 function toggle_repeat()
-    if is_repeat() then
+    local rep = is_repeat()
+    if rep then
         send("repeat 0")
     else
         send("repeat 1")
     end
+    status()
+    return not rep
 end
 
 -- Repeat mode

@@ -1,6 +1,5 @@
 local awful = require("awful")
 local beautiful = require("beautiful")
-local wicked = require("wicked")
 local shiny = require("shiny")
 
 local tonumber = tonumber
@@ -11,9 +10,13 @@ local io = {
     close = io.close
 }
 local string = {
-    find = string.find
+    find = string.find,
+    sub  = string.sub
 }
-local widget, button, mouse, image = widget, button, mouse, image
+local math = { floor = math.floor }
+local os = { time = os.time }
+local widget, button, mouse, image, table, tostring
+    = widget, button, mouse, image, table, tostring
 
 local net_if = nil
 local essid = nil
@@ -24,36 +27,23 @@ local icon = widget({ type = "imagebox", align = "right" })
 local infobox = widget({type = "textbox", name = "netbox", align = "right" })
 local openbox = widget({ type = "textbox", align = "right" })
 
-local graph_down = widget({
-   type  = 'graph',
-   name  = 'netgraph_down',
-   align = 'right'
-})
-local graph_up = widget({
-    type  = 'graph',
-    name  = 'netgraph_up',
-    align = 'right'
-})
-graph_down.height = 0.85
-graph_down.width = 35
-graph_down.bg = beautiful.graph_bg
-graph_down.border_color = beautiful.bg_normal
-graph_down.grow = 'right'
+local graph_down = awful.widget.graph()
+awful.widget.layout.margins[graph_down.widget] = { top = 1, bottom = 1 }
+graph_down:set_height(13)
+graph_down:set_width(35)
+graph_down:set_color(beautiful.fg_normal)
+graph_down:set_background_color(beautiful.graph_bg)
+graph_down:set_border_color(beautiful.bg_normal)
+graph_down:set_scale("true")
 
-graph_up.height = 0.85
-graph_up.width = 35
-graph_up.bg = beautiful.graph_bg
-graph_up.border_color = beautiful.bg_normal
-graph_up.grow = 'right'
-
-graph_down:plot_properties_set('down', {
-    fg                = beautiful.fg_normal,
-    vertical_gradient = false
-})
-graph_up:plot_properties_set('up', {
-    fg                = beautiful.fg_normal,
-    vertical_gradient = false
-})
+local graph_up = awful.widget.graph()
+awful.widget.layout.margins[graph_up.widget] = { top = 1, bottom = 1 }
+graph_up:set_height(13)
+graph_up:set_width(35)
+graph_up:set_color(beautiful.fg_normal)
+graph_up:set_background_color(beautiful.graph_bg)
+graph_up:set_border_color(beautiful.bg_normal)
+graph_up:set_scale("true")
 
 local function file_exists(filename)
     local file = io.open(filename)
@@ -62,6 +52,60 @@ local function file_exists(filename)
         return true
     else
         return false
+    end
+end
+
+function splitbywhitespace(str)
+    values = {}
+    start = 1
+    splitstart, splitend = string.find(str, ' ', start)
+    
+    while splitstart do
+        m = string.sub(str, start, splitstart-1)
+        if m:gsub(' ','') ~= '' then
+            table.insert(values, m)
+        end
+
+        start = splitend+1
+        splitstart, splitend = string.find(str, ' ', start)
+    end
+
+    m = string.sub(str, start)
+    if m:gsub(' ','') ~= '' then
+        table.insert(values, m)
+    end
+
+    return values
+end
+
+function bytes_to_string(bytes, sec)
+    if bytes == nil or tonumber(bytes) == nil then
+        return ''
+    end
+
+    bytes = tonumber(bytes)
+
+    signs = {}
+    signs[1] = '  b'
+    signs[2] = 'KiB'
+    signs[3] = 'MiB'
+    signs[4] = 'GiB'
+    signs[5] = 'TiB'
+
+    sign = 1
+
+    while bytes/1024 > 1 and signs[sign+1] ~= nil do
+        bytes = bytes/1024
+        sign = sign+1
+    end
+
+    bytes = bytes*10
+    bytes = math.floor(bytes)/10
+
+    if sec then
+        return tostring(bytes)..signs[sign]..'ps'
+    else
+        return tostring(bytes)..signs[sign]
     end
 end
 
@@ -97,20 +141,99 @@ local function get_essid(iface)
     return ret
 end
 
+local nets = {}
+local function get_net_data()
+    local f = io.open('/proc/net/dev')
+    args = {}
+
+    for line in f:lines() do
+        line = splitbywhitespace(line)
+
+        local p = line[1]:find(':')
+        if p ~= nil then
+            name = line[1]:sub(0,p-1)
+            line[1] = line[1]:sub(p+1)
+
+            if tonumber(line[1]) == nil then
+                line[1] = line[2]
+                line[9] = line[10]
+            end
+
+            args['{'..name..' rx}'] = bytes_to_string(line[1])
+            args['{'..name..' tx}'] = bytes_to_string(line[9])
+
+            args['{'..name..' rx_b}'] = math.floor(line[1]*10)/10
+            args['{'..name..' tx_b}'] = math.floor(line[9]*10)/10
+            
+            args['{'..name..' rx_kb}'] = math.floor(line[1]/1024*10)/10
+            args['{'..name..' tx_kb}'] = math.floor(line[9]/1024*10)/10
+
+            args['{'..name..' rx_mb}'] = math.floor(line[1]/1024/1024*10)/10
+            args['{'..name..' tx_mb}'] = math.floor(line[9]/1024/1024*10)/10
+
+            args['{'..name..' rx_gb}'] = math.floor(line[1]/1024/1024/1024*10)/10
+            args['{'..name..' tx_gb}'] = math.floor(line[9]/1024/1024/1024*10)/10
+
+            if nets[name] == nil then 
+                nets[name] = {}
+                args['{'..name..' down}'] = 'n/a'
+                args['{'..name..' up}'] = 'n/a'
+                
+                args['{'..name..' down_b}'] = 0
+                args['{'..name..' up_b}'] = 0
+
+                args['{'..name..' down_kb}'] = 0
+                args['{'..name..' up_kb}'] = 0
+
+                args['{'..name..' down_mb}'] = 0
+                args['{'..name..' up_mb}'] = 0
+
+                args['{'..name..' down_gb}'] = 0
+                args['{'..name..' up_gb}'] = 0
+
+                nets[name].time = os.time()
+            else
+                interval = os.time()-nets[name].time
+                nets[name].time = os.time()
+
+                down = (line[1]-nets[name][1])/interval
+                up = (line[9]-nets[name][2])/interval
+
+                args['{'..name..' down}'] = bytes_to_string(down, true)
+                args['{'..name..' up}'] = bytes_to_string(up, true)
+
+                args['{'..name..' down_b}'] = math.floor(down*10)/10
+                args['{'..name..' up_b}'] = math.floor(up*10)/10
+
+                args['{'..name..' down_kb}'] = math.floor(down/1024*10)/10
+                args['{'..name..' up_kb}'] = math.floor(up/1024*10)/10
+
+                args['{'..name..' down_mb}'] = math.floor(down/1024/1024*10)/10
+                args['{'..name..' up_mb}'] = math.floor(up/1024/1024*10)/10
+
+                args['{'..name..' down_gb}'] = math.floor(down/1024/1024/1024*10)/10
+                args['{'..name..' up_gb}'] = math.floor(up/1024/1024/1024*10)/10
+            end
+
+            nets[name][1] = line[1]
+            nets[name][2] = line[9]
+        end
+    end
+
+    f:close()
+    return args
+
+end
+
 local function update()
+    local data = get_net_data()
     local nif = get_up()
     if not nif then
-        wicked.unregister(graph_down, false)
-        wicked.unregister(graph_up, false)
         openbox.text = ""
         icon.image = nil
         net_if = nil
         infobox.text = ""
     elseif net_if ~= nif then
-        wicked.unregister(graph_down, true)
-        wicked.unregister(graph_up, true)
-        wicked.register(graph_down, wicked.widgets.net,"${" .. nif .. " down_kb}",1,"down")
-        wicked.register(graph_up, wicked.widgets.net,"${" .. nif .. " up_kb}",1,"up")
         net_if = nif
         if nif == "wlan0" then
             icon.image = image(beautiful.wireless)
@@ -130,8 +253,12 @@ local function update()
         end
         infobox.text = shiny.bold(essid) .. shiny.fg(beautiful.hilight, " ] ")
     end
+    if nif then
+        graph_down:add_value(data["{" .. nif .. " down_kb}"])
+        graph_up:add_value(data["{" .. nif .. " up_kb}"])
+    end
 end
 
-shiny.register(update, 5)
+shiny.register(update, 1)
 
-setmetatable(_M, { __call = function () return {graph_up, graph_down, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
+setmetatable(_M, { __call = function () return {graph_up.widget, graph_down.widget, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })

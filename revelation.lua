@@ -13,7 +13,6 @@ local table = table
 local pairs = pairs
 local button = button
 local awful = awful
-local otable = otable
 local capi =
 {
     tag = tag,
@@ -34,21 +33,21 @@ function clients(class, s)
                 table.insert(clients, c)
             end
         end
-   else
+    else
         clients = capi.client.get(s)
-   end
-   return clients
+    end
+    return clients
 end
 
 function selectfn(restore)
     return function(c)
-               restore()
-               -- Pop to client tag
-               awful.tag.viewonly(c:tags()[1])
-               -- Focus and raise
-               capi.client.focus = c
-               c:raise()
-           end
+        restore()
+        -- Pop to client tag
+        awful.tag.viewonly(c:tags()[1])
+        -- Focus and raise
+        capi.client.focus = c
+        c:raise()
+    end
 end
 
 --- Returns keyboardhandler.
@@ -56,34 +55,29 @@ end
 -- Ignores modifiers.
 function keyboardhandler (restore)
     return function (mod, key, event)
-      if event ~= "press" then return true end
-                -- translate vim-style home keys to directions
-                if key == "j" or key == "k" or key == "h" or key == "l" then
-                  if key == "j" then
-                    key = "Down"
-                  elseif key == "k" then
-                    key = "Up"
-                  elseif key == "h" then
-                    key = "Left"
-                  elseif key == "l" then
-                    key = "Right"
-                  end
-                end
+        if event ~= "press" then return true end
+        -- translate vim-style home keys to directions
+        translate = {
+            j = "Down",
+            k = "Up",
+            h = "Left",
+            l = "Right"
+        }
+        key = translate[key] or key
 
-                --
-                if key == "Escape" then
-                    restore()
-                    -- awful.tag.history.restore()
-                    return false
-                elseif key == "Return" then
-                    selectfn(restore)(capi.client.focus)
-                    return false
-                elseif key == "Left" or key == "Right" or
-                    key == "Up" or key == "Down" then
-                    awful.client.focus.bydirection(key:lower())
-                end
-                return true
-           end
+        if key == "Escape" then
+            restore()
+            -- awful.tag.history.restore()
+            return false
+        elseif key == "Return" then
+            selectfn(restore)(capi.client.focus)
+            return false
+        elseif key == "Left" or key == "Right" or
+            key == "Up" or key == "Down" then
+            awful.client.focus.bydirection(key:lower())
+        end
+        return true
+    end
 end
 
 --- Implement Exposé (from Mac OS X).
@@ -93,9 +87,9 @@ end
 function revelation(class, fn, s)
     local screen = s or capi.mouse.screen
     local t = awful.tag.selected()
-	local data = otable()
+    local data = {}
 
-	local clients = clients(class, screen)
+    local clients = clients(class, screen)
     local oset = {}
     oset.mwfact = awful.tag.getmwfact(t)
     oset.ncol = awful.tag.getncol(t)
@@ -114,28 +108,28 @@ function revelation(class, fn, s)
     t:clients(allc)
 
     local function restore()
-      local t = awful.tag.selected()
-      for i,c in pairs(allc) do
-	  	-- Restore client mouse bindings
-		c:buttons(data[c])
-		data[c] = nil
-        if not oset.clients[c] then
-          awful.client.toggletag(t,c)
+        local t = awful.tag.selected()
+        for i,c in pairs(allc) do
+            -- Restore client mouse bindings
+            c:buttons(data[c])
+            data[c] = nil
+            if not oset.clients[c] then
+                awful.client.toggletag(t,c)
+            end
         end
-      end
-      awful.tag.setproperty(t,"layout",oset.layout)
-      awful.tag.setnmaster(oset.nmaster,t)
-      awful.tag.setmwfact(oset.mwfact, t)
-      awful.tag.setncol(oset.ncol, t)
-      awful.tag.viewonly(t)
+        awful.tag.setproperty(t,"layout",oset.layout)
+        awful.tag.setnmaster(oset.nmaster,t)
+        awful.tag.setmwfact(oset.mwfact, t)
+        awful.tag.setncol(oset.ncol, t)
+        awful.tag.viewonly(t)
 
-      capi.keygrabber.stop()
+        capi.keygrabber.stop()
     end
 
-	for k, c in pairs(clients) do
-		data[c] = c:buttons()
-		c:buttons({ button({}, 1, selectfn(restore)) })
-	end
+    for k, c in pairs(clients) do
+        data[c] = c:buttons()
+        c:buttons(awful.util.table.join(awful.button({}, 1, selectfn(restore)) ))
+    end
     awful.tag.viewonly(t)
     capi.keygrabber.run(keyboardhandler(restore))
 end
