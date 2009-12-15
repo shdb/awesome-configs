@@ -59,7 +59,7 @@ function splitbywhitespace(str)
     values = {}
     start = 1
     splitstart, splitend = string.find(str, ' ', start)
-    
+
     while splitstart do
         m = string.sub(str, start, splitstart-1)
         if m:gsub(' ','') ~= '' then
@@ -164,7 +164,7 @@ local function get_net_data()
 
             args['{'..name..' rx_b}'] = math.floor(line[1]*10)/10
             args['{'..name..' tx_b}'] = math.floor(line[9]*10)/10
-            
+
             args['{'..name..' rx_kb}'] = math.floor(line[1]/1024*10)/10
             args['{'..name..' tx_kb}'] = math.floor(line[9]/1024*10)/10
 
@@ -174,11 +174,11 @@ local function get_net_data()
             args['{'..name..' rx_gb}'] = math.floor(line[1]/1024/1024/1024*10)/10
             args['{'..name..' tx_gb}'] = math.floor(line[9]/1024/1024/1024*10)/10
 
-            if nets[name] == nil then 
+            if nets[name] == nil then
                 nets[name] = {}
                 args['{'..name..' down}'] = 'n/a'
                 args['{'..name..' up}'] = 'n/a'
-                
+
                 args['{'..name..' down_b}'] = 0
                 args['{'..name..' up_b}'] = 0
 

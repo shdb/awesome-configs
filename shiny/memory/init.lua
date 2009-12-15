@@ -9,8 +9,8 @@ local io = {
     close = io.close
 }
 local string = {
-	find = string.find,
-	sub  = string.sub
+    find = string.find,
+    sub  = string.sub
 }
 local math = { floor = math.floor }
 local widget, button, mouse, image, table
@@ -91,7 +91,7 @@ local function get_mem()
 end
 
 local function update()
-	bar:bar_data_add("mem", get_mem()[1])
+    bar:bar_data_add("mem", get_mem()[1])
 end
 
 shiny.register(update, 2)

@@ -5,16 +5,16 @@ local shiny = require("shiny")
 
 local setmetatable = setmetatable
 local io = {
-	open = io.open,
-	popen = io.popen,
-	close = io.close
+    open = io.open,
+    popen = io.popen,
+    close = io.close
 }
 local string = {
-	find   = string.find,
+    find   = string.find,
     gmatch = string.gmatch
 }
 local math = {
-	floor = math.floor
+    floor = math.floor
 }
 local widget, button, mouse, image, ipairs, table
     = widget, button, mouse, image, ipairs, table
@@ -54,24 +54,24 @@ local function file_exists(filename)
 end
 
 local function get_cpu_freq()
-	local fhz = io.open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
-	local hz = fhz:read();
-	fhz:close()
-	return round_num(hz/10^6, 1) .. " GHz" .. shiny.fg(beautiful.hilight, " | ")
+    local fhz = io.open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
+    local hz = fhz:read();
+    fhz:close()
+    return round_num(hz/10^6, 1) .. " GHz" .. shiny.fg(beautiful.hilight, " | ")
 end
 
-local function get_temp() 
-	local f = io.popen("acpi -t")
-	local ret = ""
-	for line in f:lines() do
-		local _, _, temp = string.find(line, "(..)\.. degrees")
-		if temp then
-			ret = ret .. temp .. "C, "
-		end
-	end
-	f:close()
-	ret = ret:sub(0, ret:len() - 2)
-	return ret .. shiny.fg(beautiful.hilight, " ] ")
+local function get_temp()
+    local f = io.popen("acpi -t")
+    local ret = ""
+    for line in f:lines() do
+        local _, _, temp = string.find(line, "(..)\.. degrees")
+        if temp then
+            ret = ret .. temp .. "C, "
+        end
+    end
+    f:close()
+    ret = ret:sub(0, ret:len() - 2)
+    return ret .. shiny.fg(beautiful.hilight, " ] ")
 end
 
 -- Initialise function tables
@@ -133,7 +133,7 @@ local function get_cpu_usage()
 end
 
 local function update()
-	infobox_temp.text = get_temp()
+    infobox_temp.text = get_temp()
     infobox_cpu.text = get_cpu_freq()
     graph:add_value(get_cpu_usage()[1])
 end

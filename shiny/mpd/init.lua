@@ -7,19 +7,19 @@ local mpd = require("mpd")
 local tonumber = tonumber
 local setmetatable = setmetatable
 local io = {
-	open = io.open,
-	popen = io.popen,
-	close = io.close
+    open = io.open,
+    popen = io.popen,
+    close = io.close
 }
 local string = {
-	find = string.find
+    find = string.find
 }
 local os = {
-	date = os.date
+    date = os.date
 }
 local table = {
-	insert = table.insert,
-	sort = table.sort
+    insert = table.insert,
+    sort = table.sort
 }
 local widget, button, mouse, image = widget, button, mouse, image
 
@@ -55,36 +55,36 @@ function update()
     mpd.status()
 
     if not mpd.is_connected() then
-		openbox.text = ""
-		icon.image = nil
+        openbox.text = ""
+        icon.image = nil
         infobox.text = ""
-		return
+        return
     end
 
     if mpd.is_stop() then
-		icon.image = image(beautiful.mpd_stop)
+        icon.image = image(beautiful.mpd_stop)
         openbox.text =  shiny.fg(beautiful.hilight, "[ ") .. shiny.bold("MPD")
-		infobox.text = shiny.fg(beautiful.hilight, " ]")
+        infobox.text = shiny.fg(beautiful.hilight, " ]")
     end
 
-	if mpd.is_playing() then
-		icon.image = image(beautiful.mpd_play)
-	elseif mpd.is_pause() then
-		icon.image = image(beautiful.mpd_pause)
-	end
-	openbox.text =  shiny.fg(beautiful.hilight, "[ ")
-		.. awful.util.escape(mpd.artist())
-		.. " - "
-		.. awful.util.escape(mpd.title())
-	infobox.text = shiny.fg(beautiful.hilight, " | ")
-		.. timeformat(mpd.elapsed_time())
-		.. shiny.fg(beautiful.hilight, " / ")
-		.. timeformat(mpd.time())
-		.. shiny.fg(beautiful.hilight, " ]")
+    if mpd.is_playing() then
+        icon.image = image(beautiful.mpd_play)
+    elseif mpd.is_pause() then
+        icon.image = image(beautiful.mpd_pause)
+    end
+    openbox.text =  shiny.fg(beautiful.hilight, "[ ")
+        .. awful.util.escape(mpd.artist())
+        .. " - "
+        .. awful.util.escape(mpd.title())
+    infobox.text = shiny.fg(beautiful.hilight, " | ")
+        .. timeformat(mpd.elapsed_time())
+        .. shiny.fg(beautiful.hilight, " / ")
+        .. timeformat(mpd.time())
+        .. shiny.fg(beautiful.hilight, " ]")
 end
 
 function info(tout)
-	remove_notify(popup)
+    remove_notify(popup)
     if not tout then tout = 0 end
     local string = ""
     if not mpd.is_stop() then

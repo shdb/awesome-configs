@@ -10,8 +10,8 @@ local pairs, screen, mouse, client
 module("shiny.topapps")
 
 topapps = {
-        ["Gkrellm"] = true, 
-        ["MPlayer"] = true, 
+        ["Gkrellm"] = true,
+        ["MPlayer"] = true,
     }
 
 local function update(c)
