@@ -2,7 +2,6 @@
 require("awful")
 require("awful.autofocus")
 require("awful.rules")
-require("wicked")
 require("beautiful")
 theme_path = awful.util.getdir("config") .. "/themes/shdb/theme.lua"
 beautiful.init(theme_path)
@@ -15,6 +14,7 @@ require("shiny.borders")
 require("shiny.clock")
 require("shiny.cpu")
 require("shiny.mpd")
+require("shiny.memory")
 require("shiny.net")
 require("shiny.tasklist")
 require("shiny.topapps")
@@ -113,29 +113,6 @@ end
 gapbox = widget { type = "textbox" }
 gapbox.text = " "
 
-memicon = widget({ type = "imagebox" })
-memicon.image = image(beautiful["mem"])
-membar =  widget({ type = "progressbar" })
-membar.width = 4
-membar.height = 1.0
-membar.border_padding = 0
-membar.border_width = 0
-membar.ticks_count = 5
-membar.vertical = true
-
-membar:bar_properties_set("mem", 
-{ 
-    bg           = beautiful.bg_normal,
-    fg           = beautiful.fg_normal,
-    fg_center    = beautiful.graph_center,
-    fg_end       = beautiful.graph_end,
-    fg_off       = beautiful.graph_bg,
-    border_color = beautiful.bg_normal,
-    reverse      = false
-})
-
-wicked.register(membar, wicked.widgets.mem, '$1', 1, 'mem')
-
 -- Create a laucher widget and a main menu
 myawesomemenu = {
    { "manual", terminal .. " -e man awesome" },
@@ -202,7 +179,7 @@ for s = 1, screen.count() do
         gapbox,
         shiny.volume(),
         gapbox,
-        membar, memicon,
+        shiny.memory(),
         gapbox,
         shiny.cpu(),
         shiny.net(),
