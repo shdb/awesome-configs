@@ -260,7 +260,7 @@ for s = 1, screen.count() do
         gapbox,
         shiny.volume(),
         gapbox,
-        memicon, membar,
+        membar, memicon,
         gapbox,
         shiny.cpu(),
         shiny.net(),
