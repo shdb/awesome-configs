@@ -13,12 +13,10 @@ for s = 1, screen.count() do
 end
 
 function update(c)
-    -- tasklist and topapps
     local ccount = 0
     local selc = 0
     local mcount = 0
-    local lscreen
-    lscreen = c and c.screen or mouse.screen
+    local lscreen = c and c.screen or mouse.screen
     for _, ttag in pairs(awful.tag.selectedlist(lscreen)) do
         for _, tclient in pairs(ttag:clients()) do
             ccount = ccount + 1
