@@ -18,6 +18,7 @@ require("shiny.mpd")
 require("shiny.net")
 require("shiny.tasklist")
 require("shiny.topapps")
+require("shiny.volume")
 
 -- {{{ Variable definitions
 
@@ -74,54 +75,6 @@ for s = 1, screen.count() do
     tags[s][1].selected = true
 end
 -- }}}
-
-cardid  = 0
-lastvol = 0
-mute = false
-function volume(mode, widget, channel)
-    local function get_vol(channel)
-        local fd = io.popen("amixer -c " .. cardid .. " -- sget " .. channel)
-        local status = fd:read("*all")
-            fd:close()
-    
-        local volume = string.match(status, "(%d?%d?%d)%%")
-        if not volume then return 0 end
-        return string.format("% 3d", volume)
-    end
-    if mode == "update" then
-        widget:bar_data_add("vol", get_vol(channel))
-    elseif mode == "up" then
-        if mute then
-            mute = not mute
-            awful.util.spawn("amixer -q -c " .. cardid .. " sset PCM 100%")
-        end
-        awful.util.spawn("amixer -q -c " .. cardid .. " sset " .. channel .. " 2%+")
-        volume("update", widget, channel)
-    elseif mode == "down" then
-        awful.util.spawn("amixer -q -c " .. cardid .. " sset " .. channel .. " 2%-")
-        volume("update", widget, channel)
-    elseif mode == "init" then
-        if tonumber(get_vol("PCM")) ~= 100 then
-            mute = true
-            awful.util.spawn("amixer -q -c " .. cardid .. " sset " .. channel .. " 0%")
-        end
-        volume("update", widget, channel)
-    else
-        local vol_chan = get_vol(channel)
-        local vol_pcm
-        if mute then
-            vol_pcm = 100
-        else
-            vol_pcm = 0
-            lastvol = 0
-        end
-        mute = not mute
-        awful.util.spawn("amixer -q -c " .. cardid .. " sset " .. channel .. " " .. lastvol .. "%")
-        awful.util.spawn("amixer -q -c " .. cardid .. " sset PCM " .. vol_pcm .. "%")
-        volume("update", widget, channel)
-        lastvol = vol_chan
-    end
-end
 
 -- {{{ Widgets
 -- Set background color
@@ -218,32 +171,6 @@ openbox.text = fg(beautiful.hilight, "[ ")
 closebox = widget { type = "textbox" }
 closebox.text = fg(beautiful.hilight, " ]")
 
-volumeicon = widget({ type = "imagebox" })
-volumeicon.image = image(beautiful["volume"])
-volumeicon:buttons(awful.util.table.join(
-    awful.button({ }, 1, function() volume("mute", volumebar, "Master") end)
-))
-volumebar =  widget({ type = "progressbar", name = "volumebar" })
-volumebar.width = 4
-volumebar.height = 1.0
-volumebar.border_padding = 0
-volumebar.border_width = 0
-volumebar.ticks_count = 5
-volumebar.vertical = true
-
-volumebar:bar_properties_set("vol", 
-{ 
-    bg           = beautiful.bg_normal,
-    fg           = beautiful.fg_normal,
-    fg_off       = beautiful.graph_bg,
-    border_color = beautiful.bg_normal,
-    reverse      = false
-})
-volume("init", volumebar, "Master")
-volumebar:buttons(awful.util.table.join(
-    awful.button({ }, 1, function() volume("mute", volumebar, "Master") end)
-))
-
 memicon = widget({ type = "imagebox" })
 memicon.image = image(beautiful["mem"])
 membar =  widget({ type = "progressbar" })
@@ -331,7 +258,7 @@ for s = 1, screen.count() do
         s == 1 and mysystray or nil,
         shiny.clock(),
         gapbox,
-        volumeicon, volumebar,
+        shiny.volume(),
         gapbox,
         memicon, membar,
         gapbox,
@@ -404,11 +331,11 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, ",", function () awful.layout.inc(layouts, -1)     end),
 
     awful.key({ modkey            }, "r",     function () mypromptbox[mouse.screen]:run()      end),
-    awful.key({                   }, volup,   function () volume("up", volumebar, "Master")    end),
-    awful.key({                   }, voldn,   function () volume("down", volumebar, "Master")  end),
-    awful.key({ alt, ctrl         }, "j",     function () volume("down", volumebar, "Master")  end),
-    awful.key({ alt, ctrl         }, "k",     function () volume("up", volumebar, "Master")    end),
-    awful.key({ alt, ctrl         }, "m",     function () volume("mute", volumebar, "Master")  end),
+    awful.key({                   }, volup,   function () shiny.volume.up()                    end),
+    awful.key({                   }, voldn,   function () shiny.volume.down()                  end),
+    awful.key({ alt, ctrl         }, "j",     function () shiny.volume.down()                  end),
+    awful.key({ alt, ctrl         }, "k",     function () shiny.volume.up()                    end),
+    awful.key({ alt, ctrl         }, "m",     function () shiny.volume.mute()                  end),
     awful.key({ modkey, alt, ctrl }, "l",     function () toggle_keyboard_layout()             end),
     awful.key({ alt, ctrl         }, "space", function () mpd.pause();        shiny.mpd.update() end),
     awful.key({ alt, ctrl         }, "s",     function () mpd.stop();         shiny.mpd.update() end),
