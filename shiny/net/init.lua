@@ -45,40 +45,7 @@ graph_up:set_background_color(beautiful.graph_bg)
 graph_up:set_border_color(beautiful.bg_normal)
 graph_up:set_scale("true")
 
-local function file_exists(filename)
-    local file = io.open(filename)
-    if file then
-        io.close(file)
-        return true
-    else
-        return false
-    end
-end
-
-function splitbywhitespace(str)
-    values = {}
-    start = 1
-    splitstart, splitend = string.find(str, ' ', start)
-
-    while splitstart do
-        m = string.sub(str, start, splitstart-1)
-        if m:gsub(' ','') ~= '' then
-            table.insert(values, m)
-        end
-
-        start = splitend+1
-        splitstart, splitend = string.find(str, ' ', start)
-    end
-
-    m = string.sub(str, start)
-    if m:gsub(' ','') ~= '' then
-        table.insert(values, m)
-    end
-
-    return values
-end
-
-function bytes_to_string(bytes, sec)
+local function bytes_to_string(bytes, sec)
     if bytes == nil or tonumber(bytes) == nil then
         return ''
     end
@@ -114,7 +81,7 @@ local function get_up()
     lfd = io.open("/sys/class/net/eth0/operstate")
     lan = lfd:read()
     lfd:close()
-    if file_exists("/sys/class/net/wlan0/operstate") then
+    if shiny.file_exists("/sys/class/net/wlan0/operstate") then
         wfd = io.open("/sys/class/net/wlan0/operstate")
         wlan = wfd:read()
         wfd:close()
@@ -147,7 +114,7 @@ local function get_net_data()
     args = {}
 
     for line in f:lines() do
-        line = splitbywhitespace(line)
+        line = shiny.splitbywhitespace(line)
 
         local p = line[1]:find(':')
         if p ~= nil then

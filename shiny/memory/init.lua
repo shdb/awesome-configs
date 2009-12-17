@@ -39,36 +39,13 @@ bar:bar_properties_set("mem",
     reverse      = false
 })
 
-function splitbywhitespace(str)
-    values = {}
-    start = 1
-    splitstart, splitend = string.find(str, ' ', start)
-
-    while splitstart do
-        m = string.sub(str, start, splitstart-1)
-        if m:gsub(' ','') ~= '' then
-            table.insert(values, m)
-        end
-
-        start = splitend+1
-        splitstart, splitend = string.find(str, ' ', start)
-    end
-
-    m = string.sub(str, start)
-    if m:gsub(' ','') ~= '' then
-        table.insert(values, m)
-    end
-
-    return values
-end
-
 local function get_mem()
     -- Return MEM usage values
     local f = io.open('/proc/meminfo')
 
     ---- Get data
     for line in f:lines() do
-        line = splitbywhitespace(line)
+        line = shiny.splitbywhitespace(line)
 
         if line[1] == 'MemTotal:' then
             mem_total = math.floor(line[2]/1024)

@@ -12,18 +12,10 @@ local infobox = widget({ type = "textbox" })
 
 calendar = nil
 cal_offset = 0
-function remove_notify(notify)
-    if notify then
-        naughty.destroy(notify)
-        notify = nil
-        cal_offset = 0
-    end
-end
 
 function add_calendar(inc_offset)
-    local save_offset = cal_offset
-    remove_notify(calendar)
-    cal_offset = save_offset + inc_offset
+    shiny.remove_notify(calendar)
+    cal_offset = cal_offset + inc_offset
     local datespec = os.date("*t")
     datespec = datespec.year * 12 + datespec.month - 1 + cal_offset
     datespec = (datespec % 12 + 1) .. " " .. math.floor(datespec / 12)
@@ -46,7 +38,7 @@ local function update()
 end
 
 infobox:add_signal("mouse::enter", function() add_calendar(0) end)
-infobox:add_signal("mouse::leave", function() remove_notify(calendar) end)
+infobox:add_signal("mouse::leave", function() shiny.remove_notify(calendar); cal_offset = 0 end)
 
 infobox:buttons(awful.util.table.join(
     awful.button({ }, 1, function() add_calendar(-1) end),

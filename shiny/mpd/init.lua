@@ -28,13 +28,6 @@ local icon = widget({ type = "imagebox", align = "right" })
 local infobox = widget({type = "textbox", name = "batterybox", align = "right" })
 local openbox = widget({ type = "textbox", align = "right" })
 
-local function remove_notify(notify)
-    if notify then
-        naughty.destroy(notify)
-        notify = nil
-    end
-end
-
 local function onoff(value)
     if value then
         return "on"
@@ -84,7 +77,7 @@ function update()
 end
 
 function info(tout)
-    remove_notify(popup)
+    shiny.remove_notify(popup)
     if not tout then tout = 0 end
     local string = ""
     if not mpd.is_stop() then
@@ -168,11 +161,11 @@ icon:buttons(button_table)
 infobox:buttons(button_table)
 
 openbox:add_signal("mouse::enter", function() info() end)
-openbox:add_signal("mouse::leave", function() remove_notify(popup) end)
+openbox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 icon:add_signal("mouse::enter", function() info() end)
-icon:add_signal("mouse::leave", function() remove_notify(popup) end)
+icon:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 infobox:add_signal("mouse::enter", function() info() end)
-infobox:add_signal("mouse::leave", function() remove_notify(popup) end)
+infobox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 
 
 shiny.register(update, 1)

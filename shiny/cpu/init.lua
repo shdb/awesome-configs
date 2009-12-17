@@ -43,16 +43,6 @@ local function round_num(num, idp)
     return math.floor(num * mult + 0.5) / mult
 end
 
-local function file_exists(filename)
-    local file = io.open(filename)
-    if file then
-        io.close(file)
-        return true
-    else
-        return false
-    end
-end
-
 local function get_cpu_freq()
     local fhz = io.open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
     local hz = fhz:read();

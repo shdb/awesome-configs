@@ -1,5 +1,11 @@
-local capi  = { timer = timer }
+local naughty = require("naughty")
 local beautiful = require("beautiful")
+local capi  = { timer = timer }
+local io = { open  = io.open,
+             close = io.close }
+local string = { sub  = string.sub,
+                 find = string.find }
+local table = { insert = table.insert }
 module("shiny")
 
 function register(func, tout)
@@ -53,5 +59,45 @@ function widget_value(content, next_value)
         value = next_value
     end
     return value
+end
+
+function remove_notify(notify)
+    if notify then
+        naughty.destroy(notify)
+        notify = nil
+    end
+end
+
+function file_exists(filename)
+    local file = io.open(filename)
+    if file then
+        io.close(file)
+        return true
+    else
+        return false
+    end
+end
+
+function splitbywhitespace(str)
+    values = {}
+    start = 1
+    splitstart, splitend = string.find(str, ' ', start)
+
+    while splitstart do
+        m = string.sub(str, start, splitstart-1)
+        if m:gsub(' ','') ~= '' then
+            table.insert(values, m)
+        end
+
+        start = splitend+1
+        splitstart, splitend = string.find(str, ' ', start)
+    end
+
+    m = string.sub(str, start)
+    if m:gsub(' ','') ~= '' then
+        table.insert(values, m)
+    end
+
+    return values
 end
 

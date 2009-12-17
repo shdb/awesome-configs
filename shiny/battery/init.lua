@@ -25,23 +25,6 @@ local infobox = widget({type = "textbox", name = "batterybox", align = "right" }
 local openbox = widget({ type = "textbox", align = "right" })
 local closebox = widget({ type = "textbox", align = "right" })
 
-local function file_exists(filename)
-    local file = io.open(filename)
-    if file then
-        io.close(file)
-        return true
-    else
-        return false
-    end
-end
-
-local function remove_notify(notify)
-    if notify then
-        naughty.destroy(notify)
-        notify = nil
-    end
-end
-
 local function battery_info()
     local function battery_remaining()
         local f = io.popen("acpi -b")
@@ -55,7 +38,7 @@ local function battery_info()
         f:close()
         return ret
     end
-    remove_notify(popup)
+    shiny.remove_notify(popup)
     local timerem = battery_remaining()
     if timerem then
         popup = naughty.notify({
@@ -69,7 +52,7 @@ end
 
 local function update()
     local adapter = "BAT0"
-    if file_exists("/sys/class/power_supply/"..adapter) then
+    if shiny.file_exists("/sys/class/power_supply/"..adapter) then
         spacer = " "
         local fcur = io.open("/sys/class/power_supply/"..adapter.."/energy_now")
         local fcap = io.open("/sys/class/power_supply/"..adapter.."/energy_full")
@@ -117,13 +100,13 @@ local function update()
 end
 
 infobox:add_signal("mouse::enter", function () battery_info() end)
-infobox:add_signal("mouse::leave", function() remove_notify(popup) end)
+infobox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 icon:add_signal("mouse:enter", function () battery_info() end)
-icon:add_signal("mouse::leave", function() remove_notify(popup) end)
+icon:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 closebox:add_signal("mouse::enter", function () battery_info() end)
-closebox:add_signal("mouse::leave", function() remove_notify(popup) end)
+closebox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 openbox:add_signal("mouse::enter", function () battery_info() end)
-openbox:add_signal("mouse::leave", function() remove_notify(popup) end)
+openbox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 
 shiny.register(update, 5)
 
