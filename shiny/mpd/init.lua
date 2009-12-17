@@ -88,14 +88,15 @@ function info(tout)
     if not tout then tout = 0 end
     local string = ""
     if not mpd.is_stop() then
-        string = string .. shiny.bold("Artist:\t") .. awful.util.escape(mpd.artist()) .. "\n"
-        string = string .. shiny.bold("Title:\t\t") .. awful.util.escape(mpd.title()) .. "\n"
-        string = string .. shiny.bold("Album:\t") .. awful.util.escape(mpd.album()) .. "\n"
-        string = string .. shiny.bold("Year:\t") .. mpd.year() .. "\t"
+        string = string
+            .. shiny.bold("Artist:\t") .. awful.util.escape(mpd.artist()) .. "\n"
+            .. shiny.bold("Title:\t\t") .. awful.util.escape(mpd.title()) .. "\n"
+            .. shiny.bold("Album:\t") .. awful.util.escape(mpd.album()) .. "\n"
+            .. shiny.bold("Year:\t") .. mpd.year() .. "\t"
             .. shiny.bold("Genre: ") .. awful.util.escape(mpd.genre()) .. "\n"
     end
     string = string .. shiny.bold("random: ") .. onoff(mpd.is_random())
-    string = string .. shiny.bold("\tcrossfade: ") .. onoff(mpd.is_xfade())
+                    .. shiny.bold("\tcrossfade: ") .. onoff(mpd.is_xfade())
     popup = naughty.notify({
             title = "mpd",
             text = string,
