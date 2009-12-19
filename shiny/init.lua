@@ -6,6 +6,7 @@ local io = { open  = io.open,
 local string = { sub  = string.sub,
                  find = string.find }
 local table = { insert = table.insert }
+local math = { floor = math.floor }
 module("shiny")
 
 function register(func, tout)
@@ -101,3 +102,10 @@ function splitbywhitespace(str)
     return values
 end
 
+function round_num(num, idp, dot)
+    if dot then
+        return math.floor(num + 0.5)
+    end
+    local mult = 10^(idp or 0)
+    return math.floor(num * mult + 0.5) / mult
+end
