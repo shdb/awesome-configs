@@ -245,8 +245,8 @@ local function update()
             .. shiny.fg(beautiful.hilight, " / ")
             .. padd(data[nif .. "_up_kb"])
             .. shiny.fg(beautiful.hilight, " ] ")
-        infobox.text = text
     end
+    infobox.text = text
 end
 
 shiny.register(update, 1)
