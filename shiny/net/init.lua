@@ -192,25 +192,42 @@ local function get_net_data()
 
 end
 
+local padding = 0
+local paddu = 0
+function padd(text)
+    local text = tostring(text)
+    if text:len() >= padding then
+        padding = text:len()
+        paddu = 0
+    else
+        paddu = paddu + 1
+        if paddu == 30 then
+            paddu = 0
+            padding = padding - 1
+        end
+    end
+    while text:len() < padding do
+        text = " " .. text
+    end
+    return text
+end
+
 local function update()
     local data = get_net_data()
     local nif = get_up()
+    local text = ""
     if not nif then
         openbox.text = ""
         icon.image = nil
         net_if = nil
-        infobox.text = ""
     elseif net_if ~= nif then
         net_if = nif
         if nif == "wlan0" then
             icon.image = image(beautiful.wireless)
-            openbox.text = shiny.fg(beautiful.hilight, "[ ")
             essid = get_essid(nif)
-            infobox.text = shiny.bold(essid) .. shiny.fg(beautiful.hilight, " ] ")
+            text = shiny.bold(essid)
         elseif nif == "eth0" then
             icon.image = image(beautiful.network)
-            openbox.text = ""
-            infobox.text = ""
         end
     elseif nif == "wlan0" then
         last_update = last_update + 1
@@ -218,11 +235,18 @@ local function update()
             last_update = 0
             essid = get_essid(nif)
         end
-        infobox.text = shiny.bold(essid) .. shiny.fg(beautiful.hilight, " ] ")
+        text = shiny.bold(essid)
     end
     if nif then
+        openbox.text = shiny.fg(beautiful.hilight, "[ ")
         graph_down:add_value(data["{" .. nif .. " down_kb}"])
         graph_up:add_value(data["{" .. nif .. " up_kb}"])
+        text = text .. " "
+            .. padd(shiny.round_num(data["{" .. nif .. " down_kb}"], 1, 1))
+            .. shiny.fg(beautiful.hilight, " / ")
+            .. padd(shiny.round_num(data["{" .. nif .. " up_kb}"], 1, 1))
+            .. shiny.fg(beautiful.hilight, " ] ")
+        infobox.text = text
     end
 end
 
