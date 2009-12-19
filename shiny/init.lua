@@ -103,9 +103,10 @@ function splitbywhitespace(str)
 end
 
 function round_num(num, idp, dot)
-    if dot then
-        return math.floor(num + 0.5)
-    end
     local mult = 10^(idp or 0)
-    return math.floor(num * mult + 0.5) / mult
+    num = math.floor(num * mult + 0.5) / mult
+    if dot then
+        num = math.floor(num + 0.5)
+    end
+    return num
 end
