@@ -20,17 +20,16 @@ local widget, button, mouse, image = widget, button, mouse, image
 
 
 module("shiny.battery")
-local icon = widget({ type = "imagebox", align = "right" })
-local infobox = widget({type = "textbox", name = "batterybox", align = "right" })
-local openbox = widget({ type = "textbox", align = "right" })
-local closebox = widget({ type = "textbox", align = "right" })
+local icon = widget({ type = "imagebox" })
+local infobox = widget({ type = "textbox", name = "batterybox" })
+local openbox = widget({ type = "textbox" })
 
 local function battery_info()
     local function battery_remaining()
         local f = io.popen("acpi -b")
         local ret = nil
         for line in f:lines() do
-            local _, _, rem = string.find(line, "(..:..:..) remaining")
+            local _, _, rem = string.find(line, "(..:..:.. .*)")
             if rem then
                 ret = rem
             end
@@ -39,11 +38,11 @@ local function battery_info()
         return ret
     end
     shiny.remove_notify(popup)
-    local timerem = battery_remaining()
-    if timerem then
+    local text = battery_remaining()
+    if text then
         popup = naughty.notify({
                 title = "battery",
-                text = timerem .. " remaining",
+                text = text,
                 timeout = 0,
                 hover_timeout = 0.5,
                })
@@ -60,6 +59,9 @@ local function update()
         local cur = fcur:read()
         local cap = fcap:read()
         local sta = fsta:read()
+        fcur:close()
+        fcap:close()
+        fsta:close()
         local battery = math.floor(cur * 100 / cap)
         if sta:match("Charging") then
             battery = battery .. "% A/C"
@@ -84,16 +86,11 @@ local function update()
         else
             battery = "A/C"
         end
-        fcur:close()
-        fcap:close()
-        fsta:close()
         openbox.text = shiny.fg(beautiful.hilight, " [ ")
-        closebox.text = shiny.fg(beautiful.hilight, " ]")
         icon.image = image(beautiful.battery)
-        infobox.text = battery
+        infobox.text = battery .. shiny.fg(beautiful.hilight, " ]")
     else
         openbox.text = ""
-        closebox.text = ""
         icon.image = nil
         infobox.text = ""
     end
@@ -101,13 +98,11 @@ end
 
 infobox:add_signal("mouse::enter", function () battery_info() end)
 infobox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
-icon:add_signal("mouse:enter", function () battery_info() end)
+icon:add_signal("mouse::enter", function () battery_info() end)
 icon:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
-closebox:add_signal("mouse::enter", function () battery_info() end)
-closebox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 openbox:add_signal("mouse::enter", function () battery_info() end)
 openbox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 
 shiny.register(update, 5)
 
-setmetatable(_M, { __call = function () return {closebox, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
+setmetatable(_M, { __call = function () return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
