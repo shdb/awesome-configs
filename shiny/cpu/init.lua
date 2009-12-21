@@ -5,16 +5,16 @@ local shiny = require("shiny")
 
 local setmetatable = setmetatable
 local io = {
-	open = io.open,
-	popen = io.popen,
-	close = io.close
+    open = io.open,
+    popen = io.popen,
+    close = io.close
 }
 local string = {
-	find   = string.find,
+    find   = string.find,
     gmatch = string.gmatch
 }
 local math = {
-	floor = math.floor
+    floor = math.floor
 }
 local widget, button, mouse, image, ipairs, table
     = widget, button, mouse, image, ipairs, table
@@ -38,40 +38,25 @@ graph:set_background_color(beautiful.graph_bg)
 graph:set_border_color(beautiful.bg_normal)
 graph:set_max_value(100)
 
-local function round_num(num, idp)
-    local mult = 10^(idp or 0)
-    return math.floor(num * mult + 0.5) / mult
-end
-
-local function file_exists(filename)
-    local file = io.open(filename)
-    if file then
-        io.close(file)
-        return true
-    else
-        return false
-    end
-end
-
 local function get_cpu_freq()
-	local fhz = io.open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
-	local hz = fhz:read();
-	fhz:close()
-	return round_num(hz/10^6, 1) .. " GHz" .. shiny.fg(beautiful.hilight, " ] ")
+    local fhz = io.open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
+    local hz = fhz:read();
+    fhz:close()
+    return shiny.round_num(hz/10^6, 1) .. " GHz" .. shiny.fg(beautiful.hilight, " | ")
 end
 
-local function get_temp() 
-	local f = io.popen("acpi -t")
-	local ret = ""
-	for line in f:lines() do
-		local _, _, temp = string.find(line, "(..)\.. degrees")
-		if temp then
-			ret = ret .. temp .. "C, "
-		end
-	end
-	f:close()
-	ret = ret:sub(0, ret:len() - 2)
-	return ret .. shiny.fg(beautiful.hilight, " ] ")
+local function get_temp()
+    local f = io.popen("acpi -t")
+    local ret = ""
+    for line in f:lines() do
+        local _, _, temp = string.find(line, "(..)\.. degrees")
+        if temp then
+            ret = ret .. temp .. "C, "
+        end
+    end
+    f:close()
+    ret = ret:sub(0, ret:len() - 2)
+    return ret .. shiny.fg(beautiful.hilight, " ] ")
 end
 
 -- Initialise function tables

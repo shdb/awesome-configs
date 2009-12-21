@@ -459,9 +459,11 @@ awful.rules.rules = {
                      border_color = beautiful.border_normal,
                      focus = true,
                      keys = clientkeys,
-                     buttons = clientbuttons } },
+                     buttons = clientbuttons,
+                     size_hints_honor = false } },
     { rule = { class = "MPlayer" },
-      properties = { floating = true } },
+      properties = { floating = true,
+                     size_hints_honor = true } },
     { rule = { class = "pinentry" },
       properties = { floating = true } },
     { rule = { class = "gimp" },
@@ -500,7 +502,6 @@ client.add_signal("manage", function (c, startup)
             awful.placement.no_offscreen(c)
         end
     end
-    c.size_hints_honor = c.class == "MPlayer" or false
 end)
 -- }}}
 

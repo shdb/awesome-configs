@@ -45,41 +45,8 @@ graph_up:set_background_color(beautiful.graph_bg)
 graph_up:set_border_color(beautiful.bg_normal)
 graph_up:set_scale("true")
 
-local function file_exists(filename)
-    local file = io.open(filename)
-    if file then
-        io.close(file)
-        return true
-    else
-        return false
-    end
-end
-
-function splitbywhitespace(str)
-    values = {}
-    start = 1
-    splitstart, splitend = string.find(str, ' ', start)
-    
-    while splitstart do
-        m = string.sub(str, start, splitstart-1)
-        if m:gsub(' ','') ~= '' then
-            table.insert(values, m)
-        end
-
-        start = splitend+1
-        splitstart, splitend = string.find(str, ' ', start)
-    end
-
-    m = string.sub(str, start)
-    if m:gsub(' ','') ~= '' then
-        table.insert(values, m)
-    end
-
-    return values
-end
-
-function bytes_to_string(bytes, sec)
-    if bytes == nil or tonumber(bytes) == nil then
+local function bytes_to_string(bytes, sec)
+    if not bytes or not tonumber(bytes) then
         return ''
     end
 
@@ -114,7 +81,7 @@ local function get_up()
     lfd = io.open("/sys/class/net/eth0/operstate")
     lan = lfd:read()
     lfd:close()
-    if file_exists("/sys/class/net/wlan0/operstate") then
+    if shiny.file_exists("/sys/class/net/wlan0/operstate") then
         wfd = io.open("/sys/class/net/wlan0/operstate")
         wlan = wfd:read()
         wfd:close()
@@ -147,7 +114,7 @@ local function get_net_data()
     args = {}
 
     for line in f:lines() do
-        line = splitbywhitespace(line)
+        line = shiny.splitbywhitespace(line)
 
         local p = line[1]:find(':')
         if p ~= nil then
@@ -159,37 +126,37 @@ local function get_net_data()
                 line[9] = line[10]
             end
 
-            args['{'..name..' rx}'] = bytes_to_string(line[1])
-            args['{'..name..' tx}'] = bytes_to_string(line[9])
+            args[name..'_rx'] = bytes_to_string(line[1])
+            args[name..'_tx'] = bytes_to_string(line[9])
 
-            args['{'..name..' rx_b}'] = math.floor(line[1]*10)/10
-            args['{'..name..' tx_b}'] = math.floor(line[9]*10)/10
-            
-            args['{'..name..' rx_kb}'] = math.floor(line[1]/1024*10)/10
-            args['{'..name..' tx_kb}'] = math.floor(line[9]/1024*10)/10
+            args[name..'_rx_b'] = shiny.round_num(line[1], 1, 1)
+            args[name..'_tx_b'] = shiny.round_num(line[9], 1, 1)
 
-            args['{'..name..' rx_mb}'] = math.floor(line[1]/1024/1024*10)/10
-            args['{'..name..' tx_mb}'] = math.floor(line[9]/1024/1024*10)/10
+            args[name..'_rx_kb'] = shiny.round_num(line[1]/1024, 1, 1)
+            args[name..'_tx_kb'] = shiny.round_num(line[9]/1024, 1, 1)
 
-            args['{'..name..' rx_gb}'] = math.floor(line[1]/1024/1024/1024*10)/10
-            args['{'..name..' tx_gb}'] = math.floor(line[9]/1024/1024/1024*10)/10
+            args[name..'_rx_mb'] = shiny.round_num(line[1]/1024^2, 1, 1)
+            args[name..'_tx_mb'] = shiny.round_num(line[9]/1024^2, 1, 1)
 
-            if nets[name] == nil then 
+            args[name..'_rx_gb'] = shiny.round_num(line[1]/1024^3, 1, 1)
+            args[name..'_tx_gb'] = shiny.round_num(line[9]/1024^3, 1, 1)
+
+            if nets[name] == nil then
                 nets[name] = {}
-                args['{'..name..' down}'] = 'n/a'
-                args['{'..name..' up}'] = 'n/a'
-                
-                args['{'..name..' down_b}'] = 0
-                args['{'..name..' up_b}'] = 0
+                args[name..'_down'] = 'n/a'
+                args[name..'_up'] = 'n/a'
 
-                args['{'..name..' down_kb}'] = 0
-                args['{'..name..' up_kb}'] = 0
+                args[name..'_down_b'] = 0
+                args[name..'_up_b'] = 0
 
-                args['{'..name..' down_mb}'] = 0
-                args['{'..name..' up_mb}'] = 0
+                args[name..'_down_kb'] = 0
+                args[name..'_up_kb'] = 0
 
-                args['{'..name..' down_gb}'] = 0
-                args['{'..name..' up_gb}'] = 0
+                args[name..'_down_mb'] = 0
+                args[name..'_up_mb'] = 0
+
+                args[name..'_down_gb'] = 0
+                args[name..'_up_gb'] = 0
 
                 nets[name].time = os.time()
             else
@@ -199,20 +166,20 @@ local function get_net_data()
                 down = (line[1]-nets[name][1])/interval
                 up = (line[9]-nets[name][2])/interval
 
-                args['{'..name..' down}'] = bytes_to_string(down, true)
-                args['{'..name..' up}'] = bytes_to_string(up, true)
+                args[name..'_down'] = bytes_to_string(down, true)
+                args[name..'_up'] = bytes_to_string(up, true)
 
-                args['{'..name..' down_b}'] = math.floor(down*10)/10
-                args['{'..name..' up_b}'] = math.floor(up*10)/10
+                args[name..'_down_b'] = shiny.round_num(down, 1, 1)
+                args[name..'_up_b'] = shiny.round_num(up, 1, 1)
 
-                args['{'..name..' down_kb}'] = math.floor(down/1024*10)/10
-                args['{'..name..' up_kb}'] = math.floor(up/1024*10)/10
+                args[name..'_down_kb'] = shiny.round_num(down/1024, 1, 1)
+                args[name..'_up_kb'] = shiny.round_num(up/1024, 1, 1)
 
-                args['{'..name..' down_mb}'] = math.floor(down/1024/1024*10)/10
-                args['{'..name..' up_mb}'] = math.floor(up/1024/1024*10)/10
+                args[name..'_down_mb'] = shiny.round_num(down/1024^2, 1, 1)
+                args[name..'_up_mb'] = shiny.round_num(up/1024^2, 1, 1)
 
-                args['{'..name..' down_gb}'] = math.floor(down/1024/1024/1024*10)/10
-                args['{'..name..' up_gb}'] = math.floor(up/1024/1024/1024*10)/10
+                args[name..'_down_gb'] = shiny.round_num(down/1024^3, 1, 1)
+                args[name..'_up_gb'] = shiny.round_num(up/1024^3, 1, 1)
             end
 
             nets[name][1] = line[1]
@@ -222,28 +189,44 @@ local function get_net_data()
 
     f:close()
     return args
+end
 
+local padding = 0
+local paddu = 0
+function padd(text)
+    local text = tostring(text)
+    if text:len() >= padding then
+        padding = text:len()
+        paddu = 0
+    else
+        paddu = paddu + 1
+        if paddu == 30 then
+            paddu = 0
+            padding = padding - 1
+        end
+    end
+    while text:len() < padding do
+        text = " " .. text
+    end
+    return text
 end
 
 local function update()
     local data = get_net_data()
     local nif = get_up()
+    local text = ""
     if not nif then
         openbox.text = ""
         icon.image = nil
         net_if = nil
-        infobox.text = ""
     elseif net_if ~= nif then
         net_if = nif
         if nif == "wlan0" then
             icon.image = image(beautiful.wireless)
-            openbox.text = shiny.fg(beautiful.hilight, "[ ")
             essid = get_essid(nif)
-            infobox.text = shiny.bold(essid) .. shiny.fg(beautiful.hilight, " ] ")
+            text = shiny.bold(essid)
         elseif nif == "br0" then
             icon.image = image(beautiful.network)
-            openbox.text = ""
-            infobox.text = ""
         end
     elseif nif == "wlan0" then
         last_update = last_update + 1
@@ -251,12 +234,19 @@ local function update()
             last_update = 0
             essid = get_essid(nif)
         end
-        infobox.text = shiny.bold(essid) .. shiny.fg(beautiful.hilight, " ] ")
+        text = shiny.bold(essid)
     end
     if nif then
-        graph_down:add_value(data["{" .. nif .. " down_kb}"])
-        graph_up:add_value(data["{" .. nif .. " up_kb}"])
+        openbox.text = shiny.fg(beautiful.hilight, "[ ")
+        graph_down:add_value(data[nif .. "_down_kb"])
+        graph_up:add_value(data[nif .. "_up_kb"])
+        text = text .. " "
+            .. padd(data[nif .. "_down_kb"])
+            .. shiny.fg(beautiful.hilight, " / ")
+            .. padd(data[nif .. "_up_kb"])
+            .. shiny.fg(beautiful.hilight, " ] ")
     end
+    infobox.text = text
 end
 
 shiny.register(update, 1)

@@ -1,10 +1,10 @@
 local awful = require("awful")
 local shiny = require("shiny")
 
-local setmetatable = setmetatable
-local tonumber = tonumber
-local widget, os, math, string, pairs, screen, mouse, client
-    = widget, os, math, string, pairs, screen, mouse, client
+local setmetatable, tonumber, pairs
+    = setmetatable, tonumber, pairs
+local widget, os, math, string, screen, mouse, client
+    = widget, os, math, string, screen, mouse, client
 module("shiny.tasklist")
 
 local mytasklist = {}
@@ -13,9 +13,7 @@ for s = 1, screen.count() do
 end
 
 function update(c)
-    local ccount = 0
-    local selc = 0
-    local mcount = 0
+    local ccount, selc, mcount = 0, 0, 0
     local lscreen = c and c.screen or mouse.screen
     for _, ttag in pairs(awful.tag.selectedlist(lscreen)) do
         for _, tclient in pairs(ttag:clients()) do

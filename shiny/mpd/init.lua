@@ -7,19 +7,19 @@ local mpd = require("mpd")
 local tonumber = tonumber
 local setmetatable = setmetatable
 local io = {
-	open = io.open,
-	popen = io.popen,
-	close = io.close
+    open = io.open,
+    popen = io.popen,
+    close = io.close
 }
 local string = {
-	find = string.find
+    find = string.find
 }
 local os = {
-	date = os.date
+    date = os.date
 }
 local table = {
-	insert = table.insert,
-	sort = table.sort
+    insert = table.insert,
+    sort = table.sort
 }
 local widget, button, mouse, image = widget, button, mouse, image
 
@@ -27,13 +27,6 @@ module("shiny.mpd")
 local icon = widget({ type = "imagebox", align = "right" })
 local infobox = widget({type = "textbox", name = "batterybox", align = "right" })
 local openbox = widget({ type = "textbox", align = "right" })
-
-local function remove_notify(notify)
-    if notify then
-        naughty.destroy(notify)
-        notify = nil
-    end
-end
 
 local function onoff(value)
     if value then
@@ -55,47 +48,48 @@ function update()
     mpd.status()
 
     if not mpd.is_connected() then
-		openbox.text = ""
-		icon.image = nil
+        openbox.text = ""
+        icon.image = nil
         infobox.text = ""
-		return
+        return
     end
 
     if mpd.is_stop() then
-		icon.image = image(beautiful.mpd_stop)
+        icon.image = image(beautiful.mpd_stop)
         openbox.text =  shiny.fg(beautiful.hilight, "[ ") .. shiny.bold("MPD")
-		infobox.text = shiny.fg(beautiful.hilight, " ]")
+        infobox.text = shiny.fg(beautiful.hilight, " ]")
     end
 
-	if mpd.is_playing() then
-		icon.image = image(beautiful.mpd_play)
-	elseif mpd.is_pause() then
-		icon.image = image(beautiful.mpd_pause)
-	end
-	openbox.text =  shiny.fg(beautiful.hilight, "[ ")
-		.. awful.util.escape(mpd.artist())
-		.. " - "
-		.. awful.util.escape(mpd.title())
-	infobox.text = shiny.fg(beautiful.hilight, " | ")
-		.. timeformat(mpd.elapsed_time())
-		.. shiny.fg(beautiful.hilight, " / ")
-		.. timeformat(mpd.time())
-		.. shiny.fg(beautiful.hilight, " ]")
+    if mpd.is_playing() then
+        icon.image = image(beautiful.mpd_play)
+    elseif mpd.is_pause() then
+        icon.image = image(beautiful.mpd_pause)
+    end
+    openbox.text =  shiny.fg(beautiful.hilight, "[ ")
+        .. awful.util.escape(mpd.artist())
+        .. " - "
+        .. awful.util.escape(mpd.title())
+    infobox.text = shiny.fg(beautiful.hilight, " | ")
+        .. timeformat(mpd.elapsed_time())
+        .. shiny.fg(beautiful.hilight, " / ")
+        .. timeformat(mpd.time())
+        .. shiny.fg(beautiful.hilight, " ]")
 end
 
 function info(tout)
-	remove_notify(popup)
+    shiny.remove_notify(popup)
     if not tout then tout = 0 end
     local string = ""
     if not mpd.is_stop() then
-        string = string .. shiny.bold("Artist:\t") .. awful.util.escape(mpd.artist()) .. "\n"
-        string = string .. shiny.bold("Title:\t\t") .. awful.util.escape(mpd.title()) .. "\n"
-        string = string .. shiny.bold("Album:\t") .. awful.util.escape(mpd.album()) .. "\n"
-        string = string .. shiny.bold("Year:\t") .. mpd.year() .. "\t"
+        string = string
+            .. shiny.bold("Artist:\t") .. awful.util.escape(mpd.artist()) .. "\n"
+            .. shiny.bold("Title:\t\t") .. awful.util.escape(mpd.title()) .. "\n"
+            .. shiny.bold("Album:\t") .. awful.util.escape(mpd.album()) .. "\n"
+            .. shiny.bold("Year:\t") .. mpd.year() .. "\t"
             .. shiny.bold("Genre: ") .. awful.util.escape(mpd.genre()) .. "\n"
     end
     string = string .. shiny.bold("random: ") .. onoff(mpd.is_random())
-    string = string .. shiny.bold("\tcrossfade: ") .. onoff(mpd.is_xfade())
+                    .. shiny.bold("\tcrossfade: ") .. onoff(mpd.is_xfade())
     popup = naughty.notify({
             title = "mpd",
             text = string,
@@ -167,11 +161,11 @@ icon:buttons(button_table)
 infobox:buttons(button_table)
 
 openbox:add_signal("mouse::enter", function() info() end)
-openbox:add_signal("mouse::leave", function() remove_notify(popup) end)
+openbox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 icon:add_signal("mouse::enter", function() info() end)
-icon:add_signal("mouse::leave", function() remove_notify(popup) end)
+icon:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 infobox:add_signal("mouse::enter", function() info() end)
-infobox:add_signal("mouse::leave", function() remove_notify(popup) end)
+infobox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 
 
 shiny.register(update, 1)
