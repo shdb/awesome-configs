@@ -67,7 +67,7 @@ end
 
 local function init()
     if tonumber(get_vol("PCM")) ~= 100 then
-        mute = true
+        muted = true
         awful.util.spawn("amixer -q -c " .. cardid .. " sset Master 0%")
     end
     update()
