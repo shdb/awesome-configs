@@ -9,6 +9,7 @@ require("naughty")
 require("revelation")
 require("mpd")
 require("teardrop")
+require("shiny")
 require("shiny.battery")
 require("shiny.borders")
 require("shiny.clock")
@@ -40,14 +41,14 @@ layouts =
 {
     awful.layout.suit.tile,            -- 1
 --    awful.layout.suit.tile.left,
-    awful.layout.suit.tile.bottom,    -- 2
+    awful.layout.suit.tile.bottom,     -- 2
 --    awful.layout.suit.tile.top,
-    awful.layout.suit.fair,        -- 3
-    awful.layout.suit.fair.horizontal,        -- 4
+    awful.layout.suit.fair,            -- 3
+    awful.layout.suit.fair.horizontal, -- 4
 --    awful.layout.suit.magnifier,
-    awful.layout.suit.max,            -- 5
+    awful.layout.suit.max,             -- 5
 --    awful.layout.suit.max.fullscreen,
---    awful.layout.suit.floating        -- 6
+--    awful.layout.suit.floating
 }
 
 -- {{{ Tags
@@ -75,22 +76,6 @@ for s = 1, screen.count() do
     tags[s][1].selected = true
 end
 -- }}}
-
--- {{{ Widgets
--- Set background color
-function bg(color, text)
-    return '<bg color="' .. color .. '" />' .. text
-end
-
--- Set foreground color
-function fg(color, text)
-    return '<span color="' .. color .. '">' .. text .. '</span>'
-end
-
--- Boldify text
-function bold(text)
-    return '<b>' .. text .. '</b>'
-end
 
 function toggle_keyboard_layout()
     if keyboard_layout and keyboard_layout == "us" then
@@ -147,7 +132,7 @@ mytaglist.buttons = awful.util.table.join(
 
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
-    mypromptbox[s] = awful.widget.prompt({ prompt = fg(beautiful.hilight, "Run: ") })
+    mypromptbox[s] = awful.widget.prompt({ prompt = shiny.fg(beautiful.hilight, "Run: ") })
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     mylayoutbox[s] = awful.widget.layoutbox(s)
@@ -310,13 +295,13 @@ clientkeys = awful.util.table.join(
             local string = ""
             if client.focus then
                 if client.focus.class then
-                    string = string .. bold("Class: ") .. client.focus.class .. "\n"
+                    string = string .. shiny.bold("Class: ") .. client.focus.class .. "\n"
                 end
                 if client.focus.instance then
-                    string = string .. bold("Instance: ") .. client.focus.instance .. "\n"
+                    string = string .. shiny.bold("Instance: ") .. client.focus.instance .. "\n"
                 end
                 if client.focus.role then
-                    string = string .. bold("Role: ") .. client.focus.role
+                    string = string .. shiny.bold("Role: ") .. client.focus.role
                 end
                 naughty.notify {
                     title = "Client Info",
