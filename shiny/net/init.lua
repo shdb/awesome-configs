@@ -86,9 +86,9 @@ local function get_up()
         wlan = wfd:read()
         wfd:close()
     end
-    if lan and lan == "up" then
+    if lan and lan ~= "down" then
         return "eth0"
-    elseif wlan and wlan == "up" then
+    elseif wlan and wlan ~= "down" then
         return "wlan0"
     else
         return nil
@@ -161,6 +161,7 @@ local function get_net_data()
                 nets[name].time = os.time()
             else
                 interval = os.time()-nets[name].time
+                interval = interval > 0 and interval or 1
                 nets[name].time = os.time()
 
                 down = (line[1]-nets[name][1])/interval
