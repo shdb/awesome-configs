@@ -31,6 +31,7 @@ local openbox = widget({ type = "textbox", align = "right" })
 
 local function create_graph()
     local graph = awful.widget.graph()
+    awful.widget.layout.margins[graph.widget] = { top = 1, bottom = 1 }
     graph:set_height(13)
     graph:set_width(35)
     graph:set_color(beautiful.fg_normal)
