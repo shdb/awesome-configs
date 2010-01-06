@@ -53,14 +53,14 @@ local function bytes_to_string(bytes, sec)
 
     bytes = tonumber(bytes)
 
-    signs = {}
+    local signs = {}
     signs[1] = '  b'
     signs[2] = 'KiB'
     signs[3] = 'MiB'
     signs[4] = 'GiB'
     signs[5] = 'TiB'
 
-    sign = 1
+    local sign = 1
 
     while bytes/1024 > 1 and signs[sign+1] ~= nil do
         bytes = bytes/1024
@@ -109,14 +109,14 @@ end
 local nets = {}
 local function get_net_data()
     local f = io.open('/proc/net/dev')
-    args = {}
+    local args = {}
 
     for line in f:lines() do
         line = shiny.splitbywhitespace(line)
 
         local p = line[1]:find(':')
         if p ~= nil then
-            name = line[1]:sub(0,p-1)
+            local name = line[1]:sub(0,p-1)
             line[1] = line[1]:sub(p+1)
 
             if tonumber(line[1]) == nil then
@@ -158,7 +158,7 @@ local function get_net_data()
 
                 nets[name].time = os.time()
             else
-                interval = os.time()-nets[name].time
+                local interval = os.time()-nets[name].time
                 interval = interval > 0 and interval or 1
                 nets[name].time = os.time()
 
