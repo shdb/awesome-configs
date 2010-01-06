@@ -1,3 +1,4 @@
+local lfs = require("lfs")
 local awful = require("awful")
 local beautiful = require("beautiful")
 local shiny = require("shiny")
@@ -77,22 +78,19 @@ local function bytes_to_string(bytes, sec)
 end
 
 local function get_up()
-    local lfd, wfd, lan, wlan
-    lfd = io.open("/sys/class/net/eth0/operstate")
-    lan = lfd:read()
-    lfd:close()
-    if shiny.file_exists("/sys/class/net/wlan0/operstate") then
-        wfd = io.open("/sys/class/net/wlan0/operstate")
-        wlan = wfd:read()
-        wfd:close()
+    -- returns the first device found to be up.
+    -- lan is preferred over wlan
+    for iface in lfs.dir("/sys/class/net") do
+        if iface ~= "lo" and iface ~= "." and iface ~= ".." then
+            local fd = io.open("/sys/class/net/" .. iface .. "/operstate")
+            if fd and fd:read() ~= "down" then
+                fd:close()
+                return iface
+            end
+            fd:close()
+        end
     end
-    if lan and lan ~= "down" then
-        return "eth0"
-    elseif wlan and wlan ~= "down" then
-        return "wlan0"
-    else
-        return nil
-    end
+    return nil
 end
 
 local function get_essid(iface)
