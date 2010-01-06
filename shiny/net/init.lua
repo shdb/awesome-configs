@@ -16,35 +16,32 @@ local string = {
 }
 local math = { floor = math.floor }
 local os = { time = os.time }
-local widget, button, mouse, image, table, tostring
-    = widget, button, mouse, image, table, tostring
+local widget, button, mouse, image, table, tostring, pairs
+    = widget, button, mouse, image, table, tostring, pairs
 
 local net_if = nil
 local essid = nil
 local last_update = 0
+local iflist = {}
 
 module("shiny.net")
 local icon = widget({ type = "imagebox", align = "right" })
 local infobox = widget({type = "textbox", name = "netbox", align = "right" })
 local openbox = widget({ type = "textbox", align = "right" })
 
-local graph_down = awful.widget.graph()
-awful.widget.layout.margins[graph_down.widget] = { top = 1, bottom = 1 }
-graph_down:set_height(13)
-graph_down:set_width(35)
-graph_down:set_color(beautiful.fg_normal)
-graph_down:set_background_color(beautiful.graph_bg)
-graph_down:set_border_color(beautiful.bg_normal)
-graph_down:set_scale("true")
+local function create_graph()
+    local graph = awful.widget.graph()
+    graph:set_height(13)
+    graph:set_width(35)
+    graph:set_color(beautiful.fg_normal)
+    graph:set_background_color(beautiful.graph_bg)
+    graph:set_border_color(beautiful.bg_normal)
+    graph:set_scale("true")
+    return graph
+end
 
-local graph_up = awful.widget.graph()
-awful.widget.layout.margins[graph_up.widget] = { top = 1, bottom = 1 }
-graph_up:set_height(13)
-graph_up:set_width(35)
-graph_up:set_color(beautiful.fg_normal)
-graph_up:set_background_color(beautiful.graph_bg)
-graph_up:set_border_color(beautiful.bg_normal)
-graph_up:set_scale("true")
+local graph_down = create_graph()
+local graph_up = create_graph()
 
 local function bytes_to_string(bytes, sec)
     if not bytes or not tonumber(bytes) then
@@ -192,7 +189,7 @@ end
 
 local padding = 0
 local paddu = 0
-function padd(text)
+local function padd(text)
     local text = tostring(text)
     if text:len() >= padding then
         padding = text:len()
@@ -210,8 +207,18 @@ function padd(text)
     return text
 end
 
+local function update_icon(nif)
+    if not iflist[nif] then return false end
+    if iflist[nif] == "wlan" then
+        icon.image = image(beautiful.wireless)
+        essid = get_essid(nif)
+        text = shiny.bold(essid)
+    elseif iflist[nif] == "lan" then
+        icon.image = image(beautiful.network)
+    end
+end
+
 local function update()
-    local data = get_net_data()
     local nif = get_up()
     local text = ""
     if not nif then
@@ -219,23 +226,20 @@ local function update()
         icon.image = nil
         net_if = nil
     elseif net_if ~= nif then
-        net_if = nif
-        if nif == "wlan0" then
-            icon.image = image(beautiful.wireless)
-            essid = get_essid(nif)
-            text = shiny.bold(essid)
-        elseif nif == "eth0" then
-            icon.image = image(beautiful.network)
+        if update_icon(nif) then
+            net_if = nif
         end
-    elseif nif == "wlan0" then
-        last_update = last_update + 1
-        if last_update == 3 then
-            last_update = 0
-            essid = get_essid(nif)
-        end
-        text = shiny.bold(essid)
     end
-    if nif then
+    if nif then 
+        if iflist[nif] == "wlan" then
+            last_update = last_update + 1
+            if last_update >= 9 then
+                last_update = 0
+                essid = get_essid(nif)
+            end
+            text = shiny.bold(essid)
+        end
+        local data = get_net_data()
         openbox.text = shiny.fg(beautiful.hilight, "[ ")
         graph_down:add_value(data[nif .. "_down_kb"])
         graph_up:add_value(data[nif .. "_up_kb"])
@@ -244,10 +248,15 @@ local function update()
             .. shiny.fg(beautiful.hilight, " / ")
             .. padd(data[nif .. "_up_kb"])
             .. shiny.fg(beautiful.hilight, " ] ")
+    else
+        graph_down:add_value(0)
+        graph_up:add_value(0)
     end
     infobox.text = text
 end
 
 shiny.register(update, 1)
 
-setmetatable(_M, { __call = function () return {graph_up.widget, graph_down.widget, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
+setmetatable(_M, { __call = function (_, ifl)
+        iflist = ifl
+        return {graph_up.widget, graph_down.widget, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
