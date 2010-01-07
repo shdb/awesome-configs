@@ -1,3 +1,4 @@
+local lfs = require("lfs")
 local awful = require("awful")
 local beautiful = require("beautiful")
 local shiny = require("shiny")
@@ -15,35 +16,33 @@ local string = {
 }
 local math = { floor = math.floor }
 local os = { time = os.time }
-local widget, button, mouse, image, table, tostring
-    = widget, button, mouse, image, table, tostring
+local widget, button, mouse, image, table, tostring, pairs
+    = widget, button, mouse, image, table, tostring, pairs
 
 local net_if = nil
 local essid = nil
 local last_update = 0
+local iflist = {}
 
 module("shiny.net")
 local icon = widget({ type = "imagebox", align = "right" })
 local infobox = widget({type = "textbox", name = "netbox", align = "right" })
 local openbox = widget({ type = "textbox", align = "right" })
 
-local graph_down = awful.widget.graph()
-awful.widget.layout.margins[graph_down.widget] = { top = 1, bottom = 1 }
-graph_down:set_height(13)
-graph_down:set_width(35)
-graph_down:set_color(beautiful.fg_normal)
-graph_down:set_background_color(beautiful.graph_bg)
-graph_down:set_border_color(beautiful.bg_normal)
-graph_down:set_scale("true")
+local function create_graph()
+    local graph = awful.widget.graph()
+    awful.widget.layout.margins[graph.widget] = { top = 1, bottom = 1 }
+    graph:set_height(13)
+    graph:set_width(35)
+    graph:set_color(beautiful.fg_normal)
+    graph:set_background_color(beautiful.graph_bg)
+    graph:set_border_color(beautiful.bg_normal)
+    graph:set_scale("true")
+    return graph
+end
 
-local graph_up = awful.widget.graph()
-awful.widget.layout.margins[graph_up.widget] = { top = 1, bottom = 1 }
-graph_up:set_height(13)
-graph_up:set_width(35)
-graph_up:set_color(beautiful.fg_normal)
-graph_up:set_background_color(beautiful.graph_bg)
-graph_up:set_border_color(beautiful.bg_normal)
-graph_up:set_scale("true")
+local graph_down = create_graph()
+local graph_up = create_graph()
 
 local function bytes_to_string(bytes, sec)
     if not bytes or not tonumber(bytes) then
@@ -52,14 +51,14 @@ local function bytes_to_string(bytes, sec)
 
     bytes = tonumber(bytes)
 
-    signs = {}
+    local signs = {}
     signs[1] = '  b'
     signs[2] = 'KiB'
     signs[3] = 'MiB'
     signs[4] = 'GiB'
     signs[5] = 'TiB'
 
-    sign = 1
+    local sign = 1
 
     while bytes/1024 > 1 and signs[sign+1] ~= nil do
         bytes = bytes/1024
@@ -77,22 +76,19 @@ local function bytes_to_string(bytes, sec)
 end
 
 local function get_up()
-    local lfd, wfd, lan, wlan
-    lfd = io.open("/sys/class/net/eth0/operstate")
-    lan = lfd:read()
-    lfd:close()
-    if shiny.file_exists("/sys/class/net/wlan0/operstate") then
-        wfd = io.open("/sys/class/net/wlan0/operstate")
-        wlan = wfd:read()
-        wfd:close()
+    -- returns the first device found to be up.
+    -- lan is preferred over wlan
+    for iface in lfs.dir("/sys/class/net") do
+        if iface ~= "lo" and iface ~= "." and iface ~= ".." then
+            local fd = io.open("/sys/class/net/" .. iface .. "/operstate")
+            if fd and fd:read() ~= "down" then
+                fd:close()
+                return iface
+            end
+            fd:close()
+        end
     end
-    if lan and lan == "up" then
-        return "br0"
-    elseif wlan and wlan == "up" then
-        return "wlan0"
-    else
-        return nil
-    end
+    return nil
 end
 
 local function get_essid(iface)
@@ -111,14 +107,14 @@ end
 local nets = {}
 local function get_net_data()
     local f = io.open('/proc/net/dev')
-    args = {}
+    local args = {}
 
     for line in f:lines() do
         line = shiny.splitbywhitespace(line)
 
         local p = line[1]:find(':')
         if p ~= nil then
-            name = line[1]:sub(0,p-1)
+            local name = line[1]:sub(0,p-1)
             line[1] = line[1]:sub(p+1)
 
             if tonumber(line[1]) == nil then
@@ -160,7 +156,8 @@ local function get_net_data()
 
                 nets[name].time = os.time()
             else
-                interval = os.time()-nets[name].time
+                local interval = os.time()-nets[name].time
+                interval = interval > 0 and interval or 1
                 nets[name].time = os.time()
 
                 down = (line[1]-nets[name][1])/interval
@@ -193,7 +190,7 @@ end
 
 local padding = 0
 local paddu = 0
-function padd(text)
+local function padd(text)
     local text = tostring(text)
     if text:len() >= padding then
         padding = text:len()
@@ -211,8 +208,18 @@ function padd(text)
     return text
 end
 
+local function update_icon(nif)
+    if not iflist[nif] then return false end
+    if iflist[nif] == "wlan" then
+        icon.image = image(beautiful.wireless)
+        essid = get_essid(nif)
+        text = shiny.bold(essid)
+    elseif iflist[nif] == "lan" then
+        icon.image = image(beautiful.network)
+    end
+end
+
 local function update()
-    local data = get_net_data()
     local nif = get_up()
     local text = ""
     if not nif then
@@ -220,23 +227,20 @@ local function update()
         icon.image = nil
         net_if = nil
     elseif net_if ~= nif then
-        net_if = nif
-        if nif == "wlan0" then
-            icon.image = image(beautiful.wireless)
-            essid = get_essid(nif)
-            text = shiny.bold(essid)
-        elseif nif == "br0" then
-            icon.image = image(beautiful.network)
+        if update_icon(nif) then
+            net_if = nif
         end
-    elseif nif == "wlan0" then
-        last_update = last_update + 1
-        if last_update == 3 then
-            last_update = 0
-            essid = get_essid(nif)
-        end
-        text = shiny.bold(essid)
     end
-    if nif then
+    if nif then 
+        if iflist[nif] == "wlan" then
+            last_update = last_update + 1
+            if last_update >= 9 then
+                last_update = 0
+                essid = get_essid(nif)
+            end
+            text = shiny.bold(essid)
+        end
+        local data = get_net_data()
         openbox.text = shiny.fg(beautiful.hilight, "[ ")
         graph_down:add_value(data[nif .. "_down_kb"])
         graph_up:add_value(data[nif .. "_up_kb"])
@@ -245,10 +249,15 @@ local function update()
             .. shiny.fg(beautiful.hilight, " / ")
             .. padd(data[nif .. "_up_kb"])
             .. shiny.fg(beautiful.hilight, " ] ")
+    else
+        graph_down:add_value(0)
+        graph_up:add_value(0)
     end
     infobox.text = text
 end
 
 shiny.register(update, 1)
 
-setmetatable(_M, { __call = function () return {graph_up.widget, graph_down.widget, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
+setmetatable(_M, { __call = function (_, ifl)
+        iflist = ifl
+        return {graph_up.widget, graph_down.widget, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
