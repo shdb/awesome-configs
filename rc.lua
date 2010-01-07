@@ -165,7 +165,7 @@ for s = 1, screen.count() do
         shiny.memory(),
         gapbox,
         shiny.cpu(),
-        shiny.net({["br0"] = "lan"}),
+        shiny.net({["br0"] = "lan", ["eth0"] = "lan"}),
         gapbox,
         shiny.battery(),
         shiny.mpd(),
