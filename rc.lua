@@ -14,6 +14,7 @@ require("shiny.battery")
 require("shiny.borders")
 require("shiny.clock")
 require("shiny.cpu")
+require("shiny.keyboard")
 require("shiny.mpd")
 require("shiny.memory")
 require("shiny.net")
@@ -74,23 +75,6 @@ for s = 1, screen.count() do
     tags[s][1].selected = true
 end
 -- }}}
-
-function toggle_keyboard_layout()
-    if keyboard_layout and keyboard_layout == "us" then
-        awful.util.spawn_with_shell("setxkbmap -layout ch; "
-                .. "xmodmap " .. awful.util.getdir("config") .. "/../../.Xmodmap")
-        keyboard_layout = "ch"
-    else
-        awful.util.spawn_with_shell("setxkbmap -layout us; "
-                .. "xmodmap " .. awful.util.getdir("config") .. "/../../.Xmodmap")
-        keyboard_layout = "us"
-    end
-    naughty.notify {
-        title = "keyboard layout",
-        text  = "current layout: " .. keyboard_layout,
-        timeout = 2
-    }
-end
 
 -- {{{ Wibox
 gapbox = widget { type = "textbox" }
@@ -236,7 +220,7 @@ globalkeys = awful.util.table.join(
     awful.key({ alt, ctrl         }, "j",     function () shiny.volume.down()                  end),
     awful.key({ alt, ctrl         }, "k",     function () shiny.volume.up()                    end),
     awful.key({ alt, ctrl         }, "m",     function () shiny.volume.mute()                  end),
-    awful.key({ modkey, alt, ctrl }, "l",     function () toggle_keyboard_layout()             end),
+    awful.key({ modkey, alt, ctrl }, "l",     function () shiny.keyboard.toggle()       end),
     awful.key({ alt, ctrl         }, "space", function () mpd.pause();        shiny.mpd.update() end),
     awful.key({ alt, ctrl         }, "s",     function () mpd.stop();         shiny.mpd.update() end),
     awful.key({ alt, ctrl         }, "h",     function () mpd.previous();     shiny.mpd.update() end),

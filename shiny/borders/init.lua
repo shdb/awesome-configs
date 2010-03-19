@@ -11,6 +11,7 @@ module("shiny.borders")
 local function update(c)
     local lscreen = c and c.screen or mouse.screen
     local tiledclients = awful.client.tiled(lscreen)
+    local layout = awful.layout.getname(awful.layout.get(lscreen))
     if (#tiledclients == 0) then return end
     for _, current in pairs(tiledclients) do
         if awful.client.floating.get(current) or layout == "floating" then
