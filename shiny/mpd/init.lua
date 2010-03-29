@@ -21,6 +21,7 @@ local table = {
     insert = table.insert,
     sort = table.sort
 }
+local capi = { mouse = mouse }
 local widget, button, mouse, image = widget, button, mouse, image
 
 module("shiny.mpd")
@@ -95,6 +96,7 @@ function info(tout)
             text = string,
             timeout = tout,
             hover_timeout = 0.5,
+			screen = capi.mouse.screen,
            })
 end
 
