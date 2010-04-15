@@ -21,6 +21,7 @@ local table = {
     insert = table.insert,
     sort = table.sort
 }
+local capi = { mouse = mouse }
 local widget, button, mouse, image = widget, button, mouse, image
 
 module("shiny.mpd")
@@ -52,12 +53,11 @@ function update()
         icon.image = nil
         infobox.text = ""
         return
-    end
-
-    if mpd.is_stop() then
+    elseif mpd.is_stop() then
         icon.image = image(beautiful.mpd_stop)
         openbox.text =  shiny.fg(beautiful.hilight, "[ ") .. shiny.bold("MPD")
         infobox.text = shiny.fg(beautiful.hilight, " ]")
+        return
     end
 
     if mpd.is_playing() then
@@ -65,15 +65,28 @@ function update()
     elseif mpd.is_pause() then
         icon.image = image(beautiful.mpd_pause)
     end
-    openbox.text =  shiny.fg(beautiful.hilight, "[ ")
-        .. awful.util.escape(mpd.artist())
-        .. " - "
-        .. awful.util.escape(mpd.title())
-    infobox.text = shiny.fg(beautiful.hilight, " | ")
-        .. timeformat(mpd.elapsed_time())
-        .. shiny.fg(beautiful.hilight, " / ")
-        .. timeformat(mpd.time())
-        .. shiny.fg(beautiful.hilight, " ]")
+
+    local ot = shiny.fg(beautiful.hilight, "[ ")
+    if mpd.artist() ~= "" then
+        ot = ot
+            .. awful.util.escape(mpd.artist())
+            .. " - "
+    end
+    if mpd.title() ~= "" then
+        ot = ot
+            .. awful.util.escape(mpd.title())
+    end
+    openbox.text = ot
+
+    local it
+    if mpd.time() ~= 0 then
+        it = shiny.fg(beautiful.hilight, " | ")
+            .. timeformat(mpd.elapsed_time())
+            .. shiny.fg(beautiful.hilight, " / ")
+            .. timeformat(mpd.time())
+    end
+    it = it .. shiny.fg(beautiful.hilight, " ]")
+    infobox.text = it
 end
 
 function info(tout)
@@ -95,6 +108,7 @@ function info(tout)
             text = string,
             timeout = tout,
             hover_timeout = 0.5,
+            screen = capi.mouse.screen,
            })
 end
 
