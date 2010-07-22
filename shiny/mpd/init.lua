@@ -78,7 +78,7 @@ function update()
     end
     openbox.text = ot
 
-    local it
+    local it = ""
     if mpd.time() ~= 0 then
         it = shiny.fg(beautiful.hilight, " | ")
             .. timeformat(mpd.elapsed_time())

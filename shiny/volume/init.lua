@@ -58,7 +58,7 @@ local function get_vol(chan)
     if not chan then chan = "Master" end
     local fd = io.popen("amixer -c " .. cardid .. " -- sget " .. chan)
     local status = fd:read("*all")
-        fd:close()
+    fd:close()
 
     local volume = string.match(status, "(%d?%d?%d)%%")
     if not volume then return 0 end
