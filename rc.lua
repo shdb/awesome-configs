@@ -415,6 +415,24 @@ for i = 1, keynumber do
                    end))
 end
 
+globalkeys = awful.util.table.join(globalkeys,
+    awful.key({ modkey, shift, ctrl }, 0,
+                  function ()
+                      local c = client.focus
+                      local ison = false
+                      for t = 1, keynumber do
+                          ison = false
+                          for _, m in pairs(c:tags()) do
+                              if tags[client.focus.screen][t] == m then ison = true end
+                          end
+                          if not ison then
+                              awful.client.toggletag(tags[client.focus.screen][t])
+                          end
+                          client.focus = c
+                      end
+                      client.focus = c
+                  end))
+
 clientbuttons = awful.util.table.join(
     awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
     awful.button({ modkey }, 1, awful.mouse.client.move),
