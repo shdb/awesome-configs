@@ -14,6 +14,7 @@ require("shiny.battery")
 require("shiny.borders")
 require("shiny.clock")
 require("shiny.cpu")
+require("shiny.imap")
 require("shiny.keyboard")
 require("shiny.mpd")
 require("shiny.memory")
@@ -153,6 +154,7 @@ for s = 1, screen.count() do
         gapbox,
         shiny.battery(),
         shiny.mpd(),
+        shiny.imap(),
         layout = awful.widget.layout.horizontal.rightleft
     }
     mywibox[s].screen = s
