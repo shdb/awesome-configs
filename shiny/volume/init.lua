@@ -68,6 +68,7 @@ end
 local function init()
     if tonumber(get_vol("PCM")) ~= 100 then
         muted = true
+		icon.image = image(beautiful.muted)
         awful.util.spawn("amixer -q -c " .. cardid .. " sset Master 0%")
     end
     update()
@@ -81,6 +82,7 @@ end
 function up()
     if muted then
         muted = not muted
+		icon.image = image(beautiful.volume)
         awful.util.spawn("amixer -q -c " .. cardid .. " sset PCM 100%")
     end
     awful.util.spawn("amixer -q -c " .. cardid .. " sset Master 2%+")
@@ -97,9 +99,11 @@ function mute()
     local vol_pcm
     if muted then
         vol_pcm = 100
+		icon.image = image(beautiful.volume)
     else
         vol_pcm = 0
         lastvol = 0
+		icon.image = image(beautiful.muted)
     end
     muted = not muted
     awful.util.spawn("amixer -q -c " .. cardid .. " sset Master " .. lastvol .. "%")
