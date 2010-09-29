@@ -35,6 +35,7 @@ theme.taglist_squares = "true"
 
 theme.battery = path .. "icons/battery.png"
 theme.volume = path .. "icons/volume.png"
+theme.muted = path .. "icons/muted.png"
 theme.cpu = path .. "icons/cpu.png"
 theme.temp = path .. "icons/temp.png"
 theme.mail = path .. "icons/mail.png"
