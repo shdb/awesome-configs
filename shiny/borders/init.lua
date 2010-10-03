@@ -17,15 +17,13 @@ function update(c)
     for _, current in pairs(visibleclients) do
         if (awful.client.floating.get(current) and not current.maximized_horizontal) or layout == "floating" then
             current.border_width = beautiful.border_width
-        elseif (#visibleclients == 1) or layout == "max" or current.maximized_horizontal then
+        elseif #visibleclients == 1
+            or layout == "max"
+            or current.maximized_horizontal
+            or #tiledclients == 1 then
             current.border_width = 0
         else
             current.border_width = beautiful.border_width
-        end
-    end
-    for _, current in pairs(tiledclients) do
-        if #tiledclients == 1 then
-            current.border_width = 0
         end
     end
 end
