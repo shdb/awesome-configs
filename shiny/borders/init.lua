@@ -8,15 +8,19 @@ local widget, pairs, screen, mouse, client
     = widget, pairs, screen, mouse, client
 module("shiny.borders")
 
-local function update(c)
+function update(c)
     local lscreen = c and c.screen or mouse.screen
+    local visibleclients = awful.client.visible(lscreen)
     local tiledclients = awful.client.tiled(lscreen)
     local layout = awful.layout.getname(awful.layout.get(lscreen))
-    if (#tiledclients == 0) then return end
-    for _, current in pairs(tiledclients) do
-        if awful.client.floating.get(current) or layout == "floating" then
+    if (#visibleclients == 0) then return end
+    for _, current in pairs(visibleclients) do
+        if (awful.client.floating.get(current) and not current.maximized_horizontal) or layout == "floating" then
             current.border_width = beautiful.border_width
-        elseif (#tiledclients == 1) or layout == "max" then
+        elseif #visibleclients == 1
+            or layout == "max"
+            or current.maximized_horizontal
+            or #tiledclients == 1 then
             current.border_width = 0
         else
             current.border_width = beautiful.border_width
