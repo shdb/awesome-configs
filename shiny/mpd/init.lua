@@ -45,7 +45,7 @@ function update()
             return os.date("%M:%S", t)
         end
     end
-    mpd.currentsong()
+
     mpd.status()
 
     if not mpd.is_connected() then
@@ -59,6 +59,8 @@ function update()
         infobox.text = shiny.fg(beautiful.hilight, " ]")
         return
     end
+
+    mpd.currentsong()
 
     if mpd.is_playing() then
         icon.image = image(beautiful.mpd_play)

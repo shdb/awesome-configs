@@ -472,6 +472,7 @@ end
 -- @return List of metadata 
 function currentsong()
     local buffer = send("currentsong")
+    current_song = {} -- clear old and now maybe inexistent values
     for line in buffer:gmatch("[^\r\n]+") do
         local _, _, key, value = string.find(line, "([^:]+):%s(.+)")
         if key then
