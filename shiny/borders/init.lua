@@ -37,3 +37,9 @@ client.add_signal("unfocus", function(c)
         c.border_color = beautiful.border_normal
     end)
 client.add_signal("unmanage", function(c) update(c) end)
+
+client.add_signal("manage", function (c, startup)
+    c:add_signal("property::geometry", function(c)
+        update(c)
+    end)
+end)

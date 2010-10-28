@@ -261,7 +261,6 @@ clientkeys = awful.util.table.join(
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal
             c.maximized_vertical   = not c.maximized_vertical
-            shiny.borders.update(c)
         end),
 
     awful.key({ modkey, ctrl }, "t",
