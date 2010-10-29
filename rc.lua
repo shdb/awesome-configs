@@ -10,6 +10,7 @@ require("revelation")
 require("mpd")
 require("teardrop")
 require("shiny")
+require("shiny.appstack")
 require("shiny.battery")
 require("shiny.borders")
 require("shiny.clock")
@@ -170,7 +171,7 @@ root.buttons(awful.util.table.join(
 -- }}}
 
 -- {{{ Key bindings
-globalkeys = awful.util.table.join(
+globalkeys = awful.util.table.join(globalkeys,
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore),
@@ -244,7 +245,8 @@ globalkeys = awful.util.table.join(
                     end
                 end
             end
-        end)
+        end),
+    awful.key({ modkey            }, "p",      function () shiny.appstack.pop_appstack()     end)
 )
 
 -- Client awful tagging: this is useful to tag some clients and then do stuff like move to tag on them
@@ -256,7 +258,7 @@ clientkeys = awful.util.table.join(
     awful.key({ modkey,           }, "o",      awful.client.movetoscreen                        ),
     awful.key({ modkey, shift     }, "r",      function (c) c:redraw()                       end),
     awful.key({ modkey            }, "t",      awful.client.togglemarked                        ),
-    awful.key({ modkey            }, "i",      function(c) c.minimized = true                end),
+    awful.key({ modkey            }, "i",      function (c) c.minimized = true               end),
     awful.key({ modkey,           }, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal
