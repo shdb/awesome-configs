@@ -53,7 +53,7 @@ layouts =
 
 -- {{{ Tags
 gold_number   = 0.618
-tags_name     = { "sys",       "ssh",       "www",       "dev",       "win",       "etc" }
+tags_name     = { "sys",       "ssh",       "www",       "dev",       "com",       "win" }
 tags_layout   = {     1,           3,           2,           1,           2,           1 }
 tags_mwfact   = {  0.70, gold_number,        0.85, gold_number, gold_number, gold_number }
 tags_setslave = { false,       false,        true,       false,       false,       false }
@@ -461,6 +461,8 @@ awful.rules.rules = {
     -- Set Firefox to always map on tags number 2 of screen 1.
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][3] } },
+    { rule = { class = "Thunderbird" },
+      properties = { tag = tags[1][5] } },
 }
 -- }}}
 
