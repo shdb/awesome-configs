@@ -19,6 +19,8 @@ function register(func, tout)
 end
 
 function fg(color, text)
+    color = color or "#ffffff"
+    text = text or ""
     return '<span color="' .. color .. '">' .. text .. '</span>'
 end
 
