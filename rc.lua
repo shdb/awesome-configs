@@ -20,6 +20,7 @@ require("shiny.keyboard")
 require("shiny.mpd")
 require("shiny.memory")
 require("shiny.net")
+require("shiny.screen")
 require("shiny.tasklist")
 require("shiny.topapps")
 require("shiny.volume")
@@ -144,6 +145,8 @@ for s = 1, screen.count() do
             mytaglist[s],
             shiny.tasklist(s),
             gapbox,
+            screen.count() > 1 and shiny.screen(s) or nil,
+            screen.count() > 1 and gapbox or nil,
             mypromptbox[s],
             layout = awful.widget.layout.horizontal.leftright
         },
@@ -197,6 +200,10 @@ globalkeys = awful.util.table.join(
     -- Layout manipulation
     awful.key({ modkey, shift     }, "j",     function () awful.client.swap.byidx(  1) end),
     awful.key({ modkey, shift     }, "k",     function () awful.client.swap.byidx( -1) end),
+    awful.key({ modkey            }, "n",     function () awful.screen.focus_relative( 1)
+                                                          shiny.screen.update()        end),
+    awful.key({ modkey            }, "p",     function () awful.screen.focus_relative(-1)
+                                                          shiny.screen.update()        end),
     awful.key({ modkey, ctrl      }, "j",     function () awful.screen.focus( 1)       end),
     awful.key({ modkey, ctrl      }, "k",     function () awful.screen.focus(-1)       end),
     awful.key({ modkey,           }, "u",     awful.client.urgent.jumpto),
@@ -253,7 +260,7 @@ globalkeys = awful.util.table.join(
                 end
             end
         end),
-    awful.key({ modkey            }, "p",      function () shiny.appstack.pop_appstack()     end)
+    awful.key({ modkey            }, "e",      function () shiny.appstack.pop_appstack()     end)
 )
 
 -- Client awful tagging: this is useful to tag some clients and then do stuff like move to tag on them
