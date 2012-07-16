@@ -29,7 +29,7 @@ require("shiny.lock")
 -- {{{ Variable definitions
 
 -- This is used later as the default terminal and editor to run.
-terminal = "urxvtc"
+terminal = "urxvt"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -204,8 +204,6 @@ globalkeys = awful.util.table.join(
                                                           shiny.screen.update()        end),
     awful.key({ modkey            }, "p",     function () awful.screen.focus_relative(-1)
                                                           shiny.screen.update()        end),
-    awful.key({ modkey, ctrl      }, "j",     function () awful.screen.focus( 1)       end),
-    awful.key({ modkey, ctrl      }, "k",     function () awful.screen.focus(-1)       end),
     awful.key({ modkey,           }, "u",     awful.client.urgent.jumpto),
     awful.key({ modkey,           }, "Tab",
         function ()
@@ -480,7 +478,7 @@ awful.rules.rules = {
       properties = { floating = true } },
     -- Set Firefox to always map on tags number 2 of screen 1.
     { rule = { class = "Firefox" },
-      properties = { tag = tags[1][3] } },
+      properties = { tag = tags[3][3] } },
 }
 -- }}}
 
