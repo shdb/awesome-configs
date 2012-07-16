@@ -22,6 +22,7 @@ require("shiny.net")
 require("shiny.tasklist")
 require("shiny.topapps")
 require("shiny.volume")
+require("shiny.lock")
 
 -- {{{ Variable definitions
 
@@ -37,6 +38,7 @@ ctrl    = "Control"
 shift   = "Shift"
 volup   = "XF86AudioRaiseVolume"
 voldn   = "XF86AudioLowerVolume"
+slock   = "XF86ScreenSaver"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 layouts =
@@ -219,6 +221,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, ".", function () awful.layout.inc(layouts,  1)     end),
     awful.key({ modkey,           }, ",", function () awful.layout.inc(layouts, -1)     end),
 
+    awful.key({                   }, slock,   function () shiny.lock.lock()                    end),
     awful.key({ modkey            }, "r",     function () mypromptbox[mouse.screen]:run()      end),
     awful.key({                   }, volup,   function () shiny.volume.up()                    end),
     awful.key({                   }, voldn,   function () shiny.volume.down()                  end),
