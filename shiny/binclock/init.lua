@@ -63,7 +63,7 @@ local drawclock = function () --get time and send digits to paintdot()
      if (string.len(hour) == 1) then
          hour = "0" .. time.hour
      end
-	 
+     
      local min = time.min
      if (string.len(min) == 1) then
          min = "0" .. time.min
@@ -93,7 +93,7 @@ shiny.register(drawclock, 1)
 setmetatable(_M, { __call = function (_, lheight, lwidth, lshow_sec)
         height = lheight or 12
         width = lwidth or 28
-		show_sec = lshow_sec or false
+        show_sec = lshow_sec or false
         return {cwidget, layout = awful.widget.layout.horizontal.rightleft}
     end }
 )

@@ -29,7 +29,7 @@ function add_calendar(inc_offset)
         text = string.format('<span font_desc="%s">%s</span>', "monospace", cal),
         timeout = 0,
         hover_timeout = 0.5,
-		screen = capi.mouse.screen,
+        screen = capi.mouse.screen,
     }
 end
 
