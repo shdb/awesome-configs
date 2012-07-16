@@ -51,11 +51,18 @@ end
 
 local function update()
     local adapter = "BAT0"
-    if shiny.file_exists("/sys/class/power_supply/"..adapter) then
-        spacer = " "
-        local fcur = io.open("/sys/class/power_supply/"..adapter.."/energy_now")
-        local fcap = io.open("/sys/class/power_supply/"..adapter.."/energy_full")
-        local fsta = io.open("/sys/class/power_supply/"..adapter.."/status")
+    local fcur, fcap, fsta
+    local spacer = " "
+    if shiny.file_exists("/sys/class/power_supply/"..adapter.."/energy_now") then
+        fcur = io.open("/sys/class/power_supply/"..adapter.."/energy_now")
+        fcap = io.open("/sys/class/power_supply/"..adapter.."/energy_full")
+        fsta = io.open("/sys/class/power_supply/"..adapter.."/status")
+    elseif shiny.file_exists("/sys/class/power_supply/"..adapter.."/charge_now") then
+        fcur = io.open("/sys/class/power_supply/"..adapter.."/charge_now")
+        fcap = io.open("/sys/class/power_supply/"..adapter.."/charge_full")
+        fsta = io.open("/sys/class/power_supply/"..adapter.."/status")
+    end
+    if fcur then
         local cur = fcur:read()
         local cap = fcap:read()
         local sta = fsta:read()
