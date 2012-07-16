@@ -58,10 +58,10 @@ layouts =
 
 -- {{{ Tags
 gold_number   = 0.618
-tags_name     = { "sys",       "ssh",       "www",       "dev",       "etc" }
-tags_layout   = {     1,           3,           2,           1,           2 }
-tags_mwfact   = {  0.65, gold_number,        0.85, gold_number, gold_number }
-tags_setslave = { false,       false,        true,       false,       false }
+tags_name     = { "sys",              "ssh",       "www",       "dev",       "etc" }
+tags_layout   = {     1,                  3,           2,           1,           2 }
+tags_mwfact   = {  gold_number, gold_number,        0.85, gold_number, gold_number }
+tags_setslave = { false,              false,        true,       false,       false }
 
 -- Define tags table.
 tags = {}
@@ -214,16 +214,16 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, ctrl      }, "r",     awesome.restart),
     awful.key({ modkey, shift     }, "q",     awesome.quit),
 
-    awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.01)    end),
-    awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.01)    end),
-    awful.key({ modkey, ctrl      }, "j",     function () awful.client.incwfact(0.01)   end),
-    awful.key({ modkey, ctrl      }, "k",     function () awful.client.incwfact(-0.01)  end),
-    awful.key({ modkey, shift     }, "h",     function () awful.tag.incnmaster( 1)      end),
-    awful.key({ modkey, shift     }, "l",     function () awful.tag.incnmaster(-1)      end),
-    awful.key({ modkey, ctrl      }, "h",     function () awful.tag.incncol( 1)         end),
-    awful.key({ modkey, ctrl      }, "l",     function () awful.tag.incncol(-1)         end),
-    awful.key({ modkey,           }, ".", function () awful.layout.inc(layouts,  1)     end),
-    awful.key({ modkey,           }, ",", function () awful.layout.inc(layouts, -1)     end),
+    awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.01)           end),
+    awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.01)           end),
+    awful.key({ modkey, ctrl      }, "j",     function () awful.client.incwfact(0.01)          end),
+    awful.key({ modkey, ctrl      }, "k",     function () awful.client.incwfact(-0.01)         end),
+    awful.key({ modkey, shift     }, "h",     function () awful.tag.incnmaster( 1)             end),
+    awful.key({ modkey, shift     }, "l",     function () awful.tag.incnmaster(-1)             end),
+    awful.key({ modkey, ctrl      }, "h",     function () awful.tag.incncol( 1)                end),
+    awful.key({ modkey, ctrl      }, "l",     function () awful.tag.incncol(-1)                end),
+    awful.key({ modkey,           }, ".",     function () awful.layout.inc(layouts,  1)        end),
+    awful.key({ modkey,           }, ",",     function () awful.layout.inc(layouts, -1)        end),
 
     awful.key({                   }, slock,   function () shiny.lock.lock()                    end),
     awful.key({ modkey            }, "r",     function () mypromptbox[mouse.screen]:run()      end),
@@ -232,7 +232,7 @@ globalkeys = awful.util.table.join(
     awful.key({ alt, ctrl         }, "j",     function () shiny.volume.down()                  end),
     awful.key({ alt, ctrl         }, "k",     function () shiny.volume.up()                    end),
     awful.key({ alt, ctrl         }, "m",     function () shiny.volume.mute()                  end),
-    awful.key({ modkey, alt, ctrl }, "l",     function () shiny.keyboard.toggle()       end),
+    awful.key({ modkey, alt, ctrl }, "l",     function () shiny.keyboard.toggle()              end),
     awful.key({ alt, ctrl         }, "space", function () mpd.pause();        shiny.mpd.update() end),
     awful.key({ alt, ctrl         }, "s",     function () mpd.stop();         shiny.mpd.update() end),
     awful.key({ alt, ctrl         }, "h",     function () mpd.previous();     shiny.mpd.update() end),
