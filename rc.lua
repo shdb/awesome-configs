@@ -12,6 +12,7 @@ require("teardrop")
 require("shiny")
 require("shiny.appstack")
 require("shiny.battery")
+require("shiny.binclock")
 require("shiny.borders")
 require("shiny.clock")
 require("shiny.cpu")
@@ -146,8 +147,11 @@ for s = 1, screen.count() do
             mypromptbox[s],
             layout = awful.widget.layout.horizontal.leftright
         },
-        s == 1 and mysystray or nil,
+        gapbox,
+        shiny.binclock(12, 28, true),
+        gapbox,
         shiny.clock(),
+        s == 1 and mysystray or nil,
         gapbox,
         shiny.volume(),
         gapbox,
