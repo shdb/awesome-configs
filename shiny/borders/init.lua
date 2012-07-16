@@ -13,15 +13,25 @@ function update(c)
     local visibleclients = awful.client.visible(lscreen)
     local tiledclients = awful.client.tiled(lscreen)
     local layout = awful.layout.getname(awful.layout.get(lscreen))
+
     if (#visibleclients == 0) then return end
+
     for _, current in pairs(visibleclients) do
-        if (awful.client.floating.get(current) and not current.maximized_horizontal) or layout == "floating" then
+        if (awful.client.floating.get(current)
+            and not current.maximized_horizontal
+            and not current.fullscreen)
+            or layout == "floating" then
+
             current.border_width = beautiful.border_width
+
         elseif #visibleclients == 1
             or layout == "max"
             or current.maximized_horizontal
+            or current.fullscreen
             or #tiledclients == 1 then
+
             current.border_width = 0
+
         else
             current.border_width = beautiful.border_width
         end
