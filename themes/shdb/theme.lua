@@ -54,4 +54,6 @@ theme.layout_spiral = path .. "../default/layouts/spiralw.png"
 theme.layout_tilebottom = path .. "layouts/tilebottom.png"
 theme.layout_tile = path .. "layouts/tile.png"
 
+theme.wallpaper_cmd = { "xsetroot -solid black" }
+
 return theme
