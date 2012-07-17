@@ -200,13 +200,13 @@ function imap:unread()
    local k,v
    for k,v in pairs(msg) do
       if v:match("^* SEARCH %d+") then
-	 while v:find("%d+") do
-	    local s, e = v:find("%d+")
+     while v:find("%d+") do
+        local s, e = v:find("%d+")
 
-	    n = n + 1
-	    v = v:sub(e + 1, #v)
-	    
-	 end
+        n = n + 1
+        v = v:sub(e + 1, #v)
+        
+     end
       end
    end
 
@@ -262,29 +262,29 @@ function imap:fetch(recent, unread, total)
       if not res then return nil, msg end
       local k,v
       for k,v in pairs(msg) do
-	 if v:match("^* SEARCH %d+") then
-	    while v:find("%d+") do
-	       local s, e = v:find("%d+")
-	       local uid = v:sub(s, e)
+     if v:match("^* SEARCH %d+") then
+        while v:find("%d+") do
+           local s, e = v:find("%d+")
+           local uid = v:sub(s, e)
 
-	       messages[uid] = {}
+           messages[uid] = {}
 
-	       local r,m = self:request("FETCH " .. uid .. " (FLAGS RFC822.SIZE BODY[HEADER.FIELDS (FROM SUBJECT)])")
-	       if not r then return nil, m end
-	       local l,w
-	       for l,w in pairs(m) do
-		  if w:match("RFC822.SIZE %d+") then messages[uid].size = w:match("RFC822.SIZE (%d+)") end
-		  if w:match("^From:") then messages[uid].from = w:match("^From:%s+(.*)") end
-		  if w:match("^Subject:") then messages[uid].subject = w:match("^Subject:%s+(.*)") end
-		  if w:match("FLAGS") then
-		     if w:match("\Recent") then messages[uid].recent = true end
-		     if not w:match("\Seen") then messages[uid].unread = true end
-		  end
-	       end
+           local r,m = self:request("FETCH " .. uid .. " (FLAGS RFC822.SIZE BODY[HEADER.FIELDS (FROM SUBJECT)])")
+           if not r then return nil, m end
+           local l,w
+           for l,w in pairs(m) do
+          if w:match("RFC822.SIZE %d+") then messages[uid].size = w:match("RFC822.SIZE (%d+)") end
+          if w:match("^From:") then messages[uid].from = w:match("^From:%s+(.*)") end
+          if w:match("^Subject:") then messages[uid].subject = w:match("^Subject:%s+(.*)") end
+          if w:match("FLAGS") then
+             if w:match("\Recent") then messages[uid].recent = true end
+             if not w:match("\Seen") then messages[uid].unread = true end
+          end
+           end
 
-	       v = v:sub(e + 1, #v)
-	    end
-	 end
+           v = v:sub(e + 1, #v)
+        end
+     end
       end
    end
 

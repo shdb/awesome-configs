@@ -12,6 +12,7 @@ require("teardrop")
 require("shiny")
 require("shiny.appstack")
 require("shiny.battery")
+require("shiny.binclock")
 require("shiny.borders")
 require("shiny.clock")
 require("shiny.cpu")
@@ -20,14 +21,16 @@ require("shiny.keyboard")
 require("shiny.mpd")
 require("shiny.memory")
 require("shiny.net")
+require("shiny.screen")
 require("shiny.tasklist")
 require("shiny.topapps")
 require("shiny.volume")
+require("shiny.lock")
 
 -- {{{ Variable definitions
 
 -- This is used later as the default terminal and editor to run.
-terminal = "urxvtc"
+terminal = "urxvt"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -140,11 +143,16 @@ for s = 1, screen.count() do
             mytaglist[s],
             shiny.tasklist(s),
             gapbox,
+            screen.count() > 1 and shiny.screen(s) or nil,
+            screen.count() > 1 and gapbox or nil,
             mypromptbox[s],
             layout = awful.widget.layout.horizontal.leftright
         },
-        s == 1 and mysystray or nil,
+        gapbox,
+        shiny.binclock(12, 28, true),
+        gapbox,
         shiny.clock(),
+        s == 1 and mysystray or nil,
         gapbox,
         shiny.volume(),
         gapbox,
@@ -191,8 +199,10 @@ globalkeys = awful.util.table.join(
     -- Layout manipulation
     awful.key({ modkey, shift     }, "j",     function () awful.client.swap.byidx(  1) end),
     awful.key({ modkey, shift     }, "k",     function () awful.client.swap.byidx( -1) end),
-    awful.key({ modkey, ctrl      }, "j",     function () awful.screen.focus( 1)       end),
-    awful.key({ modkey, ctrl      }, "k",     function () awful.screen.focus(-1)       end),
+    awful.key({ modkey            }, "n",     function () awful.screen.focus_relative( 1)
+                                                          shiny.screen.update()        end),
+    awful.key({ modkey            }, "p",     function () awful.screen.focus_relative(-1)
+                                                          shiny.screen.update()        end),
     awful.key({ modkey,           }, "u",     awful.client.urgent.jumpto),
     awful.key({ modkey,           }, "Tab",
         function ()
@@ -208,22 +218,23 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, ctrl      }, "r",     awesome.restart),
     awful.key({ modkey, shift     }, "q",     awesome.quit),
 
-    awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.01)    end),
-    awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.01)    end),
-    awful.key({ modkey, ctrl      }, "j",     function () awful.client.incwfact(0.01)   end),
-    awful.key({ modkey, ctrl      }, "k",     function () awful.client.incwfact(-0.01)  end),
-    awful.key({ modkey, shift     }, "h",     function () awful.tag.incnmaster( 1)      end),
-    awful.key({ modkey, shift     }, "l",     function () awful.tag.incnmaster(-1)      end),
-    awful.key({ modkey, ctrl      }, "h",     function () awful.tag.incncol( 1)         end),
-    awful.key({ modkey, ctrl      }, "l",     function () awful.tag.incncol(-1)         end),
-    awful.key({ modkey,           }, ".", function () awful.layout.inc(layouts,  1)     end),
-    awful.key({ modkey,           }, ",", function () awful.layout.inc(layouts, -1)     end),
+    awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.01)           end),
+    awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.01)           end),
+    awful.key({ modkey, ctrl      }, "j",     function () awful.client.incwfact(0.01)          end),
+    awful.key({ modkey, ctrl      }, "k",     function () awful.client.incwfact(-0.01)         end),
+    awful.key({ modkey, shift     }, "h",     function () awful.tag.incnmaster( 1)             end),
+    awful.key({ modkey, shift     }, "l",     function () awful.tag.incnmaster(-1)             end),
+    awful.key({ modkey, ctrl      }, "h",     function () awful.tag.incncol( 1)                end),
+    awful.key({ modkey, ctrl      }, "l",     function () awful.tag.incncol(-1)                end),
+    awful.key({ modkey,           }, ".",     function () awful.layout.inc(layouts,  1)        end),
+    awful.key({ modkey,           }, ",",     function () awful.layout.inc(layouts, -1)        end),
 
+    awful.key({                   }, slock,   function () shiny.lock.lock()                    end),
     awful.key({ modkey            }, "r",     function () mypromptbox[mouse.screen]:run()      end),
     awful.key({ alt, ctrl         }, "j",     function () shiny.volume.down()                  end),
     awful.key({ alt, ctrl         }, "k",     function () shiny.volume.up()                    end),
     awful.key({ alt, ctrl         }, "m",     function () shiny.volume.mute()                  end),
-    awful.key({ modkey, alt, ctrl }, "l",     function () shiny.keyboard.toggle()       end),
+    awful.key({ modkey, alt, ctrl }, "l",     function () shiny.keyboard.toggle()              end),
     awful.key({ alt, ctrl         }, "space", function () mpd.pause();        shiny.mpd.update() end),
     awful.key({ alt, ctrl         }, "s",     function () mpd.stop();         shiny.mpd.update() end),
     awful.key({ alt, ctrl         }, "h",     function () mpd.previous();     shiny.mpd.update() end),
@@ -244,7 +255,7 @@ globalkeys = awful.util.table.join(
                 end
             end
         end),
-    awful.key({ modkey            }, "p",      function () shiny.appstack.pop_appstack()     end)
+    awful.key({ modkey            }, "e",      function () shiny.appstack.pop_appstack()     end)
 )
 
 -- Client awful tagging: this is useful to tag some clients and then do stuff like move to tag on them
@@ -455,6 +466,9 @@ awful.rules.rules = {
     { rule = { class = "MPlayer" },
       properties = { floating = true,
                      size_hints_honor = true } },
+    { rule = { class = "mplayer2" },
+      properties = { floating = true,
+                     size_hints_honor = true } },
     { rule = { class = "pinentry" },
       properties = { floating = true } },
     { rule = { class = "gimp" },
@@ -463,7 +477,7 @@ awful.rules.rules = {
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][3] } },
     { rule = { class = "Thunderbird" },
-      properties = { tag = tags[1][5] } },
+      properties = { tag = tags[2][1] } },
 }
 -- }}}
 

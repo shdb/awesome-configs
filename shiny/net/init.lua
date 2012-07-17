@@ -81,11 +81,14 @@ local function get_up()
     for iface in lfs.dir("/sys/class/net") do
         if iface ~= "lo" and iface ~= "." and iface ~= ".." then
             local fd = io.open("/sys/class/net/" .. iface .. "/operstate")
-            if fd and fd:read() ~= "down" then
-                fd:close()
-                return iface
-            end
+            if fd then
+                local stat = fd:read()
+                if stat ~= "down" and stat ~= "unknown" then
+                   fd:close()
+                   return iface
+                end
             fd:close()
+            end
         end
     end
     return nil
