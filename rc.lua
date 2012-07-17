@@ -41,9 +41,9 @@ shift   = "Shift"
 layouts =
 {
     awful.layout.suit.tile,            -- 1
---    awful.layout.suit.tile.left,
+    awful.layout.suit.tile.left,
     awful.layout.suit.tile.bottom,     -- 2
---    awful.layout.suit.tile.top,
+    awful.layout.suit.tile.top,
     awful.layout.suit.fair,            -- 3
     awful.layout.suit.fair.horizontal, -- 4
 --    awful.layout.suit.magnifier,
@@ -171,7 +171,7 @@ root.buttons(awful.util.table.join(
 -- }}}
 
 -- {{{ Key bindings
-globalkeys = awful.util.table.join(globalkeys,
+globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore),
