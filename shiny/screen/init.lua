@@ -15,7 +15,7 @@ for s = 1, screen.count() do
 end
 
 function update()
-    if not screen.count() > 1 then return end
+    if screen.count() == 1 then return end
     for s = 1, screen.count() do
         local ltext = ""
     
