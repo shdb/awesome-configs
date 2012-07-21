@@ -158,14 +158,15 @@ shifty.config.apps = {
     {
         match = {""},
         buttons = awful.util.table.join(
-            awful.button({}, 1, function (c) client.focus = c; c:raise() end),
-            awful.button({modkey}, 1, function(c)
-                client.focus = c
-                c:raise()
-                awful.mouse.client.move(c)
+            awful.button({        }, 1, function (c) client.focus = c; c:raise() end),
+            awful.button({ modkey }, 1,
+                function(c)
+                    client.focus = c
+                    c:raise()
+                    awful.mouse.client.move(c)
                 end),
-            awful.button({modkey}, 3, awful.mouse.client.resize)
-            )
+            awful.button({ modkey }, 3, awful.mouse.client.resize)
+        )
     },
 }
 
@@ -296,10 +297,10 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore),
 
     -- Shifty: keybindings specific to shifty
-    awful.key({modkey             }, "d", shifty.del), -- delete a tag
-    awful.key({modkey, ctrl       }, "n", shifty.send_prev), -- client to prev tag
-    awful.key({modkey, alt        }, "n", shifty.send_next), -- client to next tag
-    awful.key({modkey, shift      }, "n",
+    awful.key({ modkey            }, "d", shifty.del), -- delete a tag
+    awful.key({ modkey, ctrl      }, "n", shifty.send_prev), -- client to prev tag
+    awful.key({ modkey, alt       }, "n", shifty.send_next), -- client to next tag
+    awful.key({ modkey, shift     }, "n",
         function()
             local t = awful.tag.selected()
             local s = awful.util.cycle(screen.count(), t.screen + 1)
@@ -307,9 +308,9 @@ globalkeys = awful.util.table.join(
             t = shifty.tagtoscr(s, t)
             awful.tag.viewonly(t)
         end),
-    awful.key({modkey}, "a", shifty.add), -- creat a new tag
-    awful.key({modkey, alt}, "r", shifty.rename), -- rename a tag
-    awful.key({modkey, shift}, "a", -- nopopup new tag
+    awful.key({ modkey            }, "a", shifty.add), -- creat a new tag
+    awful.key({ modkey, alt       }, "r", shifty.rename), -- rename a tag
+    awful.key({ modkey, shift     }, "a", -- nopopup new tag
         function()
             shifty.add({nopopup = true})
         end),
@@ -387,7 +388,28 @@ globalkeys = awful.util.table.join(
                 end
             end
         end),
-    awful.key({ modkey            }, "e",      function () shiny.appstack.pop_appstack()     end)
+    awful.key({ modkey            }, "e",      function () shiny.appstack.pop_appstack()     end),
+
+    awful.key({ modkey, shift, ctrl }, 0,
+        function ()
+            local c = client.focus
+            local ison = false
+            local scr = mouse.screen or 1
+
+            for _, t in pairs(screen[scr]:tags()) do
+                ison = false
+
+                for _, m in pairs(c:tags()) do
+                    if t == m then ison = true end
+                end
+
+                if not ison then
+                    awful.client.toggletag(t)
+                end
+                client.focus = c
+            end
+            client.focus = c
+        end)
 )
 
 -- Client awful tagging: this is useful to tag some clients and then do stuff like move to tag on them
@@ -416,7 +438,7 @@ clientkeys = awful.util.table.join(
             end
         end),
 
-    awful.key({ modkey, "Ctrl" }, "i",
+    awful.key({ modkey, ctrl      }, "i",
         function ()
             local s = mouse.screen
             local string = ""
@@ -518,54 +540,33 @@ shifty.config.modkey = modkey
 -- Compute the maximum number of digit we need, limited to 9
 for i = 1, (shifty.config.maxtags or 9) do
     globalkeys = awful.util.table.join(globalkeys,
-        awful.key({modkey}, i, function()
-            awful.tag.viewonly(shifty.getpos(i))
+        awful.key({ modkey }, i,
+            function()
+                awful.tag.viewonly(shifty.getpos(i))
             end),
-        awful.key({modkey, ctrl}, i, function()
-            local t = shifty.getpos(i)
-            t.selected = not t.selected
+        awful.key({ modkey, ctrl }, i,
+            function()
+                local t = shifty.getpos(i)
+                t.selected = not t.selected
             end),
-        awful.key({modkey, ctrl, shift}, i, function()
-            if client.focus then
-                awful.client.toggletag(shifty.getpos(i))
-            end
+        awful.key({ modkey, ctrl, shift }, i,
+            function()
+                if client.focus then
+                    awful.client.toggletag(shifty.getpos(i))
+                end
             end),
         -- move clients to other tags
-        awful.key({modkey, shift}, i, function()
-            if client.focus then
-                local t = shifty.getpos(i)
-                awful.client.movetotag(t)
-                awful.tag.viewonly(t)
-            end
-        end))
-    end
+        awful.key({ modkey, shift }, i,
+            function()
+                if client.focus then
+                    local t = shifty.getpos(i)
+                    awful.client.movetotag(t)
+                    awful.tag.viewonly(t)
+                end
+            end)
+    )
+end
 
-
-globalkeys = awful.util.table.join(globalkeys,
-    awful.key({ modkey, shift, ctrl }, 0,
-                  function ()
-                      local c = client.focus
-                      local ison = false
-                      local scr = mouse.screen or 1
-
-                      for _, t in pairs(screen[scr]:tags()) do
-                          ison = false
-
-                          for _, m in pairs(c:tags()) do
-                              if t == m then ison = true end
-                          end
-
-                          if not ison then
-                              awful.client.toggletag(t)
-                          end
-                          client.focus = c
-                      end
-                      client.focus = c
-                  end))
-
--- Set keys
 root.keys(globalkeys)
--- }}}
 
 -- vim: filetype=lua:expandtab:shiftwidth=4:tabstop=4:softtabstop=4
--- Include awesome libraries, with lots of useful function!
