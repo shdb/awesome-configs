@@ -9,6 +9,7 @@ require("naughty")
 require("revelation")
 require("mpd")
 require("teardrop")
+require("shifty")
 require("shiny")
 require("shiny.appstack")
 require("shiny.battery")
@@ -28,8 +29,9 @@ require("shiny.lock")
 
 -- {{{ Variable definitions
 
--- This is used later as the default terminal and editor to run.
 terminal = "urxvt"
+browser = "firefox"
+mail = "sylpheed"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -57,31 +59,132 @@ layouts =
 --    awful.layout.suit.floating
 }
 
--- {{{ Tags
-gold_number   = 0.618
-tags_name     = { "sys",              "ssh",       "www",       "dev",       "etc" }
-tags_layout   = {     1,                  3,           2,           1,           2 }
-tags_mwfact   = {  gold_number, gold_number,        0.85, gold_number, gold_number }
-tags_setslave = { false,              false,        true,       false,       false }
+-- Shifty configured tags.
+gold_number = 0.618
+shifty.config.tags = {
+    w1 = {
+        layout    = awful.layout.suit.max,
+        exclusive = false,
+        position  = 1,
+        init      = true,
+        screen    = 1,
+        slave     = true,
+    },
+    www = {
+        layout      = awful.layout.suit.tile.bottom,
+        exclusive   = true,
+        max_clients = 1,
+        position    = 3,
+        spawn       = browser,
+    },
+    mail = {
+        layout    = awful.layout.suit.tile,
+        exclusive = false,
+        position  = 5,
+        spawn     = mail,
+        slave     = true
+    },
+    media = {
+        layout    = awful.layout.suit.float,
+        exclusive = false,
+        position  = 9,
+    },
+}
 
--- Define tags table.
-tags = {}
-for s = 1, screen.count() do
-    -- Each screen has its own tag table.
-    tags[s] = {}
-    -- Create all tags on each screen
-    for tagnumber, tagname in ipairs(tags_name) do
-        tags[s][tagnumber] = tag({name = tagname})
-        -- Add tags to screen one by one
-        tags[s][tagnumber].screen = s
-        awful.tag.setproperty(tags[s][tagnumber], "layout", layouts[tags_layout[tagnumber]])
-        awful.tag.setproperty(tags[s][tagnumber], "mwfact", tags_mwfact[tagnumber])
-        awful.tag.setproperty(tags[s][tagnumber], "setslave", tags_setslave[tagnumber])
-    end
-    -- I'm sure you want to see at least one tag.
-    tags[s][1].selected = true
-end
--- }}}
+-- SHIFTY: application matching rules
+-- order here matters, early rules will be applied first
+shifty.config.apps = {
+    {
+        match = {
+            "Navigator",
+            "Vimperator",
+            "Gran Paradiso",
+            "Firefox",
+        },
+        tag = "www",
+    },
+    {
+        match = {
+            "Shredder.*",
+            "Thunderbird",
+            "Sylpheed",
+            "mutt",
+        },
+        tag = "mail",
+    },
+    {
+        match = {
+            "pcmanfm",
+        },
+        slave = true
+    },
+    {
+        match = {
+            "OpenOffice.*",
+            "Abiword",
+            "Gnumeric",
+        },
+        tag = "office",
+    },
+    {
+        match = {
+            "Mplayer.*",
+            "mplayer2",
+            "Mirage",
+            "gimp",
+            "gtkpod",
+            "Ufraw",
+            "easytag",
+        },
+        tag = "media",
+        -- nopopup = true,
+    },
+    {
+        match = {
+            "MPlayer",
+            "mplayer2",
+            "Gnuplot",
+            "galculator",
+        },
+        float = true,
+    },
+    {
+        match = {
+            terminal,
+        },
+        honorsizehints = false,
+        slave = true,
+    },
+    {
+        match = {""},
+        buttons = awful.util.table.join(
+            awful.button({}, 1, function (c) client.focus = c; c:raise() end),
+            awful.button({modkey}, 1, function(c)
+                client.focus = c
+                c:raise()
+                awful.mouse.client.move(c)
+                end),
+            awful.button({modkey}, 3, awful.mouse.client.resize)
+            )
+    },
+}
+
+-- SHIFTY: default tag creation rules
+-- parameter description
+--  * floatBars : if floating clients should always have a titlebar
+--  * guess_name : should shifty try and guess tag names when creating
+--                 new (unconfigured) tags?
+--  * guess_position: as above, but for position parameter
+--  * run : function to exec when shifty creates a new tag
+--  * all other parameters (e.g. layout, mwfact) follow awesome's tag API
+shifty.config.defaults = {
+    layout = awful.layout.suit.tile,
+    ncol = 1,
+    mwfact = gold_number,
+    floatBars = true,
+    guess_name = true,
+    guess_position = true,
+}
 
 -- {{{ Wibox
 gapbox = widget { type = "textbox" }
@@ -154,6 +257,7 @@ for s = 1, screen.count() do
         shiny.binclock(12, 28, true),
         gapbox,
         shiny.clock(),
+        s == 1 and gapbox or nil,
         s == 1 and mysystray or nil,
         gapbox,
         shiny.volume(),
@@ -171,6 +275,12 @@ for s = 1, screen.count() do
 end
 -- }}}
 
+-- SHIFTY: initialize shifty
+-- the assignment of shifty.taglist must always be after its actually
+-- initialized with awful.widget.taglist.new()
+shifty.taglist = mytaglist
+shifty.init()
+
 -- {{{ Mouse bindings
 root.buttons(awful.util.table.join(
     awful.button({ }, 3, function () mymainmenu:toggle() end),
@@ -181,9 +291,28 @@ root.buttons(awful.util.table.join(
 
 -- {{{ Key bindings
 globalkeys = awful.util.table.join(
-    awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
-    awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
+    awful.key({ modkey,           }, "h",   awful.tag.viewprev       ),
+    awful.key({ modkey,           }, "l",  awful.tag.viewnext       ),
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore),
+
+    -- Shifty: keybindings specific to shifty
+    awful.key({modkey             }, "d", shifty.del), -- delete a tag
+    awful.key({modkey, ctrl       }, "n", shifty.send_prev), -- client to prev tag
+    awful.key({modkey, alt        }, "n", shifty.send_next), -- client to next tag
+    awful.key({modkey, shift      }, "n",
+        function()
+            local t = awful.tag.selected()
+            local s = awful.util.cycle(screen.count(), t.screen + 1)
+            awful.tag.history.restore()
+            t = shifty.tagtoscr(s, t)
+            awful.tag.viewonly(t)
+        end),
+    awful.key({modkey}, "a", shifty.add), -- creat a new tag
+    awful.key({modkey, alt}, "r", shifty.rename), -- rename a tag
+    awful.key({modkey, shift}, "a", -- nopopup new tag
+        function()
+            shifty.add({nopopup = true})
+        end),
 
     awful.key({ modkey,           }, "j",
         function ()
@@ -219,8 +348,8 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, ctrl      }, "r",     awesome.restart),
     awful.key({ modkey, shift     }, "q",     awesome.quit),
 
-    awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.01)           end),
-    awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.01)           end),
+    awful.key({ modkey, alt       }, "l",     function () awful.tag.incmwfact( 0.01)           end),
+    awful.key({ modkey, alt       }, "h",     function () awful.tag.incmwfact(-0.01)           end),
     awful.key({ modkey, ctrl      }, "j",     function () awful.client.incwfact(0.01)          end),
     awful.key({ modkey, ctrl      }, "k",     function () awful.client.incwfact(-0.01)         end),
     awful.key({ modkey, shift     }, "h",     function () awful.tag.incnmaster( 1)             end),
@@ -307,73 +436,73 @@ clientkeys = awful.util.table.join(
                 }
             end
         end),
-    awful.key({ modkey, alt       }, "j",
+    awful.key({ modkey, alt       }, "u",
         function(c)
             if awful.client.floating.get(c) then
                 awful.client.moveresize(0, 0, 0, 2)
             end
         end),
-    awful.key({ modkey, alt       }, "k",
+    awful.key({ modkey, alt       }, "i",
         function(c)
             if awful.client.floating.get(c) then
                 awful.client.moveresize(0, -2, 0, 2)
             end
         end),
-    awful.key({ modkey, alt       }, "l",
+    awful.key({ modkey, alt       }, "o",
         function(c)
             if awful.client.floating.get(c) then
                 awful.client.moveresize(0, 0, 2, 0)
             end
         end),
-    awful.key({ modkey, alt       }, "h",
+    awful.key({ modkey, alt       }, "y",
         function(c)
             if awful.client.floating.get(c) then
                 awful.client.moveresize(-2, 0, 2, 0)
             end
         end),
-    awful.key({ modkey, alt, shift}, "j",
+    awful.key({ modkey, alt, shift}, "u",
         function(c)
             if awful.client.floating.get(c) then
                 awful.client.moveresize(0, 0, 0, -2)
             end
         end),
-    awful.key({ modkey, alt, shift}, "k",
+    awful.key({ modkey, alt, shift}, "i",
         function(c)
             if awful.client.floating.get(c) then
                 awful.client.moveresize(0, 2, 0, -2)
             end
         end),
-    awful.key({ modkey, alt, shift}, "l",
+    awful.key({ modkey, alt, shift}, "o",
         function(c)
             if awful.client.floating.get(c) then
                 awful.client.moveresize(0, 0, -2, 0)
             end
         end),
-    awful.key({ modkey, alt, shift}, "h",
+    awful.key({ modkey, alt, shift}, "y",
         function(c)
             if awful.client.floating.get(c) then
                 awful.client.moveresize(2, 0, -2, 0)
             end
         end),
-    awful.key({ modkey, alt, ctrl }, "j",
+    awful.key({ modkey, alt, ctrl }, "u",
         function(c)
             if awful.client.floating.get(c) then
                 awful.client.moveresize(0, 2, 0, 0)
             end
         end),
-    awful.key({ modkey, alt, ctrl }, "k",
+    awful.key({ modkey, alt, ctrl }, "i",
         function(c)
             if awful.client.floating.get(c) then
                 awful.client.moveresize(0, -2, 0, 0)
             end
         end),
-    awful.key({ modkey, alt, ctrl }, "l",
+    awful.key({ modkey, alt, ctrl }, "o",
         function(c)
             if awful.client.floating.get(c) then
                 awful.client.moveresize(2, 0, 0, 0)
             end
         end),
-    awful.key({ modkey, alt, ctrl }, "h",
+    awful.key({ modkey, alt, ctrl }, "y",
         function(c)
             if awful.client.floating.get(c) then
                 awful.client.moveresize(-2, 0, 0, 0)
@@ -381,136 +510,62 @@ clientkeys = awful.util.table.join(
         end)
 )
 
+-- SHIFTY: assign client keys to shifty for use in
+-- match() function(manage hook)
+shifty.config.clientkeys = clientkeys
+shifty.config.modkey = modkey
+
 -- Compute the maximum number of digit we need, limited to 9
-keynumber = 0
-for s = 1, screen.count() do
-    keynumber = math.min(9, math.max(#tags[s], keynumber));
-end
-
-
-for i = 1, keynumber do
+for i = 1, (shifty.config.maxtags or 9) do
     globalkeys = awful.util.table.join(globalkeys,
-    awful.key({ modkey }, i,
-                  function ()
-                        local screen = mouse.screen
-                        if tags[screen][i] then
-                            awful.tag.viewonly(tags[screen][i])
-                        end
-                  end),
-    awful.key({ modkey, ctrl }, i,
-                  function ()
-                      local screen = mouse.screen
-                      if tags[screen][i] then
-                          awful.tag.viewtoggle(tags[screen][i])
-                      end
-                  end),
-    awful.key({ modkey, shift }, i,
-                  function ()
-                      if client.focus and tags[client.focus.screen][i] then
-                          awful.client.movetotag(tags[client.focus.screen][i])
-                      end
-                  end),
-    awful.key({ modkey, shift, ctrl }, i,
-                  function ()
-                      if client.focus and tags[client.focus.screen][i] then
-                          local c = client.focus
-                          awful.client.toggletag(tags[client.focus.screen][i])
-                          client.focus = c
-                      end
-                  end),
-    awful.key({ modkey, shift }, "F" .. i,
-                  function ()
-                      local screen = mouse.screen
-                      if tags[screen][i] then
-                          for k, c in pairs(awful.client.getmarked()) do
-                              awful.client.movetotag(tags[screen][i], c)
-                          end
-                      end
-                   end))
-end
+        awful.key({modkey}, i, function()
+            awful.tag.viewonly(shifty.getpos(i))
+            end),
+        awful.key({modkey, ctrl}, i, function()
+            local t = shifty.getpos(i)
+            t.selected = not t.selected
+            end),
+        awful.key({modkey, ctrl, shift}, i, function()
+            if client.focus then
+                awful.client.toggletag(shifty.getpos(i))
+            end
+            end),
+        -- move clients to other tags
+        awful.key({modkey, shift}, i, function()
+            if client.focus then
+                local t = shifty.getpos(i)
+                awful.client.movetotag(t)
+                awful.tag.viewonly(t)
+            end
+        end))
+    end
+
 
 globalkeys = awful.util.table.join(globalkeys,
     awful.key({ modkey, shift, ctrl }, 0,
                   function ()
                       local c = client.focus
                       local ison = false
-                      for t = 1, keynumber do
+                      local scr = mouse.screen or 1
+
+                      for _, t in pairs(screen[scr]:tags()) do
                           ison = false
+
                           for _, m in pairs(c:tags()) do
-                              if tags[client.focus.screen][t] == m then ison = true end
+                              if t == m then ison = true end
                           end
+
                           if not ison then
-                              awful.client.toggletag(tags[client.focus.screen][t])
+                              awful.client.toggletag(t)
                           end
                           client.focus = c
                       end
                       client.focus = c
                   end))
 
-clientbuttons = awful.util.table.join(
-    awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
-    awful.button({ modkey }, 1, awful.mouse.client.move),
-    awful.button({ modkey }, 3, awful.mouse.client.resize))
-
 -- Set keys
 root.keys(globalkeys)
 -- }}}
 
--- {{{ Rules
-awful.rules.rules = {
-    -- All clients will match this rule.
-    { rule = { },
-      properties = { border_width = beautiful.border_width,
-                     border_color = beautiful.border_normal,
-                     focus = true,
-                     keys = clientkeys,
-                     buttons = clientbuttons,
-                     size_hints_honor = false } },
-    { rule = { class = "MPlayer" },
-      properties = { floating = true,
-                     size_hints_honor = true } },
-    { rule = { class = "mplayer2" },
-      properties = { floating = true,
-                     size_hints_honor = true } },
-    { rule = { class = "pinentry" },
-      properties = { floating = true } },
-    { rule = { class = "gimp" },
-      properties = { floating = true } },
-    -- Set Firefox to always map on tags number 2 of screen 1.
-    { rule = { class = "Firefox" },
-      properties = { tag = tags[3][3] } },
-}
--- }}}
-
--- {{{ Signals
--- Signal function to execute when a new client appears.
-client.add_signal("manage", function (c, startup)
-    -- Add a titlebar
-    -- awful.titlebar.add(c, { modkey = modkey })
-
-    -- Enable sloppy focus
-    c:add_signal("mouse::enter", function(c)
-        if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
-            and awful.client.focus.filter(c) then
-            client.focus = c
-        end
-    end)
-
-    if not startup then
-        -- Set the windows at the slave,
-        -- i.e. put it at the end of others instead of setting it master.
-        -- awful.client.setslave(c)
-        if awful.tag.getproperty(c:tags()[1], "setslave") then
-            awful.client.setslave(c)
-        end
-
-        -- Put windows in a smart way, only if they does not set an initial position.
-        if not c.size_hints.user_position and not c.size_hints.program_position then
-            awful.placement.no_overlap(c)
-            awful.placement.no_offscreen(c)
-        end
-    end
-end)
--- }}}
-
 -- vim: filetype=lua:expandtab:shiftwidth=4:tabstop=4:softtabstop=4
+-- Include awesome libraries, with lots of useful function!
