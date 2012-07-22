@@ -307,6 +307,8 @@ globalkeys = awful.util.table.join(
             awful.tag.history.restore()
             t = shifty.tagtoscr(s, t)
             awful.tag.viewonly(t)
+            awful.screen.focus_relative( 1)
+            shiny.screen.update()
         end),
     awful.key({ modkey            }, "a", shifty.add), -- creat a new tag
     awful.key({ modkey, alt       }, "r", shifty.rename), -- rename a tag
