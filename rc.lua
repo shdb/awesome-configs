@@ -70,7 +70,6 @@ for s = 1, screen.count() do
             position  = s,
             init      = true,
             screen    = s,
-            slave     = true,
         }
     })
 end
@@ -161,7 +160,7 @@ shifty.config.apps = {
             terminal,
         },
         honorsizehints = false,
-        slave = true,
+        -- slave = true,
     },
     {
         match = {""},
@@ -459,6 +458,9 @@ clientkeys = awful.util.table.join(
                 if client.focus.instance then
                     string = string .. shiny.bold("Instance: ") .. client.focus.instance .. "\n"
                 end
+                if client.focus.name then
+                    string = string .. shiny.bold("Name: ") .. client.focus.name .. "\n"
+                end
                 if client.focus.role then
                     string = string .. shiny.bold("Role: ") .. client.focus.role
                 end
@@ -571,7 +573,7 @@ for i = 1, (shifty.config.maxtags or 9) do
                 if client.focus then
                     local t = shifty.getpos(i)
                     awful.client.movetotag(t)
-                    awful.tag.viewonly(t)
+                    -- awful.tag.viewonly(t)
                 end
             end)
     )
