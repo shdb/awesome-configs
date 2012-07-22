@@ -61,26 +61,32 @@ layouts =
 
 -- Shifty configured tags.
 gold_number = 0.618
-shifty.config.tags = {
-    w1 = {
-        layout    = awful.layout.suit.max,
-        exclusive = false,
-        position  = 1,
-        init      = true,
-        screen    = 1,
-        slave     = true,
-    },
+shifty_tags = {}
+for s = 1, screen.count() do
+    shifty_tags = awful.util.table.join(shifty_tags, {
+        ["w" .. s] = {
+            layout    = awful.layout.suit.max,
+            exclusive = false,
+            position  = s,
+            init      = true,
+            screen    = s,
+            slave     = true,
+        }
+    })
+end
+
+shifty_tags = awful.util.table.join(shifty_tags, {
     www = {
         layout      = awful.layout.suit.tile.bottom,
         exclusive   = true,
         max_clients = 1,
-        position    = 3,
+        position    = screen.count() + 1,
         spawn       = browser,
     },
     mail = {
         layout    = awful.layout.suit.tile,
         exclusive = false,
-        position  = 5,
+        position  = screen.count() + 2,
         spawn     = mail,
         slave     = true
     },
@@ -89,7 +95,9 @@ shifty.config.tags = {
         exclusive = false,
         position  = 9,
     },
-}
+})
+
+shifty.config.tags = shifty_tags
 
 -- SHIFTY: application matching rules
 -- order here matters, early rules will be applied first
