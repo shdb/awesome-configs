@@ -18,6 +18,7 @@ require("shiny.borders")
 require("shiny.clock")
 require("shiny.cpu")
 require("shiny.keyboard")
+require("shiny.luaprompt")
 require("shiny.mpd")
 require("shiny.memory")
 require("shiny.net")
@@ -297,6 +298,8 @@ root.buttons(awful.util.table.join(
 ))
 -- }}}
 
+
+
 -- {{{ Key bindings
 globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "h",   awful.tag.viewprev       ),
@@ -353,10 +356,11 @@ globalkeys = awful.util.table.join(
         end),
 
     -- Standard program
-    awful.key({ modkey,           }, "Return",function() awful.util.spawn(terminal) end),
-    awful.key({ modkey,           }, "space", function() teardrop("urxvtc"); shiny.tasklist.update() end),
-    awful.key({ modkey, ctrl      }, "r",     awesome.restart),
-    awful.key({ modkey, shift     }, "q",     awesome.quit),
+    awful.key({ modkey,           }, "Return",function() awful.util.spawn(terminal)           end),
+    awful.key({ modkey,           }, "space", function() teardrop("urxvtc")
+                                                         shiny.tasklist.update()              end),
+    awful.key({ modkey, ctrl      }, "r",     awesome.restart                                    ),
+    awful.key({ modkey, shift     }, "q",     awesome.quit                                       ),
 
     awful.key({ modkey, alt       }, "l",     function() awful.tag.incmwfact( 0.01)           end),
     awful.key({ modkey, alt       }, "h",     function() awful.tag.incmwfact(-0.01)           end),
@@ -371,6 +375,7 @@ globalkeys = awful.util.table.join(
 
     awful.key({                   }, slock,   function() shiny.lock.lock()                    end),
     awful.key({ modkey            }, "r",     function() mypromptbox[mouse.screen]:run()      end),
+    awful.key({ modkey            }, "v",     function() shiny.luaprompt.prompt(mypromptbox)  end),
     awful.key({                   }, volup,   function() shiny.volume.up()                    end),
     awful.key({                   }, voldn,   function() shiny.volume.down()                  end),
     awful.key({ alt, ctrl         }, "j",     function() shiny.volume.down()                  end),
@@ -381,8 +386,10 @@ globalkeys = awful.util.table.join(
     awful.key({ alt, ctrl         }, "s",     function() mpd.stop();       shiny.mpd.update() end),
     awful.key({ alt, ctrl         }, "h",     function() mpd.previous();   shiny.mpd.update() end),
     awful.key({ alt, ctrl         }, "l",     function() mpd.next();       shiny.mpd.update() end),
-    awful.key({ alt, ctrl         }, "z",     function() shiny.mpd.info_rand();      shiny.mpd.update() end),
-    awful.key({ alt, ctrl         }, "x",     function() shiny.mpd.info_crossfade(); shiny.mpd.update() end),
+    awful.key({ alt, ctrl         }, "z",     function() shiny.mpd.info_rand()
+                                                         shiny.mpd.update()                   end),
+    awful.key({ alt, ctrl         }, "x",     function() shiny.mpd.info_crossfade()
+                                                         shiny.mpd.update()                   end),
     awful.key({ alt, ctrl         }, "i",     function() shiny.mpd.info(3)                    end),
     awful.key({ modkey, alt, ctrl }, "x",     function() awful.util.spawn("xrandr --auto")    end),
     awful.key({ modkey            }, "F2",    function() revelation.revelation()              end),
