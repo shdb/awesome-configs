@@ -50,7 +50,7 @@ layouts =
     awful.layout.suit.tile,            -- 1
 --    awful.layout.suit.tile.left,
     awful.layout.suit.tile.bottom,     -- 2
---    awful.layout.suit.tile.top,
+    awful.layout.suit.tile.top,
     awful.layout.suit.fair,            -- 3
     awful.layout.suit.fair.horizontal, -- 4
 --    awful.layout.suit.magnifier,
