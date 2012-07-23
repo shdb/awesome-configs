@@ -41,13 +41,14 @@ local dropdown = {}
 
 -- Create a new window for the drop-down application when it doesn't
 -- exist, or toggle between hidden and visible states when it does
-function toggle(prog, vert, horiz, width, height, sticky, screen)
-    local vert   = vert   or "top"
-    local horiz  = horiz  or "center"
-    local width  = width  or 1
-    local height = height or 0.21
-    local sticky = sticky or true
-    local screen = screen or capi.mouse.screen
+function toggle(prog, displacement, vert, horiz, width, height, sticky, screen)
+	local displacement = displacement or 0
+    local vert         = vert         or "top"
+    local horiz        = horiz        or "center"
+    local width        = width        or 1
+    local height       = height       or 0.21
+    local sticky       = sticky       or true
+    local screen       = screen       or capi.mouse.screen
 
     local function removefromtags(c)
         local ctags = c:tags()
@@ -86,13 +87,13 @@ function toggle(prog, vert, horiz, width, height, sticky, screen)
             if width  <= 1 then width  = screengeom.width  * width  end
             if height <= 1 then height = screengeom.height * height end
 
-            if     horiz == "left"  then x = screengeom.x
-            elseif horiz == "right" then x = screengeom.width - width
+            if     horiz == "left"  then x = screengeom.x + displacement
+            elseif horiz == "right" then x = screengeom.width - width + displacement
             else   x =  screengeom.x+(screengeom.width-width)/2 end
 
-            if     vert == "bottom" then y = screengeom.height + screengeom.y - height
+            if     vert == "bottom" then y = screengeom.height + screengeom.y - height + displacement
             elseif vert == "center" then y = screengeom.y+(screengeom.height-height)/2
-            else   y =  screengeom.y - screengeom.y + 15 end
+            else   y =  screengeom.y - screengeom.y + 15 + displacement end
 
             -- Client properties
             c:geometry({ x = x, y = y, width = width, height = height })
