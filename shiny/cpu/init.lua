@@ -126,4 +126,4 @@ end
 openbox.text = shiny.fg(beautiful.hilight, " [ ")
 shiny.register(update, 1)
 
-setmetatable(_M, { __call = function () return {graph.widget, infobox_temp, tempicon, infobox_cpu, cpuicon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
+setmetatable(_M, { __call = function() return {graph.widget, infobox_temp, tempicon, infobox_cpu, cpuicon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })

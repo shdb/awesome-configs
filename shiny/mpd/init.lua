@@ -117,7 +117,7 @@ end
 local function build_mpd_menu()
     local menu_items = {}
     local menu_genres = mpd.list("genre")
-    table.sort(menu_genres, function (a,b)
+    table.sort(menu_genres, function(a,b)
             return (a < b)
         end)
     for i = 1,#menu_genres do
@@ -126,7 +126,7 @@ local function build_mpd_menu()
     end
 
     menu_playlists = mpd.playlists()
-    table.sort(menu_playlists, function (a,b)
+    table.sort(menu_playlists, function(a,b)
             return (a < b)
         end)
     for i = 1,#menu_playlists do
@@ -161,7 +161,7 @@ local button_table = awful.util.table.join(
             update()
         end),
     awful.button({ }, 3,
-        function ()
+        function()
             if not mpd.menu or #mpd.menu.items == 0 then
                 mpd.menu = awful.menu.new({
                     id    = "mpd",
@@ -186,4 +186,4 @@ infobox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 
 shiny.register(update, 1)
 
-setmetatable(_M, { __call = function () return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
+setmetatable(_M, { __call = function() return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })

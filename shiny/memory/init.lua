@@ -73,4 +73,4 @@ end
 
 shiny.register(update, 2)
 
-setmetatable(_M, { __call = function () return {bar, icon, layout = awful.widget.layout.horizontal.rightleft} end })
+setmetatable(_M, { __call = function() return {bar, icon, layout = awful.widget.layout.horizontal.rightleft} end })

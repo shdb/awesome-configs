@@ -55,7 +55,7 @@ local paintdot = function(val,shift,limit) --paint number as dots with shift fro
     end
 end
 
-local drawclock = function () --get time and send digits to paintdot()
+local drawclock = function() --get time and send digits to paintdot()
      cwidget.image:draw_rectangle(0, 0, width, height, true, color_bg) --fill background
 
      local time = os.date("*t")
@@ -90,7 +90,7 @@ end
 
 shiny.register(drawclock, 1)
 
-setmetatable(_M, { __call = function (_, lheight, lwidth, lshow_sec)
+setmetatable(_M, { __call = function(_, lheight, lwidth, lshow_sec)
         height = lheight or 12
         width = lwidth or 28
         show_sec = lshow_sec or false

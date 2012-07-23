@@ -261,6 +261,6 @@ end
 
 shiny.register(update, 1)
 
-setmetatable(_M, { __call = function (_, ifl)
+setmetatable(_M, { __call = function(_, ifl)
         iflist = ifl
         return {graph_up.widget, graph_down.widget, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })

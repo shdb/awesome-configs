@@ -48,7 +48,7 @@ client.add_signal("unfocus", function(c)
     end)
 client.add_signal("unmanage", function(c) update(c) end)
 
-client.add_signal("manage", function (c, startup)
+client.add_signal("manage", function(c, startup)
     c:add_signal("property::geometry", function(c)
         update(c)
     end)

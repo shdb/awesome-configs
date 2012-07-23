@@ -48,4 +48,4 @@ infobox:buttons(awful.util.table.join(
 ))
 shiny.register(update, 1)
 
-setmetatable(_M, { __call = function () return {infobox, layout = awful.widget.layout.horizontal.rightleft} end })
+setmetatable(_M, { __call = function() return {infobox, layout = awful.widget.layout.horizontal.rightleft} end })

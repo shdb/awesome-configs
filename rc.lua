@@ -165,14 +165,14 @@ shifty.config.apps = {
     {
         match = {""},
         buttons = awful.util.table.join(
-            awful.button({        }, 1, function (c) client.focus = c; c:raise() end),
+            awful.button({        }, 1, function(c) client.focus = c; c:raise() end),
             awful.button({ modkey }, 1,
                 function(c)
                     client.focus = c
                     c:raise()
                     awful.mouse.client.move(c)
                 end),
-            awful.button({ modkey }, 3, function (c) awful.mouse.client.resize() end)
+            awful.button({ modkey }, 3, function(c) awful.mouse.client.resize() end)
         )
     },
 }
@@ -224,7 +224,7 @@ mytaglist = {}
 mytaglist.buttons = awful.util.table.join(
     awful.button({ }, 1, awful.tag.viewonly),
     awful.button({ modkey }, 1, awful.client.movetotag),
-    awful.button({ }, 3, function (tag) tag.selected = not tag.selected end),
+    awful.button({ }, 3, function(tag) tag.selected = not tag.selected end),
     awful.button({ modkey }, 3, awful.client.toggletag),
     awful.button({ }, 4, awful.tag.viewnext),
     awful.button({ }, 5, awful.tag.viewprev)
@@ -237,11 +237,11 @@ for s = 1, screen.count() do
     -- We need one layoutbox per screen.
     mylayoutbox[s] = awful.widget.layoutbox(s)
     mylayoutbox[s]:buttons(awful.util.table.join(
-        awful.button({ }, 1, function () awful.layout.inc(layouts, 1) end),
-        awful.button({ }, 2, function () mymainmenu:toggle() end),
-        awful.button({ }, 3, function () awful.layout.inc(layouts, -1) end),
-        awful.button({ }, 4, function () awful.layout.inc(layouts, 1) end),
-        awful.button({ }, 5, function () awful.layout.inc(layouts, -1) end)
+        awful.button({ }, 1, function() awful.layout.inc(layouts, 1)  end),
+        awful.button({ }, 2, function() mymainmenu:toggle()           end),
+        awful.button({ }, 3, function() awful.layout.inc(layouts, -1) end),
+        awful.button({ }, 4, function() awful.layout.inc(layouts, 1)  end),
+        awful.button({ }, 5, function() awful.layout.inc(layouts, -1) end)
     ))
     -- Create a taglist widget
     mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.label.all, mytaglist.buttons)
@@ -291,7 +291,7 @@ shifty.init()
 
 -- {{{ Mouse bindings
 root.buttons(awful.util.table.join(
-    awful.button({ }, 3, function () mymainmenu:toggle() end),
+    awful.button({ }, 3, function() mymainmenu:toggle() end),
     awful.button({ }, 4, awful.tag.viewnext),
     awful.button({ }, 5, awful.tag.viewprev)
 ))
@@ -325,27 +325,27 @@ globalkeys = awful.util.table.join(
         end),
 
     awful.key({ modkey,           }, "j",
-        function ()
+        function()
             awful.client.focus.byidx( 1)
             if client.focus then client.focus:raise() end
         end),
     awful.key({ modkey,           }, "k",
-        function ()
+        function()
             awful.client.focus.byidx(-1)
             if client.focus then client.focus:raise() end
         end),
-    awful.key({ modkey,           }, "w", function () mymainmenu:show(true)        end),
+    awful.key({ modkey,           }, "w", function() mymainmenu:show(true)        end),
 
     -- Layout manipulation
-    awful.key({ modkey, shift     }, "j",     function () awful.client.swap.byidx(  1) end),
-    awful.key({ modkey, shift     }, "k",     function () awful.client.swap.byidx( -1) end),
-    awful.key({ modkey            }, "n",     function () awful.screen.focus_relative( 1)
-                                                          shiny.screen.update()        end),
-    awful.key({ modkey            }, "p",     function () awful.screen.focus_relative(-1)
-                                                          shiny.screen.update()        end),
+    awful.key({ modkey, shift     }, "j",     function() awful.client.swap.byidx(  1) end),
+    awful.key({ modkey, shift     }, "k",     function() awful.client.swap.byidx( -1) end),
+    awful.key({ modkey            }, "n",     function() awful.screen.focus_relative( 1)
+                                                         shiny.screen.update()        end),
+    awful.key({ modkey            }, "p",     function() awful.screen.focus_relative(-1)
+                                                         shiny.screen.update()        end),
     awful.key({ modkey,           }, "u",     awful.client.urgent.jumpto),
     awful.key({ modkey,           }, "Tab",
-        function ()
+        function()
             awful.client.focus.history.previous()
             if client.focus then
                 client.focus:raise()
@@ -353,39 +353,39 @@ globalkeys = awful.util.table.join(
         end),
 
     -- Standard program
-    awful.key({ modkey,           }, "Return",function () awful.util.spawn(terminal) end),
-    awful.key({ modkey,           }, "space", function () teardrop("urxvtc"); shiny.tasklist.update() end),
+    awful.key({ modkey,           }, "Return",function() awful.util.spawn(terminal) end),
+    awful.key({ modkey,           }, "space", function() teardrop("urxvtc"); shiny.tasklist.update() end),
     awful.key({ modkey, ctrl      }, "r",     awesome.restart),
     awful.key({ modkey, shift     }, "q",     awesome.quit),
 
-    awful.key({ modkey, alt       }, "l",     function () awful.tag.incmwfact( 0.01)           end),
-    awful.key({ modkey, alt       }, "h",     function () awful.tag.incmwfact(-0.01)           end),
-    awful.key({ modkey, ctrl      }, "j",     function () awful.client.incwfact(0.01)          end),
-    awful.key({ modkey, ctrl      }, "k",     function () awful.client.incwfact(-0.01)         end),
-    awful.key({ modkey, shift     }, "h",     function () awful.tag.incnmaster( 1)             end),
-    awful.key({ modkey, shift     }, "l",     function () awful.tag.incnmaster(-1)             end),
-    awful.key({ modkey, ctrl      }, "h",     function () awful.tag.incncol( 1)                end),
-    awful.key({ modkey, ctrl      }, "l",     function () awful.tag.incncol(-1)                end),
-    awful.key({ modkey,           }, ".",     function () awful.layout.inc(layouts,  1)        end),
-    awful.key({ modkey,           }, ",",     function () awful.layout.inc(layouts, -1)        end),
+    awful.key({ modkey, alt       }, "l",     function() awful.tag.incmwfact( 0.01)           end),
+    awful.key({ modkey, alt       }, "h",     function() awful.tag.incmwfact(-0.01)           end),
+    awful.key({ modkey, ctrl      }, "j",     function() awful.client.incwfact(0.01)          end),
+    awful.key({ modkey, ctrl      }, "k",     function() awful.client.incwfact(-0.01)         end),
+    awful.key({ modkey, shift     }, "h",     function() awful.tag.incnmaster( 1)             end),
+    awful.key({ modkey, shift     }, "l",     function() awful.tag.incnmaster(-1)             end),
+    awful.key({ modkey, ctrl      }, "h",     function() awful.tag.incncol( 1)                end),
+    awful.key({ modkey, ctrl      }, "l",     function() awful.tag.incncol(-1)                end),
+    awful.key({ modkey,           }, ".",     function() awful.layout.inc(layouts,  1)        end),
+    awful.key({ modkey,           }, ",",     function() awful.layout.inc(layouts, -1)        end),
 
-    awful.key({                   }, slock,   function () shiny.lock.lock()                    end),
-    awful.key({ modkey            }, "r",     function () mypromptbox[mouse.screen]:run()      end),
-    awful.key({                   }, volup,   function () shiny.volume.up()                    end),
-    awful.key({                   }, voldn,   function () shiny.volume.down()                  end),
-    awful.key({ alt, ctrl         }, "j",     function () shiny.volume.down()                  end),
-    awful.key({ alt, ctrl         }, "k",     function () shiny.volume.up()                    end),
-    awful.key({ alt, ctrl         }, "m",     function () shiny.volume.mute()                  end),
-    awful.key({ modkey, alt, ctrl }, "l",     function () shiny.keyboard.toggle()              end),
-    awful.key({ alt, ctrl         }, "space", function () mpd.pause();        shiny.mpd.update() end),
-    awful.key({ alt, ctrl         }, "s",     function () mpd.stop();         shiny.mpd.update() end),
-    awful.key({ alt, ctrl         }, "h",     function () mpd.previous();     shiny.mpd.update() end),
-    awful.key({ alt, ctrl         }, "l",     function () mpd.next();         shiny.mpd.update() end),
-    awful.key({ alt, ctrl         }, "z",     function () shiny.mpd.info_rand();      shiny.mpd.update() end),
-    awful.key({ alt, ctrl         }, "x",     function () shiny.mpd.info_crossfade(); shiny.mpd.update() end),
-    awful.key({ alt, ctrl         }, "i",     function () shiny.mpd.info(3)                    end),
-    awful.key({ modkey, alt, ctrl }, "x",     function () awful.util.spawn("xrandr --auto")    end),
-    awful.key({ modkey            }, "F2",    function () revelation.revelation()              end),
+    awful.key({                   }, slock,   function() shiny.lock.lock()                    end),
+    awful.key({ modkey            }, "r",     function() mypromptbox[mouse.screen]:run()      end),
+    awful.key({                   }, volup,   function() shiny.volume.up()                    end),
+    awful.key({                   }, voldn,   function() shiny.volume.down()                  end),
+    awful.key({ alt, ctrl         }, "j",     function() shiny.volume.down()                  end),
+    awful.key({ alt, ctrl         }, "k",     function() shiny.volume.up()                    end),
+    awful.key({ alt, ctrl         }, "m",     function() shiny.volume.mute()                  end),
+    awful.key({ modkey, alt, ctrl }, "l",     function() shiny.keyboard.toggle()              end),
+    awful.key({ alt, ctrl         }, "space", function() mpd.pause();      shiny.mpd.update() end),
+    awful.key({ alt, ctrl         }, "s",     function() mpd.stop();       shiny.mpd.update() end),
+    awful.key({ alt, ctrl         }, "h",     function() mpd.previous();   shiny.mpd.update() end),
+    awful.key({ alt, ctrl         }, "l",     function() mpd.next();       shiny.mpd.update() end),
+    awful.key({ alt, ctrl         }, "z",     function() shiny.mpd.info_rand();      shiny.mpd.update() end),
+    awful.key({ alt, ctrl         }, "x",     function() shiny.mpd.info_crossfade(); shiny.mpd.update() end),
+    awful.key({ alt, ctrl         }, "i",     function() shiny.mpd.info(3)                    end),
+    awful.key({ modkey, alt, ctrl }, "x",     function() awful.util.spawn("xrandr --auto")    end),
+    awful.key({ modkey            }, "F2",    function() revelation.revelation()              end),
     awful.key({ modkey            }, "s",
         function()
             for _, ttag in pairs(awful.tag.selectedlist(mouse.screen)) do
@@ -397,10 +397,10 @@ globalkeys = awful.util.table.join(
                 end
             end
         end),
-    awful.key({ modkey            }, "e",      function () shiny.appstack.pop_appstack()     end),
+    awful.key({ modkey            }, "e",      function() shiny.appstack.pop_appstack()     end),
 
     awful.key({ modkey, shift, ctrl }, 0,
-        function ()
+        function()
             local c = client.focus
             local ison = false
             local scr = mouse.screen or 1
@@ -423,22 +423,22 @@ globalkeys = awful.util.table.join(
 
 -- Client awful tagging: this is useful to tag some clients and then do stuff like move to tag on them
 clientkeys = awful.util.table.join(
-    awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
-    awful.key({ modkey            }, "c",      function (c) c:kill()                         end),
-    awful.key({ modkey, ctrl      }, "space",  awful.client.floating.toggle                     ),
-    awful.key({ modkey, ctrl      }, "Return", function (c) c:swap(awful.client.getmaster()) end),
-    awful.key({ modkey,           }, "o",      awful.client.movetoscreen                        ),
-    awful.key({ modkey, shift     }, "r",      function (c) c:redraw()                       end),
-    awful.key({ modkey            }, "t",      awful.client.togglemarked                        ),
-    awful.key({ modkey            }, "i",      function (c) c.minimized = true               end),
+    awful.key({ modkey,           }, "f",      function(c) c.fullscreen = not c.fullscreen  end),
+    awful.key({ modkey            }, "c",      function(c) c:kill()                         end),
+    awful.key({ modkey, ctrl      }, "space",  awful.client.floating.toggle                    ),
+    awful.key({ modkey, ctrl      }, "Return", function(c) c:swap(awful.client.getmaster()) end),
+    awful.key({ modkey,           }, "o",      awful.client.movetoscreen                       ),
+    awful.key({ modkey, shift     }, "r",      function(c) c:redraw()                       end),
+    awful.key({ modkey            }, "t",      awful.client.togglemarked                       ),
+    awful.key({ modkey            }, "i",      function(c) c.minimized = true               end),
     awful.key({ modkey,           }, "m",
-        function (c)
+        function(c)
             c.maximized_horizontal = not c.maximized_horizontal
             c.maximized_vertical   = not c.maximized_vertical
         end),
 
     awful.key({ modkey, ctrl }, "t",
-        function (c)
+        function(c)
             if shiny.topapps[c.class] then
                 shiny.topapps[c.class] = not topapps[c.class]
                 c.ontop = shiny.topapps[c.class]
@@ -448,7 +448,7 @@ clientkeys = awful.util.table.join(
         end),
 
     awful.key({ modkey, ctrl      }, "i",
-        function ()
+        function()
             local s = mouse.screen
             local string = ""
             if client.focus then

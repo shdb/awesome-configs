@@ -44,5 +44,5 @@ if screen.count() > 1 then
     end)
 end
 
-setmetatable(_M, { __call = function (_, lsc)
+setmetatable(_M, { __call = function(_, lsc)
     return {infobox[lsc]} end })

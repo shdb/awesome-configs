@@ -103,13 +103,13 @@ local function update()
     end
 end
 
-infobox:add_signal("mouse::enter", function () battery_info() end)
+infobox:add_signal("mouse::enter", function() battery_info() end)
 infobox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
-icon:add_signal("mouse::enter", function () battery_info() end)
+icon:add_signal("mouse::enter", function() battery_info() end)
 icon:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
-openbox:add_signal("mouse::enter", function () battery_info() end)
+openbox:add_signal("mouse::enter", function() battery_info() end)
 openbox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 
 shiny.register(update, 5)
 
-setmetatable(_M, { __call = function () return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
+setmetatable(_M, { __call = function() return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })

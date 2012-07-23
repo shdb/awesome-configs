@@ -52,7 +52,7 @@ local function clean_appstack(c)
     end
 end
 
-client.add_signal("manage", function (c, startup)
+client.add_signal("manage", function(c, startup)
     c:add_signal("property::minimized", function(c)
         push_appstack(c)
         clean_appstack(c)

@@ -123,5 +123,5 @@ bar:buttons(button_table)
 init()
 shiny.register(update, 5)
 
---setmetatable(_M, { __call = function () return {bar.widget, icon, layout = awful.widget.layout.horizontal.rightleft} end })
-setmetatable(_M, { __call = function () return {bar, icon, layout = awful.widget.layout.horizontal.rightleft} end })
+--setmetatable(_M, { __call = function() return {bar.widget, icon, layout = awful.widget.layout.horizontal.rightleft} end })
+setmetatable(_M, { __call = function() return {bar, icon, layout = awful.widget.layout.horizontal.rightleft} end })
