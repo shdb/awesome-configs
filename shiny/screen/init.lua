@@ -19,18 +19,19 @@ function update()
     for s = 1, screen.count() do
         local ltext = ""
     
-    for ls = 1, screen.count() do
+        for ls = 1, screen.count() do
             if capi.mouse.screen == s and capi.mouse.screen == ls then
                 ltext = ltext .. shiny.fg(beautiful.fg_urgent, s) .. " "
             elseif capi.mouse.screen == ls then
                 ltext = ltext .. shiny.fg(beautiful.hilight, ls) .. " "
-        else
+            else
                 ltext = ltext .. ls .. " "
             end
-    end
+        end
+
         infobox[s].text = shiny.fg(beautiful.hilight, "[ ")
-        .. ltext
-                .. shiny.fg(beautiful.hilight, "]")
+            .. ltext
+            .. shiny.fg(beautiful.hilight, "]")
     end
 end
 
