@@ -588,4 +588,17 @@ end
 
 root.keys(globalkeys)
 
+client.add_signal("manage", function(c, startup)
+    -- Add a titlebar
+    -- awful.titlebar.add(c, { modkey = modkey })
+
+    if not startup then
+        -- Put windows in a smart way, only if they does not set an initial position.
+        if not c.size_hints.user_position and not c.size_hints.program_position then
+            awful.placement.no_overlap(c)
+            awful.placement.no_offscreen(c)
+        end
+    end
+end)
+
 -- vim: filetype=lua:expandtab:shiftwidth=4:tabstop=4:softtabstop=4
