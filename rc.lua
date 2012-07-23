@@ -90,6 +90,9 @@ shifty_tags = awful.util.table.join(shifty_tags, {
         spawn     = mail,
         slave     = true
     },
+    win = {
+        position  = 8
+    },
     media = {
         layout    = awful.layout.suit.float,
         exclusive = false,
@@ -133,6 +136,12 @@ shifty.config.apps = {
             "Gnumeric",
         },
         tag = "office",
+    },
+    {
+        match = {
+            "rdesktop",
+        },
+        tag = "win",
     },
     {
         match = {
