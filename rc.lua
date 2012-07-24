@@ -79,7 +79,7 @@ shifty_tags = awful.util.table.join(shifty_tags, {
     www = {
         layout      = awful.layout.suit.tile.bottom,
         exclusive   = true,
-        max_clients = 1,
+        -- max_clients = 1,
         position    = screen.count() + 1,
         spawn       = browser,
     },
