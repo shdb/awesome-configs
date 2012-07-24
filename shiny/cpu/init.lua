@@ -49,7 +49,7 @@ local function get_temp()
     local f = io.popen("acpi -t")
     local ret = ""
     for line in f:lines() do
-        local _, _, temp = string.find(line, "(..)\.. degrees")
+        local _, _, temp = string.find(line, "(..).. degrees")
         if temp then
             ret = ret .. temp .. "C, "
         end
