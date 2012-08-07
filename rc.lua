@@ -257,7 +257,13 @@ for s = 1, screen.count() do
     mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.label.all, mytaglist.buttons)
 
     -- Create the wibox
-    mywibox[s] = awful.wibox({ position = "top", screen = s})
+    if s == 2 then
+        mywibox[s] = awful.wibox({ position = "right", screen = s})
+    elseif s == 3 then
+        mywibox[s] = awful.wibox({ position = "left", screen = s})
+    else
+        mywibox[s] = awful.wibox({ position = "top", screen = s})
+    end
     -- Add widgets to the wibox - order matters
     mywibox[s].widgets = {
         {
@@ -366,8 +372,16 @@ globalkeys = awful.util.table.join(
 
     -- Standard program
     awful.key({ modkey,           }, "Return",function() awful.util.spawn(terminal)           end),
-    awful.key({ modkey,           }, "space", function() teardrop("urxvtc")
-                                                         shiny.tasklist.update()              end),
+    awful.key({ modkey,           }, "space",
+        function()
+            if mouse.screen > 1 then
+                teardrop("urxvtc", -15, nil, 0)
+            else
+                teardrop("urxvtc")
+            end
+            shiny.tasklist.update()
+        end),
+
     awful.key({ modkey, ctrl      }, "r",     awesome.restart                                    ),
     awful.key({ modkey, shift     }, "q",     awesome.quit                                       ),
 
