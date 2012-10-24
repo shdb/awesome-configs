@@ -19,12 +19,13 @@ local current_song = {}
 local state = {}
 local connected = nil
 local delay = 0
+local statusstring = ""
 
 local settings = {
     hostname = "localhost",
     port = 6600,
     password = nil,
-    timeout = 1
+    timeout = 0
 }
 
 --- Scans the music directory as defined in the MPD configuration file's 
@@ -494,9 +495,9 @@ function send(command)
     local buffer = ""
     if not connected and (not last_try or (os.time() - last_try) > delay) then
         mpd_socket = socket.tcp()
-        mpd_socket:settimeout(settings.timeout, 't')
         last_try = os.time()
         connected = mpd_socket:connect(settings.hostname, settings.port)
+        mpd_socket:settimeout(settings.timeout, 't')
         if connected then
             if settings.password then
                 send(string.format("password %s", settings.password))
@@ -511,7 +512,10 @@ function send(command)
 
     if connected then
         mpd_socket:send(string.format("%s\n", command))
-        local line = mpd_socket:receive("*l")
+        local line, status = mpd_socket:receive("*l")
+        if status == "timeout" then
+            return statusstring
+        end
         if not line then -- closed (mpd killed?): reset socket and retry
             connected = false
             mpd_socket:close()
@@ -521,8 +525,9 @@ function send(command)
             buffer = buffer..line.."\n"
             line = mpd_socket:receive("*l")
         end
+        statusstring = buffer
     end
-    return buffer
+    return statusstring
 end
 
 -- Close the connection with the MPD host
