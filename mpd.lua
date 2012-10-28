@@ -19,13 +19,13 @@ local current_song = {}
 local state = {}
 local connected = nil
 local delay = 0
-local statusstring = ""
+local statusstring = {}
 
 local settings = {
     hostname = "localhost",
     port = 6600,
     password = nil,
-    timeout = 0
+    timeout = 0.05
 }
 
 --- Scans the music directory as defined in the MPD configuration file's 
@@ -492,12 +492,12 @@ end
 -- @param command Command for MPD
 -- @return Answer from MPD
 function send(command)
-    local buffer = ""
     if not connected and (not last_try or (os.time() - last_try) > delay) then
         mpd_socket = socket.tcp()
         last_try = os.time()
         connected = mpd_socket:connect(settings.hostname, settings.port)
         mpd_socket:settimeout(settings.timeout, 't')
+
         if connected then
             if settings.password then
                 send(string.format("password %s", settings.password))
@@ -511,23 +511,30 @@ function send(command)
     end
 
     if connected then
+        statusstring[command] = ""
         mpd_socket:send(string.format("%s\n", command))
-        local line, status = mpd_socket:receive("*l")
-        if status == "timeout" then
-            return statusstring
+        local line, status = "", ""
+
+        while line do
+            line, status = mpd_socket:receive("*l")
+            if line and not (line:match("^OK$") or line:match("^ACK ")) then
+                statusstring[command] = statusstring[command] .. line .. "\n"
+            end
+
+            if status == "timeout" then
+                if delay > 5 then 
+                    mpd_socket:close()
+                    connected = false
+                end
+                delay = delay + 1
+                return statusstring[command]
+            end
+
+            delay = 0
         end
-        if not line then -- closed (mpd killed?): reset socket and retry
-            connected = false
-            mpd_socket:close()
-            return send(command)
-        end
-        while line and not (line:match("^OK$") or line:match("^ACK ")) do
-            buffer = buffer..line.."\n"
-            line = mpd_socket:receive("*l")
-        end
-        statusstring = buffer
+
     end
-    return statusstring
+    return statusstring[command]
 end
 
 -- Close the connection with the MPD host
