@@ -454,6 +454,8 @@ end
 -- @return Statuses list
 function status()
     local buffer = send("status")
+    if not buffer then return end
+
     for line in buffer:gmatch("[^\r\n]+") do
         local _, _, key, value = string.find(line, "([^:]+):%s(.+)")
         if key then
@@ -466,6 +468,7 @@ function status()
             end    
         end
     end
+
     return state
 end
 
