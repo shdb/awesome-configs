@@ -8,7 +8,10 @@ local login = require("login")
 local setmetatable = setmetatable
 local widget, image = widget, image
 
-module("shiny.imap")
+-- display new mails
+imap = { mt = {} }
+
+
 local icon = widget({ type = "imagebox", align = "right" })
 local infobox = widget({type = "textbox", name = "batterybox", align = "right" })
 local openbox = widget({ type = "textbox", align = "right" })
@@ -20,7 +23,7 @@ _, o_imap.errmsg = o_imap:connect()
 
 _, o_imap.errmsg = o_imap:login(login.imap_user, login.imap_pass)
 
-function update()
+function imap.update()
     if o_imap.logged_in then
     -- The check() function returns a table with the number of unread, recent
     -- and total messages in the mailbox.
@@ -53,6 +56,10 @@ end
 
 openbox.text = shiny.fg(beautiful.hilight, " [ ")
 
-shiny.register(update, 60)
+shiny.register(imap.update, 60)
 
-setmetatable(_M, { __call = function() return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
+function imap.mt:__call
+    return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft}
+end
+
+return setmetatable(imap, imap.mt)

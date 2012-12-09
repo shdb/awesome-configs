@@ -6,7 +6,8 @@ local shiny = require("shiny")
 local pairs, screen, mouse, table, setfenv, pcall, tostring, _G, type, loadstring, select
     = pairs, screen, mouse, table, setfenv, pcall, tostring, _G, type, loadstring, select
 
-module("shiny.luaprompt")
+-- a promtp for lua code
+luaprompt = {}
     
 local function usefuleval(s)
     local f, err = loadstring("return " .. s);
@@ -55,10 +56,10 @@ local function usefuleval(s)
     end
     if err then
         naughty.notify {
-			title  = 'lua:',
-			text   = awful.util.escape("Error: " .. tostring(err)),
-			screen = mouse.screen
-		}
+            title  = 'lua:',
+            text   = awful.util.escape("Error: " .. tostring(err)),
+            screen = mouse.screen
+        }
     end
 end
 
@@ -122,9 +123,11 @@ local function lua_completion(line, cur_pos, ncomp)
     return str, cur_pos
 end
 
-function prompt(promptbox)
+function luaprompt.prompt(promptbox)
     awful.prompt.run({ prompt = shiny.fg(beautiful.hilight, "Run Lua Code: ") },
     promptbox[mouse.screen].widget,
     usefuleval, lua_completion,
     awful.util.getdir("cache") .. "/history_eval")
 end
+
+return luaprompt

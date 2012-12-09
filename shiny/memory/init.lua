@@ -16,7 +16,10 @@ local math = { floor = math.floor }
 local widget, button, mouse, image, table
     = widget, button, mouse, image, table
 
-module("shiny.memory")
+-- display memory usage
+memory = { mt = {} }
+
+
 local icon = widget({ type = "imagebox", align = "right" })
 icon.image = image(beautiful.mem)
 
@@ -73,4 +76,8 @@ end
 
 shiny.register(update, 2)
 
-setmetatable(_M, { __call = function() return {bar, icon, layout = awful.widget.layout.horizontal.rightleft} end })
+function memory.mt:__call()
+    return {bar, icon, layout = awful.widget.layout.horizontal.rightleft}
+end
+
+return setmetatable(memory, memory.mt)

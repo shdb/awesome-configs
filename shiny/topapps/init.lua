@@ -7,7 +7,10 @@ local shiny = require("shiny")
 
 local pairs, screen, mouse, client
     = pairs, screen, mouse, client
-module("shiny.topapps")
+
+-- keeps apps on top
+topapps = {}
+
 
 topapps = {
         ["Gkrellm"]  = true,
@@ -30,3 +33,5 @@ end
 client.add_signal("focus", function(c) update(c) end)
 client.add_signal("unfocus", function(c) update(c) end)
 client.add_signal("unmanage", function(c) update(c) end)
+
+return topapps

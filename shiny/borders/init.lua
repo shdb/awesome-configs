@@ -6,9 +6,11 @@ local setmetatable = setmetatable
 local tonumber = tonumber
 local widget, pairs, screen, mouse, client
     = widget, pairs, screen, mouse, client
-module("shiny.borders")
 
-function update(c)
+-- manages border colors
+borders = {}
+
+function borders.update(c)
     local lscreen = c and c.screen or mouse.screen
     local visibleclients = awful.client.visible(lscreen)
     local tiledclients = awful.client.tiled(lscreen)
@@ -39,18 +41,20 @@ function update(c)
 end
 
 client.add_signal("focus", function(c)
-        update(c)
+        borders.update(c)
         c.border_color = beautiful.border_focus
     end)
 client.add_signal("unfocus", function(c)
-        update(c)
+        borders.update(c)
         c.border_color = beautiful.border_normal
     end)
-client.add_signal("unmanage", function(c) update(c) end)
+client.add_signal("unmanage", function(c) borders.update(c) end)
 
 client.add_signal("manage", function(c, startup)
     c:add_signal("property::geometry", function(c)
-        update(c)
+        borders.update(c)
     end)
-    update(c)
+    borders.update(c)
 end)
+
+return borders

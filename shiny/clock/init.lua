@@ -7,14 +7,16 @@ local setmetatable = setmetatable
 local tonumber = tonumber
 local widget, os, math, string = widget, os, math, string
 local capi = { mouse = mouse }
-module("shiny.clock")
+
+-- display the current time and date
+clock = { mt = {} }
 
 local infobox = widget({ type = "textbox" })
 
 calendar = nil
 cal_offset = 0
 
-function add_calendar(inc_offset)
+function clock.add_calendar(inc_offset)
     shiny.remove_notify(calendar)
     cal_offset = cal_offset + inc_offset
     local datespec = os.date("*t")
@@ -39,13 +41,17 @@ local function update()
                 .. shiny.fg(beautiful.hilight, " ]")
 end
 
-infobox:add_signal("mouse::enter", function() add_calendar(0) end)
+infobox:add_signal("mouse::enter", function() clock.add_calendar(0) end)
 infobox:add_signal("mouse::leave", function() shiny.remove_notify(calendar); cal_offset = 0 end)
 
 infobox:buttons(awful.util.table.join(
-    awful.button({ }, 1, function() add_calendar(-1) end),
-    awful.button({ }, 3, function() add_calendar(1)  end)
+    awful.button({ }, 1, function() clock.add_calendar(-1) end),
+    awful.button({ }, 3, function() clock.add_calendar(1)  end)
 ))
 shiny.register(update, 1)
 
-setmetatable(_M, { __call = function() return {infobox, layout = awful.widget.layout.horizontal.rightleft} end })
+function clock.mt:__call()
+    return {infobox, layout = awful.widget.layout.horizontal.rightleft}
+end
+
+return setmetatable(clock, clock.mt)

@@ -1,9 +1,10 @@
-local naughty = require("naughty")
-local awful = require("awful")
+local naughty   = require("naughty")
+local awful     = require("awful")
 local beautiful = require("beautiful")
-local shiny = require("shiny")
+local shiny     = require("shiny")
 
-local tonumber = tonumber
+local setmetatable = setmetatable
+local tonumber     = tonumber
 local setmetatable = setmetatable
 local io = {
     open = io.open,
@@ -18,11 +19,11 @@ local string = {
 }
 local widget, button, mouse, image = widget, button, mouse, image
 
-
-module("shiny.battery")
 local icon = widget({ type = "imagebox" })
 local infobox = widget({ type = "textbox", name = "batterybox" })
 local openbox = widget({ type = "textbox" })
+
+battery = { mt  = {} }
 
 local function battery_info()
     local function battery_remaining()
@@ -69,33 +70,33 @@ local function update()
         fcur:close()
         fcap:close()
         fsta:close()
-        local battery = math.floor(cur * 100 / cap)
+        local bstat = math.floor(cur * 100 / cap)
         if sta:match("Charging") then
-            battery = battery .. "% A/C"
+            bstat = bstat .. "% A/C"
         elseif sta:match("Discharging") then
-            if tonumber(battery) <= 3 then
+            if tonumber(bstat) <= 3 then
                 naughty.notify({
                     title      = "Battery Warning",
-                    text       = "Battery low!"..spacer..battery.."%"..spacer.."left!",
+                    text       = "Battery low!"..spacer..bstat.."%"..spacer.."left!",
                     timeout    = 5,
                     position   = "top_right",
                     fg         = beautiful.fg_focus,
                     bg         = beautiful.bg_focus,
                 })
             end
-            if tonumber(battery) < 10 then
-                battery = shiny.fg("#ff0000", battery .. "%")
-            elseif tonumber(battery) < 20 then
-                battery = shiny.fg("#ffff00", battery .. "%")
+            if tonumber(bstat) < 10 then
+                bstat = shiny.fg("#ff0000", bstat .. "%")
+            elseif tonumber(bstat) < 20 then
+                bstat = shiny.fg("#ffff00", bstat .. "%")
             else
-                battery = battery .. "%"
+                bstat = bstat .. "%"
             end
         else
-            battery = "A/C"
+            bstat = "A/C"
         end
         openbox.text = shiny.fg(beautiful.hilight, " [ ")
         icon.image = image(beautiful.battery)
-        infobox.text = battery .. shiny.fg(beautiful.hilight, " ]")
+        infobox.text = bstat .. shiny.fg(beautiful.hilight, " ]")
     else
         openbox.text = ""
         icon.image = nil
@@ -112,4 +113,8 @@ openbox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 
 shiny.register(update, 5)
 
-setmetatable(_M, { __call = function() return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
+function battery.mt:__call()
+    return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft}
+end
+
+return setmetatable(battery, battery.mt)

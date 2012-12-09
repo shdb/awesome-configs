@@ -24,7 +24,10 @@ local essid = nil
 local last_update = 0
 local iflist = {}
 
-module("shiny.net")
+-- display network statistics
+local net = { mt = {} }
+
+
 local icon = widget({ type = "imagebox", align = "right" })
 local infobox = widget({type = "textbox", name = "netbox", align = "right" })
 local openbox = widget({ type = "textbox", align = "right" })
@@ -261,6 +264,9 @@ end
 
 shiny.register(update, 1)
 
-setmetatable(_M, { __call = function(_, ifl)
-        iflist = ifl
-        return {graph_up.widget, graph_down.widget, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
+function net.mt:__call(ifl)
+    iflist = ifl
+    return {graph_up.widget, graph_down.widget, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft}
+end
+
+return setmetatable(net, net.mt)

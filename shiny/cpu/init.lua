@@ -19,8 +19,10 @@ local math = {
 local widget, button, mouse, image, ipairs, table
     = widget, button, mouse, image, ipairs, table
 
+-- display cpu usage
+cpu = { mt = {} }
 
-module("shiny.cpu")
+
 local cpuicon = widget({ type = "imagebox", align = "right" })
 cpuicon.image = image(beautiful.cpu)
 local tempicon = widget({ type = "imagebox", align = "right" })
@@ -126,4 +128,8 @@ end
 openbox.text = shiny.fg(beautiful.hilight, " [ ")
 shiny.register(update, 1)
 
-setmetatable(_M, { __call = function() return {graph.widget, infobox_temp, tempicon, infobox_cpu, cpuicon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
+function cpu.mt:__call()
+    return {graph.widget, infobox_temp, tempicon, infobox_cpu, cpuicon, openbox, layout = awful.widget.layout.horizontal.rightleft}
+end
+
+return setmetatable(cpu, cpu.mt)

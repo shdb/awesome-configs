@@ -6,7 +6,9 @@ local io = {
     close = io.close
 }
 local string = string
-module("shiny.keyboard")
+
+-- change keyboard layout
+keyboard = {}
 
 
 local function getkb()
@@ -21,7 +23,7 @@ local function getkb()
     f:close()
 end
 
-function toggle()
+function keyboard.toggle()
     if not layout then
         layout = getkb()
     end
@@ -40,3 +42,5 @@ function toggle()
         timeout = 2
     }
 end
+
+return keyboard

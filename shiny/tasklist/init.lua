@@ -5,14 +5,17 @@ local setmetatable, tonumber, pairs
     = setmetatable, tonumber, pairs
 local widget, os, math, string, screen, mouse, client
     = widget, os, math, string, screen, mouse, client
-module("shiny.tasklist")
+
+-- display count of active tasks
+tasklist = { mt = {} }
+
 
 local mytasklist = {}
 for s = 1, screen.count() do
     mytasklist[s] = widget({ type = "textbox" })
 end
 
-function update(c)
+function tasklist.update(c)
     local ccount, selc, mcount = 0, 0, 0
     local lscreen = c and c.screen or mouse.screen
     for _, ttag in pairs(awful.tag.selectedlist(lscreen)) do
@@ -36,11 +39,15 @@ function update(c)
     end
 end
 
-client.add_signal("focus", function(c) update(c) end)
-client.add_signal("unfocus", function(c) update(c) end)
-client.add_signal("unmanage", function(c) update(c) end)
+client.add_signal("focus", function(c) tasklist.update(c) end)
+client.add_signal("unfocus", function(c) tasklist.update(c) end)
+client.add_signal("unmanage", function(c) tasklist.update(c) end)
 for s = 1, screen.count() do
-    awful.tag.attached_add_signal(s, "property::selected", function() update() end)
+    awful.tag.attached_add_signal(s, "property::selected", function() tasklist.update() end)
 end
 
-setmetatable(_M, { __call = function(_, scr) return {mytasklist[scr]} end })
+function tasklist.mt:__call(scr)
+    return {mytasklist[scr]}
+end
+
+return setmetatable(tasklist, tasklist.mt)

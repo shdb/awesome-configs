@@ -17,7 +17,10 @@ local string = {
 local widget, button, mouse, image
     = widget, button, mouse, image
 
-module("shiny.volume")
+-- set and display volume
+volume = { mt = {} }
+
+
 local icon = widget({ type = "imagebox", align = "right" })
 icon.image = image(beautiful.volume)
 
@@ -71,30 +74,30 @@ local function init()
         icon.image = image(beautiful.muted)
         awful.util.spawn("amixer -q -c " .. cardid .. " sset Master 0%")
     end
-    update()
+    volume.update()
 end
 
-function update()
+function volume.update()
     --bar:set_value(get_vol()/100)
     bar:bar_data_add("vol", get_vol())
 end
 
-function up()
+function volume.up()
     if muted then
         muted = not muted
         icon.image = image(beautiful.volume)
         awful.util.spawn("amixer -q -c " .. cardid .. " sset PCM 100%")
     end
     awful.util.spawn("amixer -q -c " .. cardid .. " sset Master 2%+")
-    update()
+    volume.update()
 end
 
-function down()
+function volume.down()
     awful.util.spawn("amixer -q -c " .. cardid .. " sset Master 2%-")
-    update()
+    volume.update()
 end
 
-function mute()
+function volume.mute()
     local vol_chan = get_vol()
     local vol_pcm
     if muted then
@@ -108,20 +111,23 @@ function mute()
     muted = not muted
     awful.util.spawn("amixer -q -c " .. cardid .. " sset Master " .. lastvol .. "%")
     awful.util.spawn("amixer -q -c " .. cardid .. " sset PCM " .. vol_pcm .. "%")
-    update()
+    volume.update()
     lastvol = vol_chan
 end
 
 
 local button_table = awful.util.table.join(
-        awful.button({ }, 1, function() mute() end)
+        awful.button({ }, 1, function() volume.mute() end)
     )
 
 icon:buttons(button_table)
 bar:buttons(button_table)
 
 init()
-shiny.register(update, 5)
+shiny.register(volume.update, 5)
 
---setmetatable(_M, { __call = function() return {bar.widget, icon, layout = awful.widget.layout.horizontal.rightleft} end })
-setmetatable(_M, { __call = function() return {bar, icon, layout = awful.widget.layout.horizontal.rightleft} end })
+function volume.mt:__call()
+    return {bar, icon, layout = awful.widget.layout.horizontal.rightleft}
+end
+
+return setmetatable(volume, volume.mt)

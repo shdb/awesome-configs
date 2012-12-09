@@ -24,7 +24,10 @@ local table = {
 local capi = { mouse = mouse }
 local widget, button, mouse, image = widget, button, mouse, image
 
-module("shiny.mpd")
+-- display mpd info
+mpd_mod = { mt = {} }
+
+
 local icon = widget({ type = "imagebox", align = "right" })
 local infobox = widget({type = "textbox", name = "batterybox", align = "right" })
 local openbox = widget({ type = "textbox", align = "right" })
@@ -37,7 +40,7 @@ local function onoff(value)
     end
 end
 
-function update()
+function mpd_mod.update()
     local function timeformat(t)
         if tonumber(t) >= 60 * 60 then -- more than one hour !
             return os.date("%X", t)
@@ -91,7 +94,7 @@ function update()
     infobox.text = it
 end
 
-function info(tout)
+function mpd_mod.info(tout)
     shiny.remove_notify(popup)
     if not tout then tout = 0 end
     local string = ""
@@ -136,7 +139,7 @@ local function build_mpd_menu()
     return menu_items
 end
 
-function info_rand()
+function mpd.info_rand()
     local stat = mpd.toggle_random()
     naughty.notify {
         title = "mpd",
@@ -145,7 +148,7 @@ function info_rand()
     }
 end
 
-function info_crossfade()
+function mpd_mod.info_crossfade()
     local stat = mpd.toggle_crossfade()
     naughty.notify {
         title = "mpd",
@@ -158,7 +161,7 @@ local button_table = awful.util.table.join(
     awful.button({ }, 1,
         function()
             mpd.pause()
-            update()
+            mpd_mod.update()
         end),
     awful.button({ }, 3,
         function()
@@ -176,14 +179,18 @@ openbox:buttons(button_table)
 icon:buttons(button_table)
 infobox:buttons(button_table)
 
-openbox:add_signal("mouse::enter", function() info() end)
+openbox:add_signal("mouse::enter", function() mpd_mod.info() end)
 openbox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
-icon:add_signal("mouse::enter", function() info() end)
+icon:add_signal("mouse::enter", function() mpd_mod.info() end)
 icon:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
-infobox:add_signal("mouse::enter", function() info() end)
+infobox:add_signal("mouse::enter", function() mpd_mod.info() end)
 infobox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 
 
-shiny.register(update, 1)
+shiny.register(mpd_mod.update, 1)
 
-setmetatable(_M, { __call = function() return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft} end })
+function mpd_mod.mt:__call()
+    return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft}
+end
+
+return setmetatable(mpd_mod, mpd_mod.mt)

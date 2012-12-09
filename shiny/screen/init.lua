@@ -4,25 +4,26 @@ local shiny = require("shiny")
 
 local setmetatable = setmetatable
 local tonumber = tonumber
-local widget, client, screen, string = widget, client, screen, string
-local capi = { mouse = mouse, screen = screen }
+local widget, client, screen, string, mouse = widget, client, screen, string, mouse
 
-module("shiny.screen")
+-- display active scren
+local screen_mod = { mt = {} }
+
 
 local infobox = {}
 for s = 1, screen.count() do
     infobox[s] = widget({ type = "textbox" })
 end
 
-function update()
+function screen_mod.update()
     if screen.count() == 1 then return end
     for s = 1, screen.count() do
         local ltext = ""
     
         for ls = 1, screen.count() do
-            if capi.mouse.screen == s and capi.mouse.screen == ls then
+            if mouse.screen == s and mouse.screen == ls then
                 ltext = ltext .. shiny.fg(beautiful.fg_urgent, s) .. " "
-            elseif capi.mouse.screen == ls then
+            elseif mouse.screen == ls then
                 ltext = ltext .. shiny.fg(beautiful.hilight, ls) .. " "
             else
                 ltext = ltext .. ls .. " "
@@ -45,5 +46,8 @@ if screen.count() > 1 then
     end)
 end
 
-setmetatable(_M, { __call = function(_, lsc)
-    return {infobox[lsc]} end })
+function screen_mod.mt:__call(lsc)
+    return {infobox[lsc]}
+end
+
+return setmetatable(screen_mod, screen_mod.mt)
