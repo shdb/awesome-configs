@@ -2,6 +2,7 @@ local naughty   = require("naughty")
 local awful     = require("awful")
 local beautiful = require("beautiful")
 local shiny     = require("shiny")
+local wibox     = require("wibox")
 
 local setmetatable = setmetatable
 local tonumber     = tonumber
@@ -17,11 +18,11 @@ local math = {
 local string = {
     find = string.find
 }
-local widget, button, mouse, image = widget, button, mouse, image
+local button, mouse, image = button, mouse, image
 
-local icon = widget({ type = "imagebox" })
-local infobox = widget({ type = "textbox", name = "batterybox" })
-local openbox = widget({ type = "textbox" })
+local icon = wibox.widget.imagebox()
+local infobox = wibox.widget.textbox()
+local openbox = wibox.widget.textbox()
 
 battery = { mt  = {} }
 
@@ -94,27 +95,31 @@ local function update()
         else
             bstat = "A/C"
         end
-        openbox.text = shiny.fg(beautiful.hilight, " [ ")
-        icon.image = image(beautiful.battery)
-        infobox.text = bstat .. shiny.fg(beautiful.hilight, " ]")
+        openbox:set_markup(shiny.fg(beautiful.hilight, " [ "))
+        icon:set_image(beautiful.battery)
+        infobox:set_markup(bstat .. shiny.fg(beautiful.hilight, " ]"))
     else
-        openbox.text = ""
-        icon.image = nil
-        infobox.text = ""
+        openbox:set_text("")
+        icon:set_image(nil)
+        infobox:set_text("")
     end
 end
 
-infobox:add_signal("mouse::enter", function() battery_info() end)
-infobox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
-icon:add_signal("mouse::enter", function() battery_info() end)
-icon:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
-openbox:add_signal("mouse::enter", function() battery_info() end)
-openbox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
+infobox:connect_signal("mouse::enter", function() battery_info() end)
+infobox:connect_signal("mouse::leave", function() shiny.remove_notify(popup) end)
+icon:connect_signal("mouse::enter", function() battery_info() end)
+icon:connect_signal("mouse::leave", function() shiny.remove_notify(popup) end)
+openbox:connect_signal("mouse::enter", function() battery_info() end)
+openbox:connect_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 
 shiny.register(update, 5)
 
 function battery.mt:__call()
-    return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft}
+	local layout = wibox.layout.fixed.horizontal()
+	layout:add(openbox)
+	layout:add(icon)
+	layout:add(infobox)
+    return layout
 end
 
 return setmetatable(battery, battery.mt)

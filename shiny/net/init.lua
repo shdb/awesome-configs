@@ -1,7 +1,8 @@
-local lfs = require("lfs")
-local awful = require("awful")
+local lfs       = require("lfs")
+local awful     = require("awful")
 local beautiful = require("beautiful")
-local shiny = require("shiny")
+local shiny     = require("shiny")
+local wibox     = require("wibox")
 
 local tonumber = tonumber
 local setmetatable = setmetatable
@@ -16,8 +17,8 @@ local string = {
 }
 local math = { floor = math.floor }
 local os = { time = os.time }
-local widget, button, mouse, image, table, tostring, pairs
-    = widget, button, mouse, image, table, tostring, pairs
+local widget, button, mouse, table, tostring, pairs
+    = widget, button, mouse, table, tostring, pairs
 
 local net_if = nil
 local essid = nil
@@ -28,13 +29,13 @@ local iflist = {}
 local net = { mt = {} }
 
 
-local icon = widget({ type = "imagebox", align = "right" })
-local infobox = widget({type = "textbox", name = "netbox", align = "right" })
-local openbox = widget({ type = "textbox", align = "right" })
+local icon    = wibox.widget.imagebox()
+local infobox = wibox.widget.textbox()
+local openbox = wibox.widget.textbox()
 
 local function create_graph()
     local graph = awful.widget.graph()
-    awful.widget.layout.margins[graph.widget] = { top = 1, bottom = 1 }
+    --awful.widget.layout.margins[graph.widget] = { top = 1, bottom = 1 }
     graph:set_height(13)
     graph:set_width(35)
     graph:set_color(beautiful.fg_normal)
@@ -217,11 +218,11 @@ end
 local function update_icon(nif)
     if not iflist[nif] then return false end
     if iflist[nif] == "wlan" then
-        icon.image = image(beautiful.wireless)
+        icon:set_image(beautiful.wireless)
         essid = get_essid(nif)
         text = shiny.bold(essid)
     elseif iflist[nif] == "lan" then
-        icon.image = image(beautiful.network)
+        icon:set_image(beautiful.network)
     end
 end
 
@@ -229,8 +230,8 @@ local function update()
     local nif = get_up()
     local text = ""
     if not nif then
-        openbox.text = ""
-        icon.image = nil
+        openbox:set_text("")
+        icon:set_image(nil)
         net_if = nil
     elseif net_if ~= nif then
         if update_icon(nif) then
@@ -247,7 +248,7 @@ local function update()
             text = shiny.bold(essid)
         end
         local data = get_net_data()
-        openbox.text = shiny.fg(beautiful.hilight, "[ ")
+        openbox:set_markup(shiny.fg(beautiful.hilight, "[ "))
         graph_down:add_value(data[nif .. "_down_kb"])
         graph_up:add_value(data[nif .. "_up_kb"])
         text = text .. " "
@@ -259,14 +260,20 @@ local function update()
         graph_down:add_value(0)
         graph_up:add_value(0)
     end
-    infobox.text = text
+    infobox:set_markup(text)
 end
 
 shiny.register(update, 1)
 
 function net.mt:__call(ifl)
     iflist = ifl
-    return {graph_up.widget, graph_down.widget, infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft}
+	local layout = wibox.layout.fixed.horizontal()
+	layout:add(openbox)
+	layout:add(icon)
+	layout:add(infobox)
+	layout:add(graph_down)
+	layout:add(graph_up)
+    return layout
 end
 
 return setmetatable(net, net.mt)

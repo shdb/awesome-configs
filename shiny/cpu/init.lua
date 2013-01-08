@@ -1,7 +1,8 @@
-local naughty = require("naughty")
-local awful = require("awful")
+local naughty   = require("naughty")
+local awful     = require("awful")
 local beautiful = require("beautiful")
-local shiny = require("shiny")
+local shiny     = require("shiny")
+local wibox     = require("wibox")
 
 local setmetatable = setmetatable
 local io = {
@@ -16,23 +17,23 @@ local string = {
 local math = {
     floor = math.floor
 }
-local widget, button, mouse, image, ipairs, table
-    = widget, button, mouse, image, ipairs, table
+local button, mouse, image, ipairs, table
+    = button, mouse, image, ipairs, table
 
 -- display cpu usage
 cpu = { mt = {} }
 
 
-local cpuicon = widget({ type = "imagebox", align = "right" })
-cpuicon.image = image(beautiful.cpu)
-local tempicon = widget({ type = "imagebox", align = "right" })
-tempicon.image = image(beautiful.temp)
-local infobox_cpu = widget({type = "textbox", name = "batterybox", align = "right" })
-local infobox_temp = widget({type = "textbox", name = "batterybox", align = "right" })
-local openbox = widget({ type = "textbox", align = "right" })
+local cpuicon = wibox.widget.imagebox()
+cpuicon:set_image(beautiful.cpu)
+local tempicon = wibox.widget.imagebox()
+tempicon:set_image(beautiful.temp)
+local infobox_cpu = wibox.widget.textbox()
+local infobox_temp = wibox.widget.textbox()
+local openbox = wibox.widget.textbox()
 local graph = awful.widget.graph()
 
-awful.widget.layout.margins[graph.widget] = { top = 1, bottom = 1 }
+--awful.widget.layout.margins[graph.widget] = { top = 1, bottom = 1 }
 graph:set_height(13)
 graph:set_width(35)
 graph:set_color(beautiful.fg_normal)
@@ -120,16 +121,23 @@ local function get_cpu_usage()
 end
 
 local function update()
-    infobox_temp.text = get_temp()
-    infobox_cpu.text = get_cpu_freq()
+    infobox_temp:set_markup(get_temp())
+    infobox_cpu:set_markup(get_cpu_freq())
     graph:add_value(get_cpu_usage()[1])
 end
 
-openbox.text = shiny.fg(beautiful.hilight, " [ ")
+openbox:set_markup(shiny.fg(beautiful.hilight, " [ "))
 shiny.register(update, 1)
 
 function cpu.mt:__call()
-    return {graph.widget, infobox_temp, tempicon, infobox_cpu, cpuicon, openbox, layout = awful.widget.layout.horizontal.rightleft}
+	local layout = wibox.layout.fixed.horizontal()
+	layout:add(openbox)
+	layout:add(cpuicon)
+	layout:add(infobox_cpu)
+	layout:add(tempicon)
+	layout:add(infobox_temp)
+	layout:add(graph)
+    return layout
 end
 
 return setmetatable(cpu, cpu.mt)

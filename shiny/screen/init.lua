@@ -1,10 +1,11 @@
-local awful = require("awful")
+local awful     = require("awful")
 local beautiful = require("beautiful")
-local shiny = require("shiny")
+local shiny     = require("shiny")
+local wibox     = require("wibox")
 
 local setmetatable = setmetatable
 local tonumber = tonumber
-local widget, client, screen, string, mouse = widget, client, screen, string, mouse
+local client, screen, string, mouse = client, screen, string, mouse
 
 -- display active scren
 local screen_mod = { mt = {} }
@@ -12,7 +13,7 @@ local screen_mod = { mt = {} }
 
 local infobox = {}
 for s = 1, screen.count() do
-    infobox[s] = widget({ type = "textbox" })
+    infobox[s] = wibox.widget.textbox()
 end
 
 function screen_mod.update()
@@ -30,18 +31,20 @@ function screen_mod.update()
             end
         end
 
-        infobox[s].text = shiny.fg(beautiful.hilight, "[ ")
-            .. ltext
-            .. shiny.fg(beautiful.hilight, "]")
+        infobox[s]:set_markup(
+				shiny.fg(beautiful.hilight, "[ ")
+				.. ltext
+				.. shiny.fg(beautiful.hilight, "]")
+			)
     end
 end
 
 if screen.count() > 1 then
     shiny.register(update, 1)
-    client.add_signal("focus", function(c)
+    client.connect_signal("focus", function(c)
         update(c)
     end)
-    client.add_signal("unfocus", function(c)
+    client.connect_signal("unfocus", function(c)
         update(c)
     end)
 end

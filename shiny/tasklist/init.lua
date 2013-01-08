@@ -1,10 +1,11 @@
 local awful = require("awful")
 local shiny = require("shiny")
+local wibox = require("wibox")
 
 local setmetatable, tonumber, pairs
     = setmetatable, tonumber, pairs
-local widget, os, math, string, screen, mouse, client
-    = widget, os, math, string, screen, mouse, client
+local os, math, string, screen, mouse, client
+    = os, math, string, screen, mouse, client
 
 -- display count of active tasks
 tasklist = { mt = {} }
@@ -12,7 +13,7 @@ tasklist = { mt = {} }
 
 local mytasklist = {}
 for s = 1, screen.count() do
-    mytasklist[s] = widget({ type = "textbox" })
+    mytasklist[s] = wibox.widget.textbox()
 end
 
 function tasklist.update(c)
@@ -31,23 +32,27 @@ function tasklist.update(c)
         end
     end
     if mcount > 0 then
-        mytasklist[lscreen].text = shiny.widget_base(
-            shiny.widget_section("", shiny.widget_value(selc, ccount),
-            shiny.widget_section("", mcount)))
+        mytasklist[lscreen]:set_markup(
+			shiny.widget_base(
+				shiny.widget_section("", shiny.widget_value(selc, ccount),
+				shiny.widget_section("", mcount)))
+			)
     else
-        mytasklist[lscreen].text = shiny.widget_base(shiny.widget_section("", shiny.widget_value(selc, ccount)))
+        mytasklist[lscreen]:set_markup(shiny.widget_base(shiny.widget_section("", shiny.widget_value(selc, ccount))))
     end
 end
 
-client.add_signal("focus", function(c) tasklist.update(c) end)
-client.add_signal("unfocus", function(c) tasklist.update(c) end)
-client.add_signal("unmanage", function(c) tasklist.update(c) end)
+client.connect_signal("focus", function(c) tasklist.update(c) end)
+client.connect_signal("unfocus", function(c) tasklist.update(c) end)
+client.connect_signal("unmanage", function(c) tasklist.update(c) end)
 for s = 1, screen.count() do
-    awful.tag.attached_add_signal(s, "property::selected", function() tasklist.update() end)
+    awful.tag.attached_connect_signal(s, "property::selected", function() tasklist.update() end)
 end
 
 function tasklist.mt:__call(scr)
-    return {mytasklist[scr]}
+	local layout = wibox.layout.fixed.horizontal()
+	layout:add(mytasklist[scr])
+    return layout
 end
 
 return setmetatable(tasklist, tasklist.mt)

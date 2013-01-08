@@ -1,6 +1,7 @@
-local awful = require("awful")
+local awful     = require("awful")
 local beautiful = require("beautiful")
-local shiny = require("shiny")
+local shiny     = require("shiny")
+local wibox     = require("wibox")
 
 local tonumber = tonumber
 local setmetatable = setmetatable
@@ -13,34 +14,30 @@ local string = {
     sub  = string.sub
 }
 local math = { floor = math.floor }
-local widget, button, mouse, image, table
-    = widget, button, mouse, image, table
+local button, mouse, image, table
+    = button, mouse, image, table
 
 -- display memory usage
 memory = { mt = {} }
 
 
-local icon = widget({ type = "imagebox", align = "right" })
-icon.image = image(beautiful.mem)
+local icon = wibox.widget.imagebox()
+icon:set_image(beautiful.mem)
 
-local bar =  widget({ type = "progressbar" })
-bar.width = 4
-bar.height = 1.0
-bar.border_padding = 0
-bar.border_width = 0
-bar.ticks_count = 5
-bar.vertical = true
-
-bar:bar_properties_set("mem",
-{
-    bg           = beautiful.bg_normal,
-    fg           = beautiful.fg_normal,
-    fg_center    = beautiful.graph_center,
-    fg_end       = beautiful.graph_end,
-    fg_off       = beautiful.graph_bg,
-    border_color = beautiful.bg_normal,
-    reverse      = false
-})
+local bar = awful.widget.progressbar()
+bar:set_vertical("true")
+bar:set_height(13)
+bar:set_width(5)
+local gradient = "linear:0,0:20,20:0," .. beautiful.graph_end .. ":0.5," 
+.. beautiful.graph_center .. ":1," .. beautiful.fg_normal
+bar:set_color(gradient)
+bar:set_color(beautiful.fg_normal)
+bar:set_background_color(beautiful.graph_bg)
+bar:set_border_color(beautiful.bg_normal)
+bar:set_ticks("true")
+bar:set_ticks_gap(1)
+bar:set_ticks_size(2)
+bar:set_max_value(100)
 
 local function get_mem()
     -- Return MEM usage values
@@ -71,13 +68,16 @@ local function get_mem()
 end
 
 local function update()
-    bar:bar_data_add("mem", get_mem()[1])
+    bar:set_value(get_mem()[1])
 end
 
 shiny.register(update, 2)
 
 function memory.mt:__call()
-    return {bar, icon, layout = awful.widget.layout.horizontal.rightleft}
+	local layout = wibox.layout.fixed.horizontal()
+	layout:add(bar)
+	layout:add(icon)
+    return layout
 end
 
 return setmetatable(memory, memory.mt)

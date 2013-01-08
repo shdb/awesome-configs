@@ -1,9 +1,9 @@
 -- apps like mplayer should always be ontop
 -- mplayer looses the ontop flag when changing from fullscreen to windowed mode.
 
-local awful = require("awful")
+local awful     = require("awful")
 local beautiful = require("beautiful")
-local shiny = require("shiny")
+local shiny     = require("shiny")
 
 local pairs, screen, mouse, client
     = pairs, screen, mouse, client
@@ -30,8 +30,8 @@ local function update(c)
     end
 end
 
-client.add_signal("focus", function(c) update(c) end)
-client.add_signal("unfocus", function(c) update(c) end)
-client.add_signal("unmanage", function(c) update(c) end)
+client.connect_signal("focus", function(c) update(c) end)
+client.connect_signal("unfocus", function(c) update(c) end)
+client.connect_signal("unmanage", function(c) update(c) end)
 
 return topapps

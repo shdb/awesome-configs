@@ -1,8 +1,9 @@
-local awful = require("awful")
+local awful     = require("awful")
 local beautiful = require("beautiful")
-local shiny = require("shiny")
-local naughty = require("naughty")
-local mpd = require("mpd")
+local shiny     = require("shiny")
+local naughty   = require("naughty")
+local mpd       = require("mpd")
+local wibox     = require("wibox")
 
 local tonumber = tonumber
 local setmetatable = setmetatable
@@ -28,9 +29,9 @@ local widget, button, mouse, image = widget, button, mouse, image
 mpd_mod = { mt = {} }
 
 
-local icon = widget({ type = "imagebox", align = "right" })
-local infobox = widget({type = "textbox", name = "batterybox", align = "right" })
-local openbox = widget({ type = "textbox", align = "right" })
+local icon    = wibox.widget.imagebox()
+local infobox = wibox.widget.textbox()
+local openbox = wibox.widget.textbox()
 
 local function onoff(value)
     if value then
@@ -52,23 +53,23 @@ function mpd_mod.update()
     mpd.status()
 
     if not mpd.is_connected() then
-        openbox.text = ""
-        icon.image = nil
-        infobox.text = ""
+        openbox:set_text("")
+        icon:set_image(nil)
+        infobox:set_text("")
         return
     elseif mpd.is_stop() then
-        icon.image = image(beautiful.mpd_stop)
-        openbox.text =  shiny.fg(beautiful.hilight, "[ ") .. shiny.bold("MPD")
-        infobox.text = shiny.fg(beautiful.hilight, " ]")
+        icon:set_image(beautiful.mpd_stop)
+        openbox:set_markup(shiny.fg(beautiful.hilight, "[ ") .. shiny.bold("MPD"))
+        infobox:set_markup(shiny.fg(beautiful.hilight, " ]"))
         return
     end
 
     mpd.currentsong()
 
     if mpd.is_playing() then
-        icon.image = image(beautiful.mpd_play)
+        icon:set_image(beautiful.mpd_play)
     elseif mpd.is_pause() then
-        icon.image = image(beautiful.mpd_pause)
+        icon:set_image(beautiful.mpd_pause)
     end
 
     local ot = shiny.fg(beautiful.hilight, "[ ")
@@ -81,7 +82,7 @@ function mpd_mod.update()
         ot = ot
             .. awful.util.escape(mpd.title())
     end
-    openbox.text = ot
+    openbox:set_markup(ot)
 
     local it = ""
     if mpd.time() ~= 0 then
@@ -91,7 +92,7 @@ function mpd_mod.update()
             .. timeformat(mpd.time())
     end
     it = it .. shiny.fg(beautiful.hilight, " ]")
-    infobox.text = it
+    infobox:set_markup(it)
 end
 
 function mpd_mod.info(tout)
@@ -179,18 +180,22 @@ openbox:buttons(button_table)
 icon:buttons(button_table)
 infobox:buttons(button_table)
 
-openbox:add_signal("mouse::enter", function() mpd_mod.info() end)
-openbox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
-icon:add_signal("mouse::enter", function() mpd_mod.info() end)
-icon:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
-infobox:add_signal("mouse::enter", function() mpd_mod.info() end)
-infobox:add_signal("mouse::leave", function() shiny.remove_notify(popup) end)
+openbox:connect_signal("mouse::enter", function() mpd_mod.info() end)
+openbox:connect_signal("mouse::leave", function() shiny.remove_notify(popup) end)
+icon:connect_signal("mouse::enter", function() mpd_mod.info() end)
+icon:connect_signal("mouse::leave", function() shiny.remove_notify(popup) end)
+infobox:connect_signal("mouse::enter", function() mpd_mod.info() end)
+infobox:connect_signal("mouse::leave", function() shiny.remove_notify(popup) end)
 
 
 shiny.register(mpd_mod.update, 1)
 
 function mpd_mod.mt:__call()
-    return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft}
+	local layout = wibox.layout.fixed.horizontal()
+	layout:add(openbox)
+	layout:add(icon)
+	layout:add(infobox)
+    return layout
 end
 
 return setmetatable(mpd_mod, mpd_mod.mt)

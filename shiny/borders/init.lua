@@ -1,11 +1,11 @@
-local awful = require("awful")
+local awful     = require("awful")
 local beautiful = require("beautiful")
-local shiny = require("shiny")
+local shiny     = require("shiny")
 
 local setmetatable = setmetatable
 local tonumber = tonumber
-local widget, pairs, screen, mouse, client
-    = widget, pairs, screen, mouse, client
+local pairs, screen, mouse, client
+    = pairs, screen, mouse, client
 
 -- manages border colors
 borders = {}
@@ -40,18 +40,18 @@ function borders.update(c)
     end
 end
 
-client.add_signal("focus", function(c)
+client.connect_signal("focus", function(c)
         borders.update(c)
         c.border_color = beautiful.border_focus
     end)
-client.add_signal("unfocus", function(c)
+client.connect_signal("unfocus", function(c)
         borders.update(c)
         c.border_color = beautiful.border_normal
     end)
-client.add_signal("unmanage", function(c) borders.update(c) end)
+client.connect_signal("unmanage", function(c) borders.update(c) end)
 
-client.add_signal("manage", function(c, startup)
-    c:add_signal("property::geometry", function(c)
+client.connect_signal("manage", function(c, startup)
+    c:connect_signal("property::geometry", function(c)
         borders.update(c)
     end)
     borders.update(c)

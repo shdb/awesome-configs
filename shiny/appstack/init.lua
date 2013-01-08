@@ -1,4 +1,4 @@
-local awful = require("awful")
+local awful  = require("awful")
 local socket = require("socket")
 
 local pairs, ipairs, screen, mouse, client, table, setmetatable
@@ -53,8 +53,8 @@ function appstack.clean_appstack(c)
     end
 end
 
-client.add_signal("manage", function(c, startup)
-    c:add_signal("property::minimized", function(c)
+client.connect_signal("manage", function(c, startup)
+    c:connect_signal("property::minimized", function(c)
         appstack.push_appstack(c)
         appstack.clean_appstack(c)
     end)

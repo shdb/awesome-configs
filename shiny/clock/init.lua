@@ -2,16 +2,17 @@ local awful = require("awful")
 local beautiful = require("beautiful")
 local naughty = require("naughty")
 local shiny = require("shiny")
+local wibox      = require("wibox")
 
 local setmetatable = setmetatable
 local tonumber = tonumber
-local widget, os, math, string = widget, os, math, string
+local os, math, string = os, math, string
 local capi = { mouse = mouse }
 
 -- display the current time and date
 clock = { mt = {} }
 
-local infobox = widget({ type = "textbox" })
+local infobox = wibox.widget.textbox()
 
 calendar = nil
 cal_offset = 0
@@ -36,13 +37,15 @@ function clock.add_calendar(inc_offset)
 end
 
 local function update()
-    infobox.text = shiny.fg(beautiful.hilight, "[ ")
-                .. os.date("%d/%m/%Y " .. shiny.bold("%H:%M:%S"))
-                .. shiny.fg(beautiful.hilight, " ]")
+    infobox:set_markup(
+		shiny.fg(beautiful.hilight, "[ ")
+		.. os.date("%d/%m/%Y " .. shiny.bold("%H:%M:%S"))
+		.. shiny.fg(beautiful.hilight, " ]")
+	)
 end
 
-infobox:add_signal("mouse::enter", function() clock.add_calendar(0) end)
-infobox:add_signal("mouse::leave", function() shiny.remove_notify(calendar); cal_offset = 0 end)
+infobox:connect_signal("mouse::enter", function() clock.add_calendar(0) end)
+infobox:connect_signal("mouse::leave", function() shiny.remove_notify(calendar); cal_offset = 0 end)
 
 infobox:buttons(awful.util.table.join(
     awful.button({ }, 1, function() clock.add_calendar(-1) end),
@@ -51,7 +54,9 @@ infobox:buttons(awful.util.table.join(
 shiny.register(update, 1)
 
 function clock.mt:__call()
-    return {infobox, layout = awful.widget.layout.horizontal.rightleft}
+	local layout = wibox.layout.fixed.horizontal()
+	layout:add(infobox)
+    return layout
 end
 
 return setmetatable(clock, clock.mt)

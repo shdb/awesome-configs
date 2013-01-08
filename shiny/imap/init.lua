@@ -1,22 +1,23 @@
 -- inspired by dmj's widget
-local awful = require("awful")
+local awful     = require("awful")
 local beautiful = require("beautiful")
-local shiny = require("shiny")
-local imap = require("imap")
-local login = require("login")
+local shiny     = require("shiny")
+local imap      = require("imap")
+local login     = require("login")
+local wibox     = require("wibox")
 
 local setmetatable = setmetatable
-local widget, image = widget, image
+local image = image
 
 -- display new mails
 imap = { mt = {} }
 
 
-local icon = widget({ type = "imagebox", align = "right" })
-local infobox = widget({type = "textbox", name = "batterybox", align = "right" })
-local openbox = widget({ type = "textbox", align = "right" })
+local icon = wibox.widget.imagebox()
+local infobox = wibox.widget.textbox()
+local openbox = wibox.widget.textbox()
 
-icon.image = image(beautiful.mail)
+icon:set_image(image(beautiful.mail))
 
 o_imap = imap.new(login.imap_host, 143, "none", "Inbox", 5)
 _, o_imap.errmsg = o_imap:connect()
@@ -35,31 +36,35 @@ function imap.update()
         o_imap.errmsg = msg
         if res then
             if res.unread > 0 then
-                infobox.text = shiny.fg("#ff0000", res.unread) .. shiny.fg(beautiful.hilight, " / ") .. res.total
+                infobox:set_markup(shiny.fg("#ff0000", res.unread) .. shiny.fg(beautiful.hilight, " / ") .. res.total)
             else
-                infobox.text = res.unread .. shiny.fg(beautiful.hilight, " / ") .. res.total
+                infobox:set_markup(res.unread .. shiny.fg(beautiful.hilight, " / ") .. res.total)
             end
         else
-            infobox.text = "E/E"
+            infobox:set_text("E/E")
         end
     else
         if o_imap.errmsg then
-            infobox.text = "E/E"
+            infobox:set_text("E/E")
             o_imap:connect()
             o_imap:login(imap_user, imap_pass)
         else
-            infobox.text = "-/-"
+            infobox:set_text("-/-")
         end
     end
-    infobox.text = infobox.text .. shiny.fg(beautiful.hilight, " ] ")
+    infobox:set_text(infobox.text .. shiny.fg(beautiful.hilight, " ] "))
 end
 
-openbox.text = shiny.fg(beautiful.hilight, " [ ")
+openbox:set_markup(shiny.fg(beautiful.hilight, " [ "))
 
 shiny.register(imap.update, 60)
 
 function imap.mt:__call
-    return {infobox, icon, openbox, layout = awful.widget.layout.horizontal.rightleft}
+	local layout = wibox.layout.fixed.horizontal()
+	layout:add(infobox)
+	layout:add(icon)
+	layout:add(openbox)
+    return layout
 end
 
 return setmetatable(imap, imap.mt)

@@ -1,7 +1,7 @@
-local awful = require("awful")
-local naughty = require("naughty")
+local awful     = require("awful")
+local naughty   = require("naughty")
 local beautiful = require("beautiful")
-local shiny = require("shiny")
+local shiny     = require("shiny")
 
 local pairs, screen, mouse, table, setfenv, pcall, tostring, _G, type, loadstring, select
     = pairs, screen, mouse, table, setfenv, pcall, tostring, _G, type, loadstring, select

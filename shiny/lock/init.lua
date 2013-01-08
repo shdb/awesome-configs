@@ -1,4 +1,4 @@
-local awful   = require("awful")
+local awful = require("awful")
 
 -- locks the screen
 lock = {}

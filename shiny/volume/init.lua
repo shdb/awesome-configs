@@ -1,6 +1,7 @@
-local awful = require("awful")
+local awful     = require("awful")
 local beautiful = require("beautiful")
-local shiny = require("shiny")
+local shiny     = require("shiny")
+local wibox     = require("wibox")
 
 local tonumber = tonumber
 local setmetatable = setmetatable
@@ -14,44 +15,45 @@ local string = {
     format = string.format,
     match  = string.match
 }
-local widget, button, mouse, image
-    = widget, button, mouse, image
+local button, mouse
+    = button, mouse
 
 -- set and display volume
 volume = { mt = {} }
 
 
-local icon = widget({ type = "imagebox", align = "right" })
-icon.image = image(beautiful.volume)
+local icon = wibox.widget.imagebox()
+icon:set_image(beautiful.volume)
 
-local bar =  widget({ type = "progressbar" })
-bar.width = 4
-bar.height = 1.0
-bar.border_padding = 0
-bar.border_width = 0
-bar.ticks_count = 5
-bar.vertical = true
-
-bar:bar_properties_set("vol",
-{
-    bg           = beautiful.bg_normal,
-    fg           = beautiful.fg_normal,
-    fg_off       = beautiful.graph_bg,
-    border_color = beautiful.bg_normal,
-    reverse      = false
-})
---[[
-the new progressbar does not have ticks yet
+local bar
+--local bar =  widget({ type = "progressbar" })
+--bar.width = 4
+--bar.height = 1.0
+--bar.border_padding = 0
+--bar.border_width = 0
+--bar.ticks_count = 5
+--bar.vertical = true
+--
+--bar:bar_properties_set("vol",
+--{
+--    bg           = beautiful.bg_normal,
+--    fg           = beautiful.fg_normal,
+--    fg_off       = beautiful.graph_bg,
+--    border_color = beautiful.bg_normal,
+--    reverse      = false
+--})
 
 local bar = awful.widget.progressbar()
-awful.widget.layout.margins[bar.widget] = { top = 0, bottom = 0 }
 bar:set_vertical("true")
-bar:set_height(15)
-bar:set_width(4)
+bar:set_height(13)
+bar:set_width(5)
 bar:set_color(beautiful.fg_normal)
 bar:set_background_color(beautiful.graph_bg)
 bar:set_border_color(beautiful.bg_normal)
-]]--
+bar:set_ticks("true")
+bar:set_ticks_gap(1)
+bar:set_ticks_size(2)
+bar:set_max_value(100)
 
 cardid  = 0
 lastvol = 0
@@ -71,21 +73,21 @@ end
 local function init()
     if tonumber(get_vol("PCM")) ~= 100 then
         muted = true
-        icon.image = image(beautiful.muted)
+        icon:set_image(beautiful.muted)
         awful.util.spawn("amixer -q -c " .. cardid .. " sset Master 0%")
     end
     volume.update()
 end
 
 function volume.update()
-    --bar:set_value(get_vol()/100)
-    bar:bar_data_add("vol", get_vol())
+    bar:set_value(get_vol())
+    --bar:bar_data_add("vol", get_vol())
 end
 
 function volume.up()
     if muted then
         muted = not muted
-        icon.image = image(beautiful.volume)
+        icon:set_image(beautiful.volume)
         awful.util.spawn("amixer -q -c " .. cardid .. " sset PCM 100%")
     end
     awful.util.spawn("amixer -q -c " .. cardid .. " sset Master 2%+")
@@ -102,11 +104,11 @@ function volume.mute()
     local vol_pcm
     if muted then
         vol_pcm = 100
-        icon.image = image(beautiful.volume)
+        icon:set_image(beautiful.volume)
     else
         vol_pcm = 0
         lastvol = 0
-        icon.image = image(beautiful.muted)
+        icon:set_image(beautiful.muted)
     end
     muted = not muted
     awful.util.spawn("amixer -q -c " .. cardid .. " sset Master " .. lastvol .. "%")
@@ -121,13 +123,16 @@ local button_table = awful.util.table.join(
     )
 
 icon:buttons(button_table)
-bar:buttons(button_table)
+--bar:buttons(button_table)
 
 init()
 shiny.register(volume.update, 5)
 
 function volume.mt:__call()
-    return {bar, icon, layout = awful.widget.layout.horizontal.rightleft}
+	local layout = wibox.layout.fixed.horizontal()
+	layout:add(bar)
+	layout:add(icon)
+    return layout
 end
 
 return setmetatable(volume, volume.mt)
