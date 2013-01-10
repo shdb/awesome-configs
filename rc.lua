@@ -329,8 +329,7 @@ for s = 1, screen.count() do
     if s == 1 then right_layout:add(gapbox) end
     right_layout:add(shiny.clock())
     right_layout:add(gapbox)
-    right_layout:add(shiny.binclock(14, 28, true))
-    right_layout:add(gapbox)
+    right_layout:add(shiny.binclock(14, 28))
 
     local layout = wibox.layout.align.horizontal()
     layout:set_left(left_layout)
