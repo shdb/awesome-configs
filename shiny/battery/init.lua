@@ -64,7 +64,7 @@ local function update()
         fcap = io.open("/sys/class/power_supply/"..adapter.."/charge_full")
         fsta = io.open("/sys/class/power_supply/"..adapter.."/status")
     end
-    if fcur then
+    if fcur and fcap and fsta then
         local cur = fcur:read()
         local cap = fcap:read()
         local sta = fsta:read()
