@@ -4,7 +4,8 @@ local capi  = { timer = timer }
 local io = { open  = io.open,
              close = io.close }
 local string = { sub  = string.sub,
-                 find = string.find }
+                 find = string.find,
+				 len  = string.len }
 local table = { insert = table.insert }
 local math = { floor = math.floor }
 module("shiny")
@@ -111,4 +112,12 @@ function round_num(num, idp, dot)
         num = math.floor(num + 0.5)
     end
     return num
+end
+
+function trim(string, length)
+	if string and string.len(string) >= length then
+		string = string.sub(string, 1, length - 3)
+		string = string .. "..."
+	end
+	return string
 end
