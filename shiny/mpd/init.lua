@@ -82,7 +82,7 @@ function mpd_mod.update()
         ot = ot
             .. awful.util.escape(mpd.title())
     end
-    openbox:set_markup(ot)
+    openbox:set_markup(shiny.trim(ot, 92))
 
     local it = ""
     if mpd.time() ~= 0 then
