@@ -50,9 +50,7 @@ for s = 1, screen.count() do
 end
 
 function tasklist.mt:__call(scr)
-	local layout = wibox.layout.fixed.horizontal()
-	layout:add(mytasklist[scr])
-    return layout
+	return { mytasklist[scr] }
 end
 
 return setmetatable(tasklist, tasklist.mt)

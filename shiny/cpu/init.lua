@@ -130,14 +130,7 @@ openbox:set_markup(shiny.fg(beautiful.hilight, " [ "))
 shiny.register(update, 1)
 
 function cpu.mt:__call()
-	local layout = wibox.layout.fixed.horizontal()
-	layout:add(openbox)
-	layout:add(cpuicon)
-	layout:add(infobox_cpu)
-	layout:add(tempicon)
-	layout:add(infobox_temp)
-	layout:add(graph)
-    return layout
+	return { openbox, cpuicon, infobox_cpu, tempicon, infobox_temp, graph }
 end
 
 return setmetatable(cpu, cpu.mt)

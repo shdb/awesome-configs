@@ -191,11 +191,7 @@ infobox:connect_signal("mouse::leave", function() shiny.remove_notify(popup) end
 shiny.register(mpd_mod.update, 1)
 
 function mpd_mod.mt:__call()
-	local layout = wibox.layout.fixed.horizontal()
-	layout:add(openbox)
-	layout:add(icon)
-	layout:add(infobox)
-    return layout
+	return { openbox, icon, infobox }
 end
 
 return setmetatable(mpd_mod, mpd_mod.mt)

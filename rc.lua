@@ -279,6 +279,13 @@ mytaglist.buttons = awful.util.table.join(
     awful.button({ }, 5, awful.tag.viewprev)
 )
 
+local function add_to_layout(layout, list)
+    for _,i in pairs(list) do
+        layout:add(i)
+    end
+    return layout
+end
+
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
     mypromptbox[s] = awful.widget.prompt({ prompt = shiny.fg(beautiful.hilight, "Run: ") })
@@ -304,38 +311,53 @@ for s = 1, screen.count() do
         mywibox[s] = awful.wibox({ position = "top", screen = s})
     end
 
-    local left_layout = wibox.layout.fixed.horizontal()
+    local left_layout, right_layout, layout
+    left_layout  = wibox.layout.fixed.horizontal()
+    right_layout = wibox.layout.fixed.horizontal()
+    layout       = wibox.layout.align.horizontal()
+
     left_layout:add(mylayoutbox[s])
     left_layout:add(gapbox)
     left_layout:add(mytaglist[s])
-    left_layout:add(shiny.tasklist(s))
+    add_to_layout(left_layout, shiny.tasklist(s))
     left_layout:add(gapbox)
-    if screen.count() > 1 then left_layout:add(shiny.screen(s)) end
+    if screen.count() > 1 then add_to_layout(left_layout, shiny.screen(s)) end
     if screen.count() > 1 then left_layout:add(gapbox) end
     left_layout:add(mypromptbox[s])
 
-    local right_layout = wibox.layout.fixed.horizontal()
-    right_layout:add(shiny.mpd())
-    right_layout:add(shiny.battery())
+    add_to_layout(right_layout, shiny.mpd())
+    add_to_layout(right_layout, shiny.battery())
     right_layout:add(gapbox)
-    right_layout:add(shiny.net({["eth0"] = "lan", ["wlan0"] = "wlan"}))
-    right_layout:add(shiny.cpu())
+    add_to_layout(right_layout, shiny.net({["eth0"] = "lan", ["wlan0"] = "wlan"}))
+    add_to_layout(right_layout, shiny.cpu())
     right_layout:add(gapbox)
-    right_layout:add(shiny.memory())
+    add_to_layout(right_layout, shiny.memory())
     right_layout:add(gapbox)
-    right_layout:add(shiny.volume())
+    add_to_layout(right_layout, shiny.volume())
     right_layout:add(gapbox)
     if s == 1 then right_layout:add(mysystray) end
     if s == 1 then right_layout:add(gapbox) end
-    right_layout:add(shiny.clock())
+    add_to_layout(right_layout, shiny.clock())
     right_layout:add(gapbox)
-    right_layout:add(shiny.binclock(14, 28))
+    add_to_layout(right_layout, shiny.binclock(14, 28))
 
-    local layout = wibox.layout.align.horizontal()
     layout:set_left(left_layout)
     layout:set_right(right_layout)
 
-    mywibox[s]:set_widget(layout)
+    if s == 1 or s == 2 then
+        local rotate = wibox.layout.rotate()
+
+        if s == 2 then
+            rotate:set_direction("west")
+        elseif s == 3 then
+            rotate:set_direction("east")
+        end
+
+        rotate:set_widget(layout)
+        mywibox[s]:set_widget(rotate)
+    else
+        mywibox[s]:set_widget(layout)
+    end
 end
 -- }}}
 

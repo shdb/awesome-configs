@@ -129,10 +129,7 @@ init()
 shiny.register(volume.update, 5)
 
 function volume.mt:__call()
-	local layout = wibox.layout.fixed.horizontal()
-	layout:add(bar)
-	layout:add(icon)
-    return layout
+	return { bar, icon }
 end
 
 return setmetatable(volume, volume.mt)

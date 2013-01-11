@@ -113,9 +113,7 @@ function binclock.mt:__call(lheight, lwidth, lshow_sec)
     width = lwidth or 28
     show_sec = lshow_sec or false
 
-	local layout = wibox.layout.fixed.horizontal()
-	layout:add(bcwidget)
-    return layout
+	return { bcwidget }
 end
 
 return setmetatable(bcwidget, binclock.mt)

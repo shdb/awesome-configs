@@ -54,9 +54,7 @@ infobox:buttons(awful.util.table.join(
 shiny.register(update, 1)
 
 function clock.mt:__call()
-	local layout = wibox.layout.fixed.horizontal()
-	layout:add(infobox)
-    return layout
+	return { infobox }
 end
 
 return setmetatable(clock, clock.mt)

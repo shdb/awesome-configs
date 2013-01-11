@@ -74,10 +74,7 @@ end
 shiny.register(update, 2)
 
 function memory.mt:__call()
-	local layout = wibox.layout.fixed.horizontal()
-	layout:add(bar)
-	layout:add(icon)
-    return layout
+	return { bar, icon }
 end
 
 return setmetatable(memory, memory.mt)

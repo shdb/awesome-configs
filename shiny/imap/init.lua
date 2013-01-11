@@ -60,11 +60,7 @@ openbox:set_markup(shiny.fg(beautiful.hilight, " [ "))
 shiny.register(imap.update, 60)
 
 function imap.mt:__call
-	local layout = wibox.layout.fixed.horizontal()
-	layout:add(infobox)
-	layout:add(icon)
-	layout:add(openbox)
-    return layout
+	return { infobox, icon, openbox }
 end
 
 return setmetatable(imap, imap.mt)

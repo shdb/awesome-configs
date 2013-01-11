@@ -267,13 +267,8 @@ shiny.register(update, 1)
 
 function net.mt:__call(ifl)
     iflist = ifl
-	local layout = wibox.layout.fixed.horizontal()
-	layout:add(openbox)
-	layout:add(icon)
-	layout:add(infobox)
-	layout:add(graph_down)
-	layout:add(graph_up)
-    return layout
+	return { openbox, icon, infobox, graph_down, graph_up }
+
 end
 
 return setmetatable(net, net.mt)

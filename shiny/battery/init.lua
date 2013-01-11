@@ -115,11 +115,7 @@ openbox:connect_signal("mouse::leave", function() shiny.remove_notify(popup) end
 shiny.register(update, 5)
 
 function battery.mt:__call()
-	local layout = wibox.layout.fixed.horizontal()
-	layout:add(openbox)
-	layout:add(icon)
-	layout:add(infobox)
-    return layout
+	return { openbox, icon, infobox }
 end
 
 return setmetatable(battery, battery.mt)
