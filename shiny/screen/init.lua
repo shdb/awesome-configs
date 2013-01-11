@@ -40,17 +40,17 @@ function screen_mod.update()
 end
 
 if screen.count() > 1 then
-    shiny.register(update, 1)
+    shiny.register(screen_mod.update, 1)
     client.connect_signal("focus", function(c)
-        update(c)
+        screen_mod.update(c)
     end)
     client.connect_signal("unfocus", function(c)
-        update(c)
+        screen_mod.update(c)
     end)
 end
 
 function screen_mod.mt:__call(lsc)
-    return {infobox[lsc]}
+	return { infobox[lsc] }
 end
 
 return setmetatable(screen_mod, screen_mod.mt)
