@@ -447,14 +447,6 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, ctrl      }, "r",     awesome.restart                                    ),
     awful.key({ modkey, shift     }, "q",     awesome.quit                                       ),
 
-    awful.key({ modkey, alt       }, "l",     function() awful.tag.incmwfact( 0.01)           end),
-    awful.key({ modkey, alt       }, "h",     function() awful.tag.incmwfact(-0.01)           end),
-    awful.key({ modkey, ctrl      }, "j",     function() awful.client.incwfact(0.01)          end),
-    awful.key({ modkey, ctrl      }, "k",     function() awful.client.incwfact(-0.01)         end),
-    awful.key({ modkey, shift     }, "h",     function() awful.tag.incnmaster( 1)             end),
-    awful.key({ modkey, shift     }, "l",     function() awful.tag.incnmaster(-1)             end),
-    awful.key({ modkey, ctrl      }, "h",     function() awful.tag.incncol( 1)                end),
-    awful.key({ modkey, ctrl      }, "l",     function() awful.tag.incncol(-1)                end),
     awful.key({ modkey,           }, ".",     function() awful.layout.inc(layouts,  1)        end),
     awful.key({ modkey,           }, ",",     function() awful.layout.inc(layouts, -1)        end),
 
@@ -562,77 +554,52 @@ clientkeys = awful.util.table.join(
                 }
             end
         end),
-    awful.key({ modkey, alt       }, "u",
-        function(c)
-            if awful.client.floating.get(c) then
-                awful.client.moveresize(0, 0, 0, 2)
-            end
-        end),
-    awful.key({ modkey, alt       }, "i",
-        function(c)
-            if awful.client.floating.get(c) then
-                awful.client.moveresize(0, -2, 0, 2)
-            end
-        end),
-    awful.key({ modkey, alt       }, "o",
-        function(c)
-            if awful.client.floating.get(c) then
-                awful.client.moveresize(0, 0, 2, 0)
-            end
-        end),
-    awful.key({ modkey, alt       }, "y",
-        function(c)
-            if awful.client.floating.get(c) then
-                awful.client.moveresize(-2, 0, 2, 0)
-            end
-        end),
-    awful.key({ modkey, alt, shift}, "u",
-        function(c)
-            if awful.client.floating.get(c) then
-                awful.client.moveresize(0, 0, 0, -2)
-            end
-        end),
-    awful.key({ modkey, alt, shift}, "i",
-        function(c)
-            if awful.client.floating.get(c) then
-                awful.client.moveresize(0, 2, 0, -2)
-            end
-        end),
-    awful.key({ modkey, alt, shift}, "o",
-        function(c)
-            if awful.client.floating.get(c) then
-                awful.client.moveresize(0, 0, -2, 0)
-            end
-        end),
-    awful.key({ modkey, alt, shift}, "y",
-        function(c)
-            if awful.client.floating.get(c) then
-                awful.client.moveresize(2, 0, -2, 0)
-            end
-        end),
-    awful.key({ modkey, alt, ctrl }, "u",
-        function(c)
-            if awful.client.floating.get(c) then
-                awful.client.moveresize(0, 2, 0, 0)
-            end
-        end),
-    awful.key({ modkey, alt, ctrl }, "i",
-        function(c)
-            if awful.client.floating.get(c) then
-                awful.client.moveresize(0, -2, 0, 0)
-            end
-        end),
-    awful.key({ modkey, alt, ctrl }, "o",
-        function(c)
-            if awful.client.floating.get(c) then
-                awful.client.moveresize(2, 0, 0, 0)
-            end
-        end),
-    awful.key({ modkey, alt, ctrl }, "y",
-        function(c)
-            if awful.client.floating.get(c) then
-                awful.client.moveresize(-2, 0, 0, 0)
-            end
+
+    -- move or resize client
+    awful.key({ modkey            }, "b",
+        function (c)
+            keygrabber.run(
+            function(modifiers, key, event)
+                if event ~= "press" then return end
+
+                local mod = {}
+                for k, v in ipairs(modifiers) do mod[v] = true end
+
+                if awful.client.floating.get(c) then
+                    if     key == 'k' and mod.Control then awful.client.moveresize( 0, -4,  0,  0, c)
+                    elseif key == 'k'                 then awful.client.moveresize( 0, -4,  0,  4, c)
+                    elseif key == 'K'                 then awful.client.moveresize( 0,  4,  0, -4, c)
+                    elseif key == 'j' and mod.Control then awful.client.moveresize( 0,  4,  0,  0, c)
+                    elseif key == 'j'                 then awful.client.moveresize( 0,  0,  0,  4, c)
+                    elseif key == 'J'                 then awful.client.moveresize( 0,  0,  0, -4, c)
+                    elseif key == 'l' and mod.Control then awful.client.moveresize( 4,  0,  0,  0, c)
+                    elseif key == 'l'                 then awful.client.moveresize( 0,  0,  4,  0, c)
+                    elseif key == 'L'                 then awful.client.moveresize( 0,  0, -4,  0, c)
+                    elseif key == 'h' and mod.Control then awful.client.moveresize(-4,  0,  0,  0, c)
+                    elseif key == 'h'                 then awful.client.moveresize(-4,  0,  4,  0, c)
+                    elseif key == 'H'                 then awful.client.moveresize( 4,  0, -4,  0, c)
+                    end
+                else
+                    if     key == 'l' and mod.Control then awful.tag.incnmaster(-1)
+                    elseif key == 'l' and mod.Mod1    then awful.tag.incncol(-1)
+                    elseif key == 'l'                 then awful.tag.incmwfact( 0.01)
+                    elseif key == 'h' and mod.Control then awful.tag.incnmaster( 1)
+                    elseif key == 'h' and mod.Mod1    then awful.tag.incncol( 1)
+                    elseif key == 'h'                 then awful.tag.incmwfact(-0.01)
+                    elseif key == 'j'                 then awful.client.incwfact( 0.01)
+                    elseif key == 'k'                 then awful.client.incwfact(-0.01)
+                    end
+                end
+                if not (key == 'Shift_L'
+                     or key == 'Shift'
+                     or key == 'Control_L'
+                     or key == 'Alt_L'
+                     or key == 'h' or key == 'j' or key == 'k' or key == 'l'
+                     or key == 'H' or key == 'J' or key == 'K' or key == 'L') then
+                        keygrabber.stop()
+                end
+
+            end)
         end)
 )
 
