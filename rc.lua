@@ -489,7 +489,7 @@ globalkeys = awful.util.table.join(
             local ison = false
             local scr = mouse.screen or 1
 
-            for _, t in pairs(screen[scr]:tags()) do
+            for _, t in pairs(awful.tag.gettags(scr)) do
                 ison = false
 
                 for _, m in pairs(c:tags()) do
