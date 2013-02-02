@@ -140,7 +140,7 @@ local function build_mpd_menu()
     return menu_items
 end
 
-function mpd.info_rand()
+function mpd_mod.info_rand()
     local stat = mpd.toggle_random()
     naughty.notify {
         title = "mpd",
