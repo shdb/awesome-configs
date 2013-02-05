@@ -79,7 +79,8 @@ function mpd_mod.update()
     if mpd.title() ~= "" then
         playinfo = playinfo .. mpd.title()
     end
-    playinfo = shiny.trim(playinfo, 55)
+	local trimlength = screen[1].workarea.width / 5 / 5
+    playinfo = shiny.trim(playinfo, trimlength)
     playinfo = shiny.fg(beautiful.hilight, "[ ") .. awful.util.escape(playinfo)
     openbox:set_markup(playinfo)
 
