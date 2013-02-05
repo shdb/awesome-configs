@@ -72,17 +72,16 @@ function mpd_mod.update()
         icon:set_image(beautiful.mpd_pause)
     end
 
-    local ot = shiny.fg(beautiful.hilight, "[ ")
+    local playinfo = ""
     if mpd.artist() ~= "" then
-        ot = ot
-            .. awful.util.escape(mpd.artist())
-            .. " - "
+        playinfo = mpd.artist() .. " - "
     end
     if mpd.title() ~= "" then
-        ot = ot
-            .. awful.util.escape(mpd.title())
+        playinfo = playinfo .. mpd.title()
     end
-    openbox:set_markup(shiny.trim(ot, 92))
+    playinfo = shiny.trim(playinfo, 55)
+    playinfo = shiny.fg(beautiful.hilight, "[ ") .. awful.util.escape(playinfo)
+    openbox:set_markup(playinfo)
 
     local it = ""
     if mpd.time() ~= 0 then
