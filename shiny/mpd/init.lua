@@ -102,7 +102,7 @@ function mpd_mod.info(tout)
     if not mpd.is_stop() then
         string = string
             .. shiny.bold("Artist:\t") .. awful.util.escape(mpd.artist()) .. "\n"
-            .. shiny.bold("Title:\t\t") .. awful.util.escape(mpd.title()) .. "\n"
+            .. shiny.bold("Title:\t") .. awful.util.escape(mpd.title()) .. "\n"
             .. shiny.bold("Album:\t") .. awful.util.escape(mpd.album()) .. "\n"
             .. shiny.bold("Year:\t") .. mpd.year() .. "\t"
             .. shiny.bold("Genre: ") .. awful.util.escape(mpd.genre()) .. "\n"
