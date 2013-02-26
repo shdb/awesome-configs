@@ -67,7 +67,7 @@ local function update()
     if fcur and fcap and fsta then
         local cur = fcur:read() or 1
         local cap = fcap:read() or 1
-        local sta = fsta:read() or 1
+        local sta = fsta:read() or ""
         fcur:close()
         fcap:close()
         fsta:close()
