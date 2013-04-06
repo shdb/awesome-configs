@@ -490,6 +490,10 @@ function is_connected()
     return connected
 end
 
+function reset_connected()
+    connected = nil
+end
+
 -- Send command to MPD host
 -- Based on KAworu MPD Widget
 -- @param command Command for MPD
