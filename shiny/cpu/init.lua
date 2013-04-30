@@ -41,12 +41,39 @@ graph:set_background_color(beautiful.graph_bg)
 graph:set_border_color(beautiful.bg_normal)
 graph:set_max_value(100)
 
+local function get_cpu_mhz()
+    -- Get /proc/stat
+    local f = io.open("/proc/cpuinfo")
+    if not f then return 0 end
+    local cpus, mhz = 0, 0
+
+    for line in f:lines() do
+        if string.find(line, "^cpu MHz") then
+            cpus = cpus + 1
+
+            for i in string.gmatch(line, ": ([%d]+)") do
+                mhz = mhz + i
+            end
+        end
+    end
+
+    f:close()
+    mhz = mhz / cpus
+    return mhz
+end
+
 local function get_cpu_freq()
+    local hz
     local fhz = io.open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
-    if not fhz then return 0 end
-    local hz = fhz:read();
-    fhz:close()
-    return shiny.round_num(hz/10^6, 1) .. " GHz" .. shiny.fg(beautiful.hilight, " | ")
+    if fhz then
+        hz = fhz:read();
+        fhz:close()
+        hz = shiny.round_num(hz/10^6, 1)
+    else
+        hz = get_cpu_mhz()
+        hz = shiny.round_num(hz/10^3, 1)
+    end
+    return hz .. " GHz" .. shiny.fg(beautiful.hilight, " | ")
 end
 
 local function get_temp()
@@ -128,7 +155,7 @@ local function update()
 end
 
 openbox:set_markup(shiny.fg(beautiful.hilight, " [ "))
-shiny.register(update, 1)
+shiny.register(update, 2)
 
 function cpu.mt:__call()
     return { openbox, cpuicon, infobox_cpu, tempicon, infobox_temp, graph }
