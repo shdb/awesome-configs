@@ -43,6 +43,7 @@ graph:set_max_value(100)
 
 local function get_cpu_freq()
     local fhz = io.open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
+    if not fhz then return 0 end
     local hz = fhz:read();
     fhz:close()
     return shiny.round_num(hz/10^6, 1) .. " GHz" .. shiny.fg(beautiful.hilight, " | ")
@@ -130,7 +131,7 @@ openbox:set_markup(shiny.fg(beautiful.hilight, " [ "))
 shiny.register(update, 1)
 
 function cpu.mt:__call()
-	return { openbox, cpuicon, infobox_cpu, tempicon, infobox_temp, graph }
+    return { openbox, cpuicon, infobox_cpu, tempicon, infobox_temp, graph }
 end
 
 return setmetatable(cpu, cpu.mt)
