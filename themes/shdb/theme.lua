@@ -6,7 +6,7 @@ local path = "~/.config/awesome/themes/shdb/"
 
 theme = {}
 
-theme.font          = "snap"
+theme.font          = "snap 8"
 
 theme.bg_normal     = "#171717"
 theme.bg_focus      = "#171717"
