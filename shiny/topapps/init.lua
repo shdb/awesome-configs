@@ -16,6 +16,7 @@ topapps = {
         ["Gkrellm"]  = true,
         ["MPlayer"]  = true,
         ["mplayer2"] = true,
+        ["mpv"]      = true,
     }
 
 local function update(c)

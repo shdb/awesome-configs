@@ -61,7 +61,7 @@ end
 
 terminal = "urxvt"
 browser = "firefox"
-mail = "sylpheed"
+mail = "claws-mail"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -155,7 +155,7 @@ shifty.config.apps = {
         match = {
             "Shredder.*",
             "Thunderbird",
-            "Sylpheed",
+            "claws-mail",
             "mutt",
         },
         tag = "mail",
@@ -184,6 +184,7 @@ shifty.config.apps = {
         match = {
             "Mplayer.*",
             "mplayer2",
+            "mpv",
             "Mirage",
             "gimp",
             "gtkpod",
@@ -197,6 +198,7 @@ shifty.config.apps = {
         match = {
             "MPlayer",
             "mplayer2",
+            "mpv",
             "Gnuplot",
             "galculator",
         },
