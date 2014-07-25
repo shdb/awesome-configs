@@ -330,7 +330,7 @@ for s = 1, screen.count() do
     add_to_layout(right_layout, shiny.mpd())
     add_to_layout(right_layout, shiny.battery())
     right_layout:add(gapbox)
-    add_to_layout(right_layout, shiny.net({["eth0"] = "lan", ["wlan0"] = "wlan"}))
+    add_to_layout(right_layout, shiny.net({["enp0s25"] = "lan", ["wlp3s0"] = "wlan"}))
     add_to_layout(right_layout, shiny.cpu())
     right_layout:add(gapbox)
     add_to_layout(right_layout, shiny.memory())
