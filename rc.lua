@@ -61,7 +61,7 @@ end
 
 terminal = "urxvt"
 browser = "firefox"
-mail = "claws-mail"
+mail = "thunderbird"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 
