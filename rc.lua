@@ -310,7 +310,7 @@ for s = 1, screen.count() do
     elseif s == 3 then
         mywibox[s] = awful.wibox({ position = "left", screen = s})
     else
-        mywibox[s] = awful.wibox({ position = "top", screen = s, height = "16"})
+        mywibox[s] = awful.wibox({ position = "top", screen = s, height = "15"})
     end
 
     local left_layout, right_layout, layout
