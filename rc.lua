@@ -153,6 +153,13 @@ shifty.config.apps = {
     },
     {
         match = {
+            "Plugin[-]container",
+        },
+        tag = "www",
+        float = true,
+    },
+    {
+        match = {
             "Shredder.*",
             "Thunderbird",
             "claws-mail",

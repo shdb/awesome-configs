@@ -21,7 +21,8 @@ function borders.update(c)
     for _, current in pairs(visibleclients) do
         if (awful.client.floating.get(current)
             and not current.maximized_horizontal
-            and not current.fullscreen)
+            and not current.fullscreen
+            and not current.instance == "plugin-container")
             or layout == "floating" then
 
             current.border_width = beautiful.border_width
