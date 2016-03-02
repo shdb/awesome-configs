@@ -116,7 +116,7 @@ end
 
 shifty.config.tags = awful.util.table.join(shifty_tags, {
     www = {
-        layout      = awful.layout.suit.tile.bottom,
+        layout      = awful.layout.suit.max,
         exclusive   = true,
         -- max_clients = 1,
         position    = screen.count() + 1,
