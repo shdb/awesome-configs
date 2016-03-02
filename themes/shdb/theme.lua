@@ -45,6 +45,7 @@ theme.network = path .. "icons/network.png"
 theme.mpd_play = path .. "icons/mpd_play.png"
 theme.mpd_pause = path .. "icons/mpd_pause.png"
 theme.mpd_stop = path .. "icons/mpd_stop.png"
+theme.openvpn = path .. "icons/openvpn.png"
 
 theme.layout_fairh = path .. "layouts/fairh.png"
 theme.layout_fairv = path .. "layouts/fairv.png"
