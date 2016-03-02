@@ -12,7 +12,7 @@ local math = math
 local table = table
 local pairs = pairs
 local button = button
-local awful = awful
+local awful = require("awful")
 local capi =
 {
     tag = tag,
