@@ -23,7 +23,7 @@ function clock.add_calendar(inc_offset)
     local datespec = os.date("*t")
     datespec = datespec.year * 12 + datespec.month - 1 + cal_offset
     datespec = (datespec % 12 + 1) .. " " .. math.floor(datespec / 12)
-    local cal = awful.util.pread("cal -m " .. datespec)
+    local cal = awful.util.pread("cal -mw " .. datespec)
     if cal_offset == 0 then -- this month, hilight day and month
         cal = string.gsub(cal, "%s" .. tonumber(os.date("%d")) .. "%s", shiny.bold(shiny.fg(beautiful.hilight, "%1")))
         cal = string.gsub(cal, "^(%s*%w+%s+%d+)", shiny.bold(shiny.fg(beautiful.hilight, "%1")))
