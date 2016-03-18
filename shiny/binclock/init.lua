@@ -97,9 +97,9 @@ bcwidget.draw_point = function(bcwidget, cr, bigColumn, column, row, active)
 	if active == "bg" then
 		cr:set_source_rgba(hex2rgba(beautiful.bg_normal))
 	elseif active then
-		cr:set_source_rgba(hex2rgba(beautiful.hilight))
-	else
 		cr:set_source_rgba(hex2rgba(beautiful.fg_normal))
+	else
+		cr:set_source_rgba(hex2rgba(beautiful.hilight))
 	end
 	cr:fill()
 end
